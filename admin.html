@@ -28,27 +28,14 @@
                 <div class="h-6 w-px bg-slate-300"></div>
                 <span class="text-xs font-bold tracking-wider text-slate-500 uppercase">Panel Administrativo</span>
             </div>
-            <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-mono border border-slate-200">Acceso Restringido</span>
+            <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-mono border border-slate-200">Acceso Directo</span>
         </div>
     </header>
 
     <main class="max-w-5xl mx-auto my-10 px-4">
         
-        <!-- PANTALLA DE ACCESO POR PIN -->
-        <div id="login-box" class="card-box p-8 max-w-md mx-auto text-center space-y-6">
-            <div class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto text-xl">🔒</div>
-            <div>
-                <h2 class="text-2xl font-bold text-slate-900">Acceso Requerido</h2>
-                <p class="text-sm text-slate-500 mt-1">Ingrese el PIN de seguridad para acceder al panel.</p>
-            </div>
-            <div>
-                <input type="password" id="pin-input" placeholder="••••" maxlength="8" class="w-full p-3 border border-slate-300 rounded-lg text-center text-2xl tracking-widest outline-none focus:ring-2 focus:ring-black">
-            </div>
-            <button type="button" onclick="validateLogin()" class="w-full py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition shadow-sm">Ingresar al Panel</button>
-        </div>
-
-        <!-- PANEL DE BÚSQUEDA Y REPORTES -->
-        <div id="admin-panel" class="hidden space-y-6">
+        <!-- PANEL DE BÚSQUEDA Y REPORTES (DIRECTO) -->
+        <div id="admin-panel" class="space-y-6">
             <div class="card-box p-6 md:p-8 space-y-6">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-4">
                     <div>
@@ -81,7 +68,6 @@
     </main>
 
     <script>
-        const ADMIN_PIN = "1234";
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIuqJ7f3v20mmdThj1Ia8A6el4RrJ_KM-Le8CbD826l_1s2x2yooDNDMrya98K0v_kqA/exec";
         let dbRecords = [];
 
@@ -111,7 +97,7 @@
             "Medios e Infraestructura": "Mantenimiento físico, montaje de escenarios, soporte técnico de instalaciones y gestión de espacios de reunión para garantizar el correcto funcionamiento del espacio físico."
         };
 
-        // BANCO DE OBSERVACIONES CUALITATIVAS PROFUNDAS Y DETALLADAS
+        // BANCO DE OBSERVACIONES CUALITATIVAS PROFUNDAS
         const OBSERVACIONES = {
             "Destreza Social": {
                 alto: "Muestra fluidez superior y soltura espontánea para iniciar vínculos e integrarse a diversos entornos. Genera confianza inmediata y facilita la cohesión en grupos heterogéneos.\n• Entorno Ideal: Vocería, recepción de nuevos asistentes, relaciones públicas o consolidación comunitaria.\n• Orientación Pastoral: Asignar responsabilidades de conexión e integración, velando por que mantenga la profundización en la relación tras el primer contacto.",
@@ -135,15 +121,269 @@
             },
             "Persuasión": {
                 alto: "Posee liderazgo inspirador, elocuencia y soltura argumentativa para motivar, movilizar y transformar posturas en grupos. Comunica la visión con entusiasmo contagioso.\n• Entorno Ideal: Capacitación, predicación, dirección de equipos, reclutamiento de voluntarios y campañas de alcance.\n• Orientación Pastoral: Formar en humildad y escucha activa para asegurar que su capacidad de influencia sirva a la edificación colectiva.",
-                medio: "Comunica ideas con claridad, coherencia y convicción personal. Logra influir positivamente en su entorno cercano desde el testimonio, la lógica y el trato respetuoso.\n• Entorno Ideal: Liderazgo de pequeñas células, enseñanza grupal, coordinación de comités específicos y mentoria.\n• Orientación Pastoral: Impulsar su desarrollo expositivo asignándole la vocería de proyectos progresivamente más amplios.",
+                medio: "Comunica ideas con claridad, coherencia y convicción personal. Logra influir positivamente en su entorno cercano desde el testimonio, la lógica y el trato respetuoso.\n• Entorno Ideal: Liderazgo de pequeñas células, enseñanza grupal, coordinación de comités específicos y mentoría.\n• Orientación Pastoral: Impulsar su desarrollo expositivo asignándole la vocería de proyectos progresivamente más amplios.",
                 bajo: "Siente mayor comodidad en roles de apoyo ejecutivo, trabajo silencioso de soporte o ejecución metodológica sin exposición directiva o discursiva pública.\n• Entorno Ideal: Soporte tras bambalinas, edición, montaje, logística interna, custodia y mantenimiento.\n• Orientación Pastoral: Valorar públicamente su fiel labor de soporte sin presionarlo para asumir roles expositivos que generen ansiedad."
             },
             "Perseverancia": {
                 alto: "Evidencia tenacidad, disciplina inquebrantable y alto nivel de compromiso. Mantiene el foco en metas de largo alcance superando la monotonía o la resistencia del entorno.\n• Entorno Ideal: Proyectos estratégicos de larga duración, construcción de sedes, consolidación de procesos y discipulado continuo.\n• Orientación Pastoral: Monitorear sus cargas de trabajo para evitar el sobreagotamiento derivado de su propia autoexigencia.",
                 medio: "Mantiene constancia y responsabilidad continua en sus responsabilidades asignadas. Concluye de manera confiable las metas a mediano plazo en los tiempos previstos.\n• Entorno Ideal: Programas trimestrales o semestrales, docencia periódica, turnos rotativos de servicio y gestión de aulas.\n• Orientación Pastoral: Establecer hitos de verificación parciales que mantengan su dinamismo a lo largo de ciclos extendidos.",
-                bajo: "Fluctúa en su nivel de entrega cuando las tareas se vuelven rutinarias o exigen plazos largos. Rinde mejor con incentivos de corto alcance y tareas dinámicas de rápida resolución.\n• Entorno Ideal: Tareas por objetivos inmediatos, eventos de un solo día, comisiones temporales de trabajo y brigadas puntuales.\n• Orientación Pastoral: Dividir los proyectos grandes en metas semanales y brindar mentoria frecuente para fortalecer la autodisciplina."
+                bajo: "Fluctúa en su nivel de entrega cuando las tareas se vuelven rutinarias o exigen plazos largos. Rinde mejor con incentivos de corto alcance y tareas dinámicas de rápida resolución.\n• Entorno Ideal: Tareas por objetivos inmediatos, eventos de un solo día, comisiones temporales de trabajo y brigadas puntuales.\n• Orientación Pastoral: Dividir los proyectos grandes en metas semanales y brindar mentoría frecuente para fortalecer la autodisciplina."
             },
             "Tolerancia": {
                 alto: "Manifiesta notable paciencia, serenidad y apertura para escuchar y conciliar puntos de vista diversos o encontrados. Promueve la cultura de paz y armonía en contextos complejos.\n• Entorno Ideal: Mediación de conflictos, atención a personas difíciles, recepción de quejas/sugerencias y arbitraje.\n• Orientación Pastoral: Guardar que su elevada transigencia no comprometa la firmeza necesaria al corregir conductas o aplicar normas.",
                 medio: "Mantiene un trato respetuoso, educado y tolerante frente a las diferencias individuales. Colabora en armonía y tolera adecuadamente la frustración laboral diaria.\n• Entorno Ideal: Trabajo en equipos multidisciplinarios, comités de servicio comunitario y atención al público general.\n• Orientación Pastoral: Reforzar sus habilidades de comunicación asertiva para que exprese sus desacuerdos constructivamente.",
-                bajo: "Presenta posturas firmes, rígidas o altamente normativas. Valora el cumplimiento estricto del deber y puede mostrar impaciencia ante la in
+                bajo: "Presenta posturas firmes, rígidas o altamente normativas. Valora el cumplimiento estricto del deber y puede mostrar impaciencia ante la ineficiencia o el incumplimiento ajeno.\n• Entorno Ideal: Aplicación de reglamentos, auditoría de estándares de calidad, seguridad física e inspección operativa.\n• Orientación Pastoral: Disponerlo en entornos donde primen la norma y el orden, aconsejando gracia y templanza en su trato interpersonal."
+            },
+            "Vitalidad": {
+                alto: "Refleja energía contagiante, vigor físico y dinamismo para responder en escenarios de ritmo acelerado y alta exigencia operativa. Transmite entusiasmo al equipo.\n• Entorno Ideal: Ministerio juvenil, recreación infantil (PowerKids/Kids), montajes pesados, campamentos y evangelismo masivo.\n• Orientación Pastoral: Encauzar su abundante energía hacia metas organizadas para evitar la dispersión o el cansancio prematuro.",
+                medio: "Despliega un ritmo de trabajo activo, regular y sostenido. Mantiene un equilibrio saludable entre el esfuerzo físico y la pausa necesaria para el rendimiento constante.\n• Entorno Ideal: Protocolo de servicio regular, logística de reuniones, monitoreo de clases y trabajo de oficina.\n• Orientación Pastoral: Proporcionar roles con exigencia física razonable que le permitan mantener un desempeño constante sin desgaste.",
+                bajo: "Sobresale en labores reflexivas, analíticas, de concentración o de baja demanda física. Aporta calma, profundidad de análisis y meticulosidad al proceso.\n• Entorno Ideal: Intercesión, revisión de documentos, diseño, edición de textos, llamadas de seguimiento y planeación estratégica.\n• Orientación Pastoral: Asignarle entornos de trabajo cómodos y pausados donde su capacidad de concentración sea el factor diferenciador."
+            }
+        };
+
+        const CONCEPTO_DUAL = {
+            "Destreza Social": {
+                fortaleza: "Facilidad natural para romper el hielo y construir puentes de relación e integración comunitaria.",
+                mejora: "Puntualizar profundización en relaciones uno a uno y escucha activa."
+            },
+            "Sensibilidad Social": {
+                fortaleza: "Gran empatía y percepción activa del estado emocional y espiritual ajeno.",
+                mejora: "Establecer límites sanos para evitar el desgaste emocional por sobreinvolucramiento."
+            },
+            "Adaptabilidad": {
+                fortaleza: "Alta ecuanimidad y resiliencia frente al cambio e imprevistos.",
+                mejora: "Asegurar el respeto por los procesos organizativos básicos antes de modificar planes."
+            },
+            "Recursividad": {
+                fortaleza: "Ingenio y creatividad orientada a resolver problemas prácticos con rapidez.",
+                mejora: "Documentar y estandarizar las soluciones creadas para que sean replicables."
+            },
+            "Persuasión": {
+                fortaleza: "Capacidad de influencia, comunicación inspiradora y movilización de personas.",
+                mejora: "Equilibrar la persuasión verbal escuchando y validando las dudas del equipo."
+            },
+            "Perseverancia": {
+                fortaleza: "Consistencia, autodisciplina y enfoque riguroso hacia el cumplimiento de metas.",
+                mejora: "Mantener flexibilidad cuando las circunstancias externas exijan pausar o pivotar."
+            },
+            "Tolerancia": {
+                fortaleza: "Prudencia, paciencia y madurez para conciliar diversas opiniones.",
+                mejora: "Comunicar decisiones con firmeza oportuna para evitar dilaciones excesivas."
+            },
+            "Vitalidad": {
+                fortaleza: "Dinamismo, contagio de energía y enfoque ejecutor en las actividades.",
+                mejora: "Dosificar el esfuerzo personal para prevenir episodios de fatiga o cansancio."
+            }
+        };
+
+        // Cargar datos automáticamente al iniciar la página
+        window.addEventListener('DOMContentLoaded', () => {
+            loadRecords();
+        });
+
+        async function loadRecords() {
+            const status = document.getElementById('status-msg');
+            status.classList.remove('hidden');
+            status.className = "text-xs text-slate-500 font-medium";
+            status.innerText = "Conectando con Google Sheets...";
+
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'GET', redirect: 'follow' });
+                if (!response.ok) throw new Error("Error en la respuesta del servidor");
+                
+                dbRecords = await response.json();
+                status.className = "text-xs text-emerald-600 font-medium";
+                status.innerText = `Sincronización exitosa: ${dbRecords.length} registro(s) disponible(s).`;
+            } catch (e) {
+                status.className = "text-xs text-red-500 font-medium";
+                status.innerText = "Error al conectar con Google Sheets. Verifique el despliegue.";
+            }
+        }
+
+        function searchRecords() {
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+            const resultsList = document.getElementById('results-list');
+            const container = document.getElementById('results-container');
+            resultsList.innerHTML = '';
+
+            if (!query) {
+                alert("Por favor ingrese un término de búsqueda.");
+                return;
+            }
+
+            const matches = dbRecords.filter(r => {
+                const nombres = (r.nombres || r.Nombres || '').toLowerCase();
+                const apellidos = (r.apellidos || r.Apellidos || '').toLowerCase();
+                const fullName = `${nombres} ${apellidos}`;
+                const id = String(r.identificacion || r.Identificacion || '').toLowerCase();
+                
+                return fullName.includes(query) || id.includes(query);
+            });
+
+            if (matches.length === 0) {
+                resultsList.innerHTML = '<p class="text-sm text-slate-500 py-4 text-center">No se encontraron evaluaciones registradas con ese criterio.</p>';
+            } else {
+                matches.forEach((r) => {
+                    const idx = dbRecords.indexOf(r);
+                    const nombres = r.nombres || r.Nombres || '';
+                    const apellidos = r.apellidos || r.Apellidos || '';
+                    const id = r.identificacion || r.Identificacion || 'N/A';
+                    const edad = r.edad || r.Edad || 'N/A';
+                    const correo = r.correo || r.Correo || 'N/A';
+                    const top1 = r.top1 || r['Top 1 Area'] || 'N/A';
+
+                    resultsList.innerHTML += `
+                        <div class="p-4 border border-slate-200 rounded-xl bg-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                            <div>
+                                <h4 class="font-bold text-slate-900">${nombres} ${apellidos}</h4>
+                                <p class="text-xs text-slate-500 mt-0.5">ID: ${id} | Edad: ${edad} | Correo: ${correo}</p>
+                                <p class="text-xs font-semibold text-emerald-700 mt-1">Sugerencia Principal: ${top1}</p>
+                            </div>
+                            <button onclick="generatePDFForRecord(${idx})" class="px-4 py-2 bg-black hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition whitespace-nowrap">
+                                📄 Descargar PDF
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+            container.classList.remove('hidden');
+        }
+
+        function generatePDFForRecord(index) {
+            const record = dbRecords[index];
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            function cleanAreaName(rawName) {
+                if (!rawName) return "";
+                return rawName.replace(/\s*\(\d+\%\)/g, "").trim();
+            }
+
+            let perfil = {};
+            try {
+                const rawPerfil = record.perfil || record['Perfil Resumen'];
+                perfil = typeof rawPerfil === 'string' ? JSON.parse(rawPerfil) : rawPerfil;
+            } catch (e) {
+                perfil = {};
+            }
+
+            const nombres = record.nombres || record.Nombres || '';
+            const apellidos = record.apellidos || record.Apellidos || '';
+            const id = record.identificacion || record.Identificacion || 'N/A';
+            const edad = record.edad || record.Edad || 'N/A';
+            const correo = record.correo || record.Correo || 'N/A';
+
+            const rawTop1 = record.top1 || record['Top 1 Area'] || 'N/A';
+            const rawTop2 = record.top2 || record['Top 2 Area'] || 'N/A';
+            const rawTop3 = record.top3 || record['Top 3 Area'] || 'N/A';
+
+            const cleanTop1 = cleanAreaName(rawTop1);
+            const cleanTop2 = cleanAreaName(rawTop2);
+            const cleanTop3 = cleanAreaName(rawTop3);
+
+            // Encabezado Corporativo
+            doc.setFillColor(0, 0, 0);
+            doc.rect(0, 0, 210, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(13);
+            doc.setFont("helvetica", "bold");
+            doc.text("IGLECO - PERFILAMIENTO PSICOMÉTRICO Y MINISTERIAL", 14, 13);
+
+            // Datos Personales
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            doc.text("INFORMACIÓN DEL EVALUADO", 14, 28);
+            
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Nombre Completo: ${nombres} ${apellidos}`, 14, 34);
+            doc.text(`Identificación: ${id}`, 14, 40);
+            doc.text(`Edad: ${edad} años`, 14, 46);
+            doc.text(`Correo Electrónico: ${correo}`, 14, 52);
+
+            // Áreas Sugeridas
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("ÁREAS DE SERVICIO SUGERIDAS Y DEFINICIÓN TÉCNICA", 14, 62);
+
+            const areasBody = [
+                ['Área Principal (Top 1)', rawTop1, DEFINICIONES_AREAS[cleanTop1] || "Acompañamiento e integración en el servicio comunitario."],
+                ['Área Secundaria (Top 2)', rawTop2, DEFINICIONES_AREAS[cleanTop2] || "Soporte colaborativo en procesos operativos y de acompañamiento."],
+                ['Área Alternativa (Top 3)', rawTop3, DEFINICIONES_AREAS[cleanTop3] || "Opción complementaria para diversificar el servicio según las necesidades."]
+            ];
+
+            doc.autoTable({
+                startY: 65,
+                head: [['Prioridad', 'Área Recomendada', 'Propósito y Alcance del Área']],
+                body: areasBody,
+                theme: 'striped',
+                headStyles: { fillColor: [0, 0, 0] },
+                columnStyles: { 0: { cellWidth: 38 }, 1: { cellWidth: 38 }, 2: { cellWidth: 104 } }
+            });
+
+            // Diagnóstico Cualitativo por Categoría con Badges de Nivel y Observaciones Profundas
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("DIAGNÓSTICO CUALITATIVO PROFUNDO POR CATEGORÍA", 14, doc.lastAutoTable.finalY + 10);
+
+            const sortedTraits = Object.keys(perfil).sort((a, b) => perfil[b] - perfil[a]);
+
+            const traitRows = sortedTraits.map(trait => {
+                const score = perfil[trait];
+                let nivelKey = "medio";
+                let badge = "DESARROLLADO";
+                
+                if (score >= 75) {
+                    nivelKey = "alto";
+                    badge = "SOBRESALIENTE";
+                } else if (score < 50) {
+                    nivelKey = "bajo";
+                    badge = "EN DESARROLLO";
+                }
+
+                const obsObj = OBSERVACIONES[trait] || {
+                    alto: "Desempeño sobresaliente en la categoría.",
+                    medio: "Desempeño adecuado y funcional.",
+                    bajo: "Área con oportunidad de crecimiento."
+                };
+
+                return [trait, `${score}%\n[ ${badge} ]`, obsObj[nivelKey]];
+            });
+
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 14,
+                head: [['Rasgo Evaluado', 'Puntaje / Nivel', 'Perfilamiento Cualitativo Profundo / Observación']],
+                body: traitRows.length > 0 ? traitRows : [['N/A', 'N/A', 'Sin datos disponibles']],
+                theme: 'grid',
+                headStyles: { fillColor: [0, 0, 0] },
+                columnStyles: { 0: { cellWidth: 36 }, 1: { cellWidth: 38 }, 2: { cellWidth: 106 } }
+            });
+
+            // CONCEPTO DUAL: FORTALEZAS Y OPORTUNIDADES DE MEJORA
+            const topTraits = sortedTraits.slice(0, 2);
+            const bottomTraits = sortedTraits.slice(-2);
+
+            let fortalezasText = topTraits.map(t => `• ${t}: ${CONCEPTO_DUAL[t]?.fortaleza || "Aporte constante al equipo."}`).join("\n");
+            let mejorasText = bottomTraits.map(t => `• ${t}: ${CONCEPTO_DUAL[t]?.mejora || "Acompañamiento periódico."}`).join("\n");
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("CONCEPTO INTEGRAL: FORTALEZAS Y OPORTUNIDADES DE MEJORA", 14, doc.lastAutoTable.finalY + 10);
+
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 14,
+                head: [['Eje de Diagnóstico', 'Análisis Cualitativo del Evaluado']],
+                body: [
+                    ['Principales Fortalezas', fortalezasText],
+                    ['Oportunidades de Crecimiento', mejorasText]
+                ],
+                theme: 'striped',
+                headStyles: { fillColor: [0, 0, 0] },
+                columnStyles: { 0: { cellWidth: 45 }, 1: { cellWidth: 135 } }
+            });
+
+            doc.save(`Reporte_IGLECO_Cualitativo_${id}.pdf`);
+        }
+    </script>
+</body>
+</html>
