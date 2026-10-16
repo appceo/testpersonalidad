@@ -85,7 +85,33 @@
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3jCdQhXobfC7RMKPJIxgQXKzeXLyUMeuU8VOQQr25G_QRqaJ-pTCF3Cf0rb9S8PZObQ/exec";
         let dbRecords = [];
 
-        // MATRIZ DE OBSERVACIONES CUALITATIVAS SEGÚN RANGO
+        // DEFINICIONES TÉCNICAS OFICIALES DE LAS ÁREAS DE IGLECO
+        const DEFINICIONES_AREAS = {
+            "Acompañamiento": "Cuidado pastoral y soporte emocional primario a personas o familias en situaciones de vulnerabilidad, duelo o transición personal. Requiere empatía activa, capacidad de escucha libre de juicios y confidencialidad.",
+            "Adoración": "Dirección y ejecución del ministerio de música e instrumentación en las reuniones. Busca facilitar un entorno de conexión espiritual comunitaria a través de la excelencia musical y una actitud de servicio constante.",
+            "Artístico": "Expresión creativa mediante disciplinas como las artes escénicas, danza, teatro y composición visual. Diseñado para transmitir mensajes bíblicos y conceptuales de forma estética e innovadora.",
+            "Producción": "Gestión técnica y operativa del soporte logístico de audio, iluminación, transmisión en vivo y sistemas de presentación visual durante los servicios y eventos.",
+            "Ayudas Administrativas": "Soporte organizativo en la gestión de archivos, bases de datos, logística de suministros, llamadas de seguimiento y sistematización de procesos internos de la iglesia.",
+            "Ayudas Profesionales": "Orientación especializada en áreas técnicas (asesoría jurídica, contable, psicológica, médica o de arquitectura) brindada a miembros de la comunidad o a la estructura ministerial según sus necesidades.",
+            "Conexión": "Acogida y primer contacto con personas que visitan la iglesia por primera vez. Se encarga de la integración fluida de los asistentes a los grupos de amistad o ruta de consolidación.",
+            "Contact Center": "Atención remota (telefónica, chat o correo) para responder inquietudes, brindar información sobre horarios/eventos, registrar solicitudes de oración y mantener una línea abierta de comunicación con la membresía.",
+            "Decoración": "Ambientación y diseño espacial de los diferentes entornos del templo o eventos especiales, asegurando una estética coherente con la identidad visual corporativa y el propósito del evento.",
+            "Discipulado": "Formación, mentoría y guía en el crecimiento espiritual mediante el estudio de la Biblia, el modelamiento de vida cristiana y la facilitación de pequeños grupos de enseñanza.",
+            "CFV - Kids": "Formación espiritual y pedagógica dirigida a la infancia temprana y escolar. Adapta contenidos bíblicos mediante metodologías didácticas, dinámicas y un entorno de cuidado seguro.",
+            "Evangelismo": "Proyección hacia la comunidad externa mediante brigadas, actividades de alcance social e iniciativas interactivas orientadas a presentar el mensaje del evangelio a personas no creyentes.",
+            "Hospitalidad": "Preparación y gestión de alimentos, bebidas, atención a invitados especiales y preparación de espacios de convivencia para generar un ambiente cálido y acogedor en la iglesia.",
+            "Maquillaje": "Caracterización y arreglo estético del personal de producción visual, cámaras, obras teatrales o contenido audiovisual institucional, respetando los estándares de iluminación y pantalla.",
+            "Monitores Escuelas": "Apoyo logístico, control de asistencia, asistencia a docentes y dinamización en las aulas durante las academias, talleres o programas formales de formación de la iglesia.",
+            "Oración": "Cobertura de intercesión continua por las peticiones de la comunidad, eventos institucionales, liderazgo y necesidades pastorales particulares a través de turnos y vigilias de oración.",
+            "PowerKids": "Actividades de alto impacto, animación y dinamismo enfocadas en preadolescentes y niños mayores, combinando recreación activa, liderazgo juvenil y enseñanza bíblica práctica.",
+            "Seguridad": "Prevención, protocolo de respuesta ante emergencias, control de accesos y resguardo del orden físico e integridad de las personas en las instalaciones de la iglesia.",
+            "Servidores": "Logística interna y protocolo durante los servicios: acomodación de personas, apoyo en la recolección de ofrendas, mantenimiento del orden en el auditorio y guía al asistente.",
+            "Traductores": "Interpretación simultánea o traducción de contenidos escritos/audiovisuales para personas de habla hispana con limitaciones auditivas (lengua de señas) o hablantes de otros idiomas.",
+            "Comunicaciones y Redes": "Diseño gráfico, fotografía, redacción y gestión de medios digitales/redes sociales para la difusión de las actividades e identidad de la iglesia.",
+            "Medios e Infraestructura": "Mantenimiento físico, montaje de escenarios, soporte técnico de instalaciones y gestión de espacios de reunión para garantizar el correcto funcionamiento del espacio físico."
+        };
+
+        // MATRIZ DE OBSERVACIONES CUALITATIVAS SEGÚN RANGO PSICOMÉTRICO
         const OBSERVACIONES = {
             "Destreza Social": {
                 alto: "Sobresaliente: Alta fluidez para entablar relaciones y romper el hielo en cualquier entorno.",
@@ -260,21 +286,24 @@
             doc.text(`Edad: ${edad} años`, 14, 46);
             doc.text(`Correo Electrónico: ${correo}`, 14, 52);
 
-            // Áreas Recomendadas
+            // Áreas Recomendadas con Definiciones Técnicas
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
-            doc.text("ÁREAS DE SERVICIO SUGERIDAS", 14, 62);
+            doc.text("ÁREAS DE SERVICIO SUGERIDAS Y DEFINICIÓN TÉCNICA", 14, 62);
+
+            const areasBody = [
+                ['Área Principal (Top 1)', top1, DEFINICIONES_AREAS[top1] || "Área enfocada en el servicio comunitario y fortalecimiento del equipo ministerial."],
+                ['Área Secundaria (Top 2)', top2, DEFINICIONES_AREAS[top2] || "Área orientada a la colaboración en procesos operativos y de acompañamiento."],
+                ['Área Alternativa (Top 3)', top3, DEFINICIONES_AREAS[top3] || "Opción complementaria para diversificar el servicio según las necesidades."]
+            ];
 
             doc.autoTable({
                 startY: 65,
-                head: [['Prioridad', 'Área Recomendada']],
-                body: [
-                    ['Área Principal (Top 1)', top1],
-                    ['Área Secundaria (Top 2)', top2],
-                    ['Área Alternativa (Top 3)', top3]
-                ],
+                head: [['Prioridad', 'Área Recomendada', 'Propósito y Alcance del Área']],
+                body: areasBody,
                 theme: 'striped',
-                headStyles: { fillColor: [0, 0, 0] }
+                headStyles: { fillColor: [0, 0, 0] },
+                columnStyles: { 0: { cellWidth: 38 }, 1: { cellWidth: 35 }, 2: { cellWidth: 107 } }
             });
 
             // Diagnóstico Cualitativo por Categoría
