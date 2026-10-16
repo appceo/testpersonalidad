@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administrativo | IGLECO</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- jsPDF para Reportes -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
@@ -40,25 +36,25 @@
             <div>
                 <input type="password" id="pin-input" placeholder="••••" maxlength="8" class="w-full p-3 border border-slate-300 rounded-lg text-center text-2xl tracking-widest outline-none focus:ring-2 focus:ring-black">
             </div>
-            <button onclick="checkPin()" class="w-full py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition">Ingresar al Panel</button>
+            <button type="button" id="btn-login" class="w-full py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition">Ingresar al Panel</button>
         </div>
 
-        <!-- PANEL DE BÚSQUEDA Y REPORTES -->
+        <!-- PANEL ADMINISTRATIVO PRINCIPAL -->
         <div id="admin-panel" class="hidden bg-white rounded-xl border border-slate-200 shadow-sm p-8 space-y-6">
             <div class="flex justify-between items-center border-b pb-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-900">Consulta de Evaluaciones</h2>
-                    <p class="text-sm text-slate-500">Consulte las respuestas registradas en Google Sheets o abra la hoja centralizada.</p>
+                    <h2 class="text-2xl font-bold text-slate-900">Gestión de Evaluaciones</h2>
+                    <p class="text-sm text-slate-500">Acceda a la base de datos centralizada de respuestas en tiempo real.</p>
                 </div>
-                <a href="https://sheets.google.com" target="_blank" class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg transition flex items-center gap-2">
+                <a href="https://sheets.google.com" target="_blank" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition flex items-center gap-2">
                     📊 Abrir Google Sheets
                 </a>
             </div>
 
             <div class="p-6 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-                <h3 class="font-bold text-slate-900 text-sm">Gestión de datos de IGLECO</h3>
+                <h3 class="font-bold text-slate-900 text-sm">Sistema Centralizado IGLECO</h3>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                    Todas las respuestas enviadas por los encuestados se almacenan automáticamente en tiempo real en tu hoja de Google Sheets. Puedes consultar el archivo centralizado para exportar reportes, filtrar por participante o imprimir resultados.
+                    Las respuestas enviadas por los encuestados se almacenan automáticamente en la hoja de cálculo ligada a tu cuenta. Haz clic en el botón superior **"Abrir Google Sheets"** para consultar la tabla completa con nombres, cédula, correo, los 3 mejores resultados de áreas ministeriales y el resumen psicométrico de cada encuestado.
                 </p>
             </div>
         </div>
@@ -66,3 +62,25 @@
     </main>
 
     <script>
+        const ADMIN_PIN = "1234";
+
+        function validatePin() {
+            const inputPin = document.getElementById('pin-input').value.trim();
+            if (inputPin === ADMIN_PIN) {
+                document.getElementById('login-box').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+            } else {
+                alert("PIN incorrecto. Intente nuevamente.");
+            }
+        }
+
+        document.getElementById('btn-login').addEventListener('click', validatePin);
+        
+        document.getElementById('pin-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                validatePin();
+            }
+        });
+    </script>
+</body>
+</html>
