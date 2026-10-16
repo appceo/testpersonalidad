@@ -1,310 +1,291 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test de Personalidad y Asignación Ministerial</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
-
-    <nav class="bg-indigo-900 text-white p-4 shadow-lg">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold flex items-center gap-2">
-                <span>⛪</span> Test de Personalidad y Asignación Ministerial
-            </h1>
-        </div>
-    </nav>
-
-    <div class="max-w-4xl mx-auto my-8 p-6">
-        <div class="bg-white rounded-xl shadow-md p-8">
-            
-            <!-- PASO 1: DATOS PERSONALES -->
-            <div id="step-data" class="space-y-4">
-                <h2 class="text-2xl font-bold text-indigo-900 border-b pb-2">Datos del Encuestado</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Nombres *</label>
-                        <input type="text" id="field-nombres" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Apellidos *</label>
-                        <input type="text" id="field-apellidos" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Identificación (Cédula/DNI) *</label>
-                        <input type="text" id="field-identificacion" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1">Edad *</label>
-                        <input type="number" id="field-edad" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-sm font-medium mb-1">Correo Electrónico *</label>
-                        <input type="email" id="field-correo" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
-                    </div>
-                </div>
-                <button type="button" onclick="startTest()" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition">Iniciar Evaluación</button>
-            </div>
-
-            <!-- PASO 2: CUESTIONARIO -->
-            <div id="step-questions" class="hidden">
-                <div class="w-full bg-slate-200 rounded-full h-2.5 mb-6">
-                    <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
-                </div>
-                <div class="flex justify-between items-center mb-4">
-                    <span id="page-indicator" class="text-sm font-semibold text-indigo-900">Página 1 de 7</span>
-                    <span class="text-xs text-slate-500">Escala: 1 (En desacuerdo) a 5 (De acuerdo)</span>
-                </div>
-
-                <form id="quiz-form" class="space-y-6">
-                    <div id="questions-container" class="space-y-6"></div>
-
-                    <div class="flex justify-between pt-6 border-t">
-                        <button type="button" id="btn-prev" onclick="changePage(-1)" class="px-6 py-2 bg-slate-300 hover:bg-slate-400 rounded-lg text-slate-700 hidden">Anterior</button>
-                        <button type="button" id="btn-next" onclick="changePage(1)" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg ml-auto">Siguiente</button>
-                        <button type="button" id="btn-submit" onclick="submitAssessment()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg hidden">Finalizar y Enviar</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- PASO 3: MENSAJE DE ÉXITO -->
-            <div id="step-thanks" class="hidden text-center py-12 space-y-4">
-                <div class="text-5xl">✅</div>
-                <h2 class="text-3xl font-bold text-indigo-900">¡Evaluación Completada!</h2>
-                <p class="text-slate-600 max-w-md mx-auto">Tus respuestas han sido registradas exitosamente. El equipo administrativo procesará tu informe para la asignación ministerial.</p>
-            </div>
-
-        </div>
+<nav class="bg-indigo-900 text-white p-4 shadow-lg">
+    <div class="max-w-4xl mx-auto flex justify-between items-center">
+        <h1 class="text-xl font-bold flex items-center gap-2">
+            <span>⛪</span> Test de Personalidad y Asignación Ministerial
+        </h1>
     </div>
+</nav>
 
-    <script>
-        // === SUSTITUYE AQUÍ CON TUS DATOS REALES DE SUPABASE ===
-        const SUPABASE_URL = "https://TU_SUPABASE_URL.supabase.co";
-        const SUPABASE_KEY = "TU_SUPABASE_ANON_KEY";
-        let _supabase = null;
+<div class="max-w-4xl mx-auto my-8 p-6">
+    <div class="bg-white rounded-xl shadow-md p-8">
+        
+        <!-- PASO 1: DATOS PERSONALES -->
+        <div id="step-data" class="space-y-4">
+            <h2 class="text-2xl font-bold text-indigo-900 border-b pb-2">Datos del Encuestado</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Nombres *</label>
+                    <input type="text" id="field-nombres" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Apellidos *</label>
+                    <input type="text" id="field-apellidos" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Identificación (Cédula/DNI) *</label>
+                    <input type="text" id="field-identificacion" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Edad *</label>
+                    <input type="number" id="field-edad" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium mb-1">Correo Electrónico *</label>
+                    <input type="email" id="field-correo" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
+                </div>
+            </div>
+            <button type="button" onclick="startTest()" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition">Iniciar Evaluación</button>
+        </div>
 
-        try {
-            if (SUPABASE_URL.includes("TU_SUPABASE_URL")) {
-                console.warn("Recuerda colocar tus credenciales reales de Supabase para guardar en la base de datos.");
-            } else {
-                _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            }
-        } catch (e) {
-            console.error("Error al conectar con Supabase:", e);
-        }
+        <!-- PASO 2: CUESTIONARIO -->
+        <div id="step-questions" class="hidden">
+            <div class="w-full bg-slate-200 rounded-full h-2.5 mb-6">
+                <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between items-center mb-4">
+                <span id="page-indicator" class="text-sm font-semibold text-indigo-900">Página 1 de 7</span>
+                <span class="text-xs text-slate-500">Escala: 1 (En desacuerdo) a 5 (De acuerdo)</span>
+            </div>
 
-        const QUESTIONS = [
-            {"id": 1, "text": "Me resulta fácil iniciar conversaciones con personas que acabo de conocer.", "trait": "Destreza Social"}, #[cite: 1]
-            {"id": 2, "text": "Mantengo la calma, la serenidad y la objetividad bajo situaciones de alta presión.", "trait": "Adaptabilidad"}, #[cite: 1]
-            {"id": 3, "text": "Propongo soluciones creativas y novedosas cuando surgen imprevistos o bloqueos.", "trait": "Recursividad"}, #[cite: 1]
-            {"id": 4, "text": "Soy highly constante y disciplinado al ejecutar tareas detalladas y rutinarias.", "trait": "Perseverancia"}, #[cite: 1]
-            {"id": 5, "text": "Percibo rápidamente cuando alguien a mi alrededor está pasando por un mal momento.", "trait": "Sensibilidad Social"}, #[cite: 1]
-            {"id": 6, "text": "Realizo mis actividades con un nivel sobresaliente de energía, entusiasmo y dinamismo.", "trait": "Vitalidad"}, #[cite: 1]
-            {"id": 7, "text": "Suelo asumir el liderazgo e iniciativa cuando un grupo necesita dirección.", "trait": "Persuasión"}, #[cite: 1]
-            {"id": 8, "text": "Escucho y respeto puntos de vista o ideologías completamente opuestas a las mías.", "trait": "Tolerancia"}, #[cite: 1]
-            {"id": 9, "text": "Me adapto con agilidad cuando cambian los planes u objetivos en el último momento.", "trait": "Adaptabilidad"}, #[cite: 1]
-            {"id": 10, "text": "Aprovecho al máximo los recursos disponibles, incluso cuando son escasos o limitados.", "trait": "Recursividad"}, #[cite: 1]
-            {"id": 11, "text": "Disfruto hablar en público y expresar mis ideas con claridad y espontaneidad.", "trait": "Destreza Social"}, #[cite: 1]
-            {"id": 12, "text": "Termino todo lo que empiezo, asegurándome de no dejar tareas inconclusas.", "trait": "Perseverancia"}, #[cite: 1]
-            {"id": 13, "text": "Siento una profunda empatía y compasión ante las necesidades físicas o emocionales ajenas.", "trait": "Sensibilidad Social"}, #[cite: 1]
-            {"id": 14, "text": "Tengo facilidad para convencer e inspirar a otros a sumarse a una causa o proyecto.", "trait": "Persuasión"}, #[cite: 1]
-            {"id": 15, "text": "Manejo los desacuerdos mediante el diálogo pacífico y la búsqueda de consensos.", "trait": "Tolerancia"}, #[cite: 1]
-            {"id": 16, "text": "Disfruto los entornos de trabajo activos que exigen movimiento y dinamismo constante.", "trait": "Vitalidad"}, #[cite: 1]
-            {"id": 17, "text": "Suelo romper el hielo en grupos nuevos sin experimentar incomodidad.", "trait": "Destreza Social"}, #[cite: 1]
-            {"id": 18, "text": "Controlo mis emociones e impulsos para evaluar los problemas con frialdad y lógica.", "trait": "Adaptabilidad"}, #[cite: 1]
-            {"id": 19, "text": "Me gusta diseñar nuevos métodos o enfoques para mejorar procesos existentes.", "trait": "Recursividad"}, #[cite: 1]
-            {"id": 20, "text": "Me tomo el tiempo necesario para escuchar activamente y brindar apoyo emocional.", "trait": "Sensibilidad Social"}, #[cite: 1]
-            {"id": 21, "text": "Sé cómo presentar argumentos sólidos para transformar la postura de los demás.", "trait": "Persuasión"}, #[cite: 1]
-            {"id": 22, "text": "Mantengo la concentración y la calidad del trabajo aun en actividades repetitivas.", "trait": "Perseverancia"}, #[cite: 1]
-            {"id": 23, "text": "Evito confrontaciones innecesarias y procuro actuar con prudencia y moderación.", "trait": "Tolerancia"}, #[cite: 1]
-            {"id": 24, "text": "Mantengo un ritmo de trabajo intensivo durante largos períodos sin agotarme fácilmente.", "trait": "Vitalidad"}, #[cite: 1]
-            {"id": 25, "text": "Tengo un trato fluido, cálido y espontáneo al relacionarme con cualquier persona.", "trait": "Destreza Social"}, #[cite: 1]
-            {"id": 26, "text": "Acepto nuevas circunstancias e imprevistos sin mostrar resistencia o frustración.", "trait": "Adaptabilidad"}, #[cite: 1]
-            {"id": 27, "text": "Suelo anteponer las necesidades y bienestar de los demás antes que mi propia comodidad.", "trait": "Sensibilidad Social"}, #[cite: 1]
-            {"id": 28, "text": "Encuentro alternativas viables con rapidez ante problemas altamente complejos.", "trait": "Recursividad"}, #[cite: 1]
-            {"id": 29, "text": "Me motiva dirigir personas y guiar equipos orientándolos hacia el cumplimiento de metas.", "trait": "Persuasión"}, #[cite: 1]
-            {"id": 30, "text": "Sigo las normas, estructuras y procedimientos organizacionales de manera rigurosa.", "trait": "Perseverancia"}, #[cite: 1]
-            {"id": 31, "text": "Muestro paciencia y comprensión frente a las fallas o errores cometidos por otros.", "trait": "Tolerancia"}, #[cite: 1]
-            {"id": 32, "text": "Me atraen los retos exigentes que requieren una respuesta rápida y acción inmediata.", "trait": "Vitalidad"}, #[cite: 1]
-            {"id": 33, "text": "Me siento muy cómodo interactuando con personas de trasfondos culturales variados.", "trait": "Destreza Social"}, #[cite: 1]
-            {"id": 34, "text": "Conservo la seguridad y firmeza al tomar decisiones en entornos de total incertidumbre.", "trait": "Adaptabilidad"}, #[cite: 1]
-            {"id": 35, "text": "Procuro construir relaciones cercanas, atentas y basadas en el cuidado genuino.", "trait": "Sensibilidad Social"}, #[cite: 1]
-            {"id": 36, "text": "Tengo facilidad para improvisar con efectividad cuando la situación no permite planear.", "trait": "Recursividad"}, #[cite: 1]
-            {"id": 37, "text": "Influencio de manera positiva en las decisiones y comportamientos de quienes me rodean.", "trait": "Persuasión"}, #[cite: 1]
-            {"id": 38, "text": "Mi estilo de trabajo se caracteriza por el orden impecable, la puntualidad y la constancia.", "trait": "Perseverancia"}, #[cite: 1]
-            {"id": 39, "text": "Acepto y valoro las diferencias individuales sin prejuzgar ni criticar.", "trait": "Tolerancia"}, #[cite: 1]
-            {"id": 40, "text": "Transmito empuje, pasión e intensidad a las personas en los proyectos que participo.", "trait": "Vitalidad"}, #[cite: 1]
-            {"id": 41, "text": "Expreso mis pensamientos y sentimientos con naturalidad en grupos amplios.", "trait": "Destreza Social"}, #[cite: 1]
-            {"id": 42, "text": "Reacciono con cabeza fría y templanza ante desacuerdos o momentos críticos.", "trait": "Adaptabilidad"}, #[cite: 1]
-            {"id": 43, "text": "Me resulta sencillo conectar conceptos o ideas distintas para crear soluciones nuevas.", "trait": "Recursividad"}, #[cite: 1]
-            {"id": 44, "text": "Reviso detalladamente los resultados de mi trabajo para asegurar la máxima calidad.", "trait": "Perseverancia"}, #[cite: 1]
-            {"id": 45, "text": "Me conmuevo con facilidad ante el dolor ajeno y me dispongo a brindar ayuda tangible.", "trait": "Sensibilidad Social"}, #[cite: 1]
-            {"id": 46, "text": "Inyecto energía y entusiasmo constante al grupo de trabajo donde me encuentre.", "trait": "Vitalidad"}, #[cite: 1]
-            {"id": 47, "text": "Me siento cómodo asumiendo la responsabilidad de tomar decisiones por un equipo.", "trait": "Persuasión"}, #[cite: 1]
-            {"id": 48, "text": "Mantengo una actitud permisiva, abierta y transigente ante posturas contrarias.", "trait": "Tolerancia"}, #[cite: 1]
-            {"id": 49, "text": "Afronto los cambios de ambiente o de compañeros de trabajo con soltura y flexibilidad.", "trait": "Adaptabilidad"}, #[cite: 1]
-            {"id": 50, "text": "Tengo inventiva para resolver problemas cuando no existen instrucciones previas.", "trait": "Recursividad"}, #[cite: 1]
-            {"id": 51, "text": "Desarrollo empatía fácilmente, haciendo que las personas se sientan seguras al hablar conmigo.", "trait": "Destreza Social"}, #[cite: 1]
-            {"id": 52, "text": "Cumplo fielmente con mis compromisos aunque el entusiasmo inicial haya disminuido.", "trait": "Perseverancia"}, #[cite: 1]
-            {"id": 53, "text": "Busco de forma proactiva oportunidades para servir y aliviar la carga de los demás.", "trait": "Sensibilidad Social"}, #[cite: 1]
-            {"id": 54, "text": "Suelo convencer a otros sobre la importancia de apoyar iniciativas comunitarias o de la iglesia.", "trait": "Persuasión"}, #[cite: 1]
-            {"id": 55, "text": "Busco resolver fricciones mediante acuerdos en lugar de imponer mi posición.", "trait": "Tolerancia"}, #[cite: 1]
-            {"id": 56, "text": "Me gusta mantener un estilo de vida ágil, con múltiples tareas simultáneas.", "trait": "Vitalidad"}, #[cite: 1]
-            {"id": 57, "text": "Entablo relaciones de amistad duraderas de forma abierta y natural.", "trait": "Destreza Social"}, #[cite: 1]
-            {"id": 58, "text": "Manejo la incertidumbre laboral o ministerial sin experimentar ansiedad o bloqueo.", "trait": "Adaptabilidad"}, #[cite: 1]
-            {"id": 59, "text": "Suelo encontrar usos prácticos e innovadores a elementos que otros descartan.", "trait": "Recursividad"}, #[cite: 1]
-            {"id": 60, "text": "Prefiero la rutina organizada y metódica antes que la improvisación constante.", "trait": "Perseverancia"}, #[cite: 1]
-            {"id": 61, "text": "Priorizo la escucha atenta de las vivencias del prójimo sin emitir juicios apresurados.", "trait": "Sensibilidad Social"}, #[cite: 1]
-            {"id": 62, "text": "Tengo habilidad para movilizar a las personas hacia la acción compartida.", "trait": "Persuasión"}, #[cite: 1]
-            {"id": 63, "text": "Demuestro serenidad y transigencia ante comentarios de crítica hacia mi trabajo.", "trait": "Tolerancia"}, #[cite: 1]
-            {"id": 64, "text": "Contagio mi entusiasmo y empuje a las personas que trabajan junto a mí.", "trait": "Vitalidad"} #[cite: 1]
-        ];
+            <form id="quiz-form" class="space-y-6" onsubmit="return false;">
+                <div id="questions-container" class="space-y-6"></div>
 
-        const AREAS_REQUIREMENTS = {
-            "Acompañamiento": {"Sensibilidad Social": 0.35, "Tolerancia": 0.35, "Destreza Social": 0.30},
-            "Adoración": {"Recursividad": 0.35, "Vitalidad": 0.35, "Destreza Social": 0.30},
-            "Artístico": {"Recursividad": 0.50, "Vitalidad": 0.30, "Adaptabilidad": 0.20},
-            "Producción": {"Perseverancia": 0.40, "Adaptabilidad": 0.40, "Recursividad": 0.20},
-            "Ayudas Administrativas": {"Perseverancia": 0.50, "Adaptabilidad": 0.30, "Tolerancia": 0.20},
-            "Ayudas Profesionales": {"Adaptabilidad": 0.35, "Recursividad": 0.35, "Tolerancia": 0.30},
-            "Conexión": {"Destreza Social": 0.40, "Sensibilidad Social": 0.30, "Vitalidad": 0.30},
-            "Contact Center": {"Destreza Social": 0.35, "Tolerancia": 0.35, "Perseverancia": 0.30},
-            "Decoración": {"Recursividad": 0.50, "Perseverancia": 0.30, "Vitalidad": 0.20},
-            "Discipulado": {"Persuasión": 0.35, "Sensibilidad Social": 0.35, "Tolerancia": 0.30},
-            "CFV - Kids": {"Sensibilidad Social": 0.35, "Vitalidad": 0.35, "Tolerancia": 0.30},
-            "Evangelismo": {"Destreza Social": 0.35, "Persuasión": 0.35, "Vitalidad": 0.30},
-            "Hospitalidad": {"Destreza Social": 0.35, "Sensibilidad Social": 0.35, "Tolerancia": 0.30},
-            "Maquillaje": {"Recursividad": 0.40, "Perseverancia": 0.30, "Sensibilidad Social": 0.30},
-            "Monitores Escuelas": {"Persuasión": 0.35, "Perseverancia": 0.35, "Adaptabilidad": 0.30},
-            "Oración": {"Sensibilidad Social": 0.40, "Tolerancia": 0.30, "Perseverancia": 0.30},
-            "PowerKids": {"Vitalidad": 0.40, "Sensibilidad Social": 0.30, "Recursividad": 0.30},
-            "Seguridad": {"Adaptabilidad": 0.40, "Perseverancia": 0.30, "Tolerancia": 0.30},
-            "Servidores": {"Destreza Social": 0.35, "Tolerancia": 0.35, "Vitalidad": 0.30},
-            "Traductores": {"Perseverancia": 0.35, "Adaptabilidad": 0.35, "Destreza Social": 0.30}
+                <div class="flex justify-between pt-6 border-t">
+                    <button type="button" id="btn-prev" onclick="changePage(-1)" class="px-6 py-2 bg-slate-300 hover:bg-slate-400 rounded-lg text-slate-700 hidden">Anterior</button>
+                    <button type="button" id="btn-next" onclick="changePage(1)" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg ml-auto">Siguiente</button>
+                    <button type="button" id="btn-submit" onclick="submitAssessment()" class="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg hidden">Finalizar y Enviar</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- PASO 3: MENSAJE DE ÉXITO -->
+        <div id="step-thanks" class="hidden text-center py-12 space-y-4">
+            <div class="text-5xl">✅</div>
+            <h2 class="text-3xl font-bold text-indigo-900">¡Evaluación Completada!</h2>
+            <p class="text-slate-600 max-w-md mx-auto">Tus respuestas han sido registradas exitosamente. El equipo administrativo procesará tu informe para la asignación ministerial.</p>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // CONFIGURACIÓN DE SUPABASE (Reemplazar con tus claves reales)
+    const SUPABASE_URL = "https://TU_SUPABASE_URL.supabase.co";
+    const SUPABASE_KEY = "TU_SUPABASE_ANON_KEY";
+    let _supabase = null;
+
+    if (typeof supabase !== 'undefined' && !SUPABASE_URL.includes("TU_SUPABASE_URL")) {
+        _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+
+    const QUESTIONS = [
+        {"id": 1, "text": "Me resulta fácil iniciar conversaciones con personas que acabo de conocer.", "trait": "Destreza Social"},
+        {"id": 2, "text": "Mantengo la calma, la serenidad y la objetividad bajo situaciones de alta presión.", "trait": "Adaptabilidad"},
+        {"id": 3, "text": "Propongo soluciones creativas y novedosas cuando surgen imprevistos o bloqueos.", "trait": "Recursividad"},
+        {"id": 4, "text": "Soy altamente constante y disciplinado al ejecutar tareas detalladas y rutinarias.", "trait": "Perseverancia"},
+        {"id": 5, "text": "Percibo rápidamente cuando alguien a mi alrededor está pasando por un mal momento.", "trait": "Sensibilidad Social"},
+        {"id": 6, "text": "Realizo mis actividades con un nivel sobresaliente de energía, entusiasmo y dinamismo.", "trait": "Vitalidad"},
+        {"id": 7, "text": "Suelo asumir el liderazgo e iniciativa cuando un grupo necesita dirección.", "trait": "Persuasión"},
+        {"id": 8, "text": "Escucho y respeto puntos de vista o ideologías completamente opuestas a las mías.", "trait": "Tolerancia"},
+        {"id": 9, "text": "Me adapto con agilidad cuando cambian los planes u objetivos en el último momento.", "trait": "Adaptabilidad"},
+        {"id": 10, "text": "Aprovecho al máximo los recursos disponibles, incluso cuando son escasos o limitados.", "trait": "Recursividad"},
+        {"id": 11, "text": "Disfruto hablar en público y expresar mis ideas con claridad y espontaneidad.", "trait": "Destreza Social"},
+        {"id": 12, "text": "Termino todo lo que empiezo, asegurándome de no dejar tareas inconclusas.", "trait": "Perseverancia"},
+        {"id": 13, "text": "Siento una profunda empatía y compasión ante las necesidades físicas o emocionales ajenas.", "trait": "Sensibilidad Social"},
+        {"id": 14, "text": "Tengo facilidad para convencer e inspirar a otros a sumarse a una causa o proyecto.", "trait": "Persuasión"},
+        {"id": 15, "text": "Manejo los desacuerdos mediante el diálogo pacífico y la búsqueda de consensos.", "trait": "Tolerancia"},
+        {"id": 16, "text": "Disfruto los entornos de trabajo activos que exigen movimiento y dinamismo constante.", "trait": "Vitalidad"},
+        {"id": 17, "text": "Suelo romper el hielo en grupos nuevos sin experimentar incomodidad.", "trait": "Destreza Social"},
+        {"id": 18, "text": "Controlo mis emociones e impulsos para evaluar los problemas con frialdad y lógica.", "trait": "Adaptabilidad"},
+        {"id": 19, "text": "Me gusta diseñar nuevos métodos o enfoques para mejorar procesos existentes.", "trait": "Recursividad"},
+        {"id": 20, "text": "Me tomo el tiempo necesario para escuchar activamente y brindar apoyo emocional.", "trait": "Sensibilidad Social"},
+        {"id": 21, "text": "Sé cómo presentar argumentos sólidos para transformar la postura de los demás.", "trait": "Persuasión"},
+        {"id": 22, "text": "Mantengo la concentración y la calidad del trabajo aun en actividades repetitivas.", "trait": "Perseverancia"},
+        {"id": 23, "text": "Evito confrontaciones innecesarias y procuro actuar con prudencia y moderación.", "trait": "Tolerancia"},
+        {"id": 24, "text": "Mantengo un ritmo de trabajo intensivo durante largos períodos sin agotarme fácilmente.", "trait": "Vitalidad"},
+        {"id": 25, "text": "Tengo un trato fluido, cálido y espontáneo al relacionarme con cualquier persona.", "trait": "Destreza Social"},
+        {"id": 26, "text": "Acepto nuevas circunstancias e imprevistos sin mostrar resistencia o frustración.", "trait": "Adaptabilidad"},
+        {"id": 27, "text": "Suelo anteponer las necesidades y bienestar de los demás antes que mi propia comodidad.", "trait": "Sensibilidad Social"},
+        {"id": 28, "text": "Encuentro alternativas viables con rapidez ante problemas altamente complejos.", "trait": "Recursividad"},
+        {"id": 29, "text": "Me motiva dirigir personas y guiar equipos orientándolos hacia el cumplimiento de metas.", "trait": "Persuasión"},
+        {"id": 30, "text": "Sigo las normas, estructuras y procedimientos organizacionales de manera rigurosa.", "trait": "Perseverancia"},
+        {"id": 31, "text": "Muestro paciencia y comprensión frente a las fallas o errores cometidos por otros.", "trait": "Tolerancia"},
+        {"id": 32, "text": "Me atraen los retos exigentes que requieren una respuesta rápida y acción inmediata.", "trait": "Vitalidad"},
+        {"id": 33, "text": "Me siento muy cómodo interactuando con personas de trasfondos culturales variados.", "trait": "Destreza Social"},
+        {"id": 34, "text": "Conservo la seguridad y firmeza al tomar decisiones en entornos de total incertidumbre.", "trait": "Adaptabilidad"},
+        {"id": 35, "text": "Procuro construir relaciones cercanas, atentas y basadas en el cuidado genuino.", "trait": "Sensibilidad Social"},
+        {"id": 36, "text": "Tengo facilidad para improvisar con efectividad cuando la situación no permite planear.", "trait": "Recursividad"},
+        {"id": 37, "text": "Influencio de manera positiva en las decisiones y comportamientos de quienes me rodean.", "trait": "Persuasión"},
+        {"id": 38, "text": "Mi estilo de trabajo se caracteriza por el orden impecable, la puntualidad y la constancia.", "trait": "Perseverancia"},
+        {"id": 39, "text": "Acepto y valoro las diferencias individuales sin prejuzgar ni criticar.", "trait": "Tolerancia"},
+        {"id": 40, "text": "Transmito empuje, pasión e intensidad a las personas en los proyectos que participo.", "trait": "Vitalidad"},
+        {"id": 41, "text": "Expreso mis pensamientos y sentimientos con naturalidad en grupos amplios.", "trait": "Destreza Social"},
+        {"id": 42, "text": "Reacciono con cabeza fría y templanza ante desacuerdos o momentos críticos.", "trait": "Adaptabilidad"},
+        {"id": 43, "text": "Me resulta sencillo conectar conceptos o ideas distintas para crear soluciones nuevas.", "trait": "Recursividad"},
+        {"id": 44, "text": "Reviso detalladamente los resultados de mi trabajo para asegurar la máxima calidad.", "trait": "Perseverancia"},
+        {"id": 45, "text": "Me conmuevo con facilidad ante el dolor ajeno y me dispongo a brindar ayuda tangible.", "trait": "Sensibilidad Social"},
+        {"id": 46, "text": "Inyecto energía y entusiasmo constante al grupo de trabajo donde me encuentre.", "trait": "Vitalidad"},
+        {"id": 47, "text": "Me siento cómodo asumiendo la responsabilidad de tomar decisiones por un equipo.", "trait": "Persuasión"},
+        {"id": 48, "text": "Mantengo una actitud permisiva, abierta y transigente ante posturas contrarias.", "trait": "Tolerancia"},
+        {"id": 49, "text": "Afronto los cambios de ambiente o de compañeros de trabajo con soltura y flexibilidad.", "trait": "Adaptabilidad"},
+        {"id": 50, "text": "Tengo inventiva para resolver problemas cuando no existen instrucciones previas.", "trait": "Recursividad"},
+        {"id": 51, "text": "Desarrollo empatía fácilmente, haciendo que las personas se sientan seguras al hablar conmigo.", "trait": "Destreza Social"},
+        {"id": 52, "text": "Cumplo fielmente con mis compromisos aunque el entusiasmo inicial haya disminuido.", "trait": "Perseverancia"},
+        {"id": 53, "text": "Busco de forma proactiva oportunidades para servir y aliviar la carga de los demás.", "trait": "Sensibilidad Social"},
+        {"id": 54, "text": "Suelo convencer a otros sobre la importancia de apoyar iniciativas comunitarias o de la iglesia.", "trait": "Persuasión"},
+        {"id": 55, "text": "Busco resolver fricciones mediante acuerdos en lugar de imponer mi posición.", "trait": "Tolerancia"},
+        {"id": 56, "text": "Me gusta mantener un estilo de vida ágil, con múltiples tareas simultáneas.", "trait": "Vitalidad"},
+        {"id": 57, "text": "Entablo relaciones de amistad duraderas de forma abierta y natural.", "trait": "Destreza Social"},
+        {"id": 58, "text": "Manejo la incertidumbre laboral o ministerial sin experimentar ansiedad o bloqueo.", "trait": "Adaptabilidad"},
+        {"id": 59, "text": "Suelo encontrar usos prácticos e innovadores a elementos que otros descartan.", "trait": "Recursividad"},
+        {"id": 60, "text": "Prefiero la rutina organizada y metódica antes que la improvisación constante.", "trait": "Perseverancia"},
+        {"id": 61, "text": "Priorizo la escucha atenta de las vivencias del prójimo sin emitir juicios apresurados.", "trait": "Sensibilidad Social"},
+        {"id": 62, "text": "Tengo habilidad para movilizar a las personas hacia la acción compartida.", "trait": "Persuasión"},
+        {"id": 63, "text": "Demuestro serenidad y transigencia ante comentarios de crítica hacia mi trabajo.", "trait": "Tolerancia"},
+        {"id": 64, "text": "Contagio mi entusiasmo y empuje a las personas que trabajan junto a mí.", "trait": "Vitalidad"}
+    ];
+
+    const AREAS_REQUIREMENTS = {
+        "Acompañamiento": {"Sensibilidad Social": 0.35, "Tolerancia": 0.35, "Destreza Social": 0.30},
+        "Adoración": {"Recursividad": 0.35, "Vitalidad": 0.35, "Destreza Social": 0.30},
+        "Artístico": {"Recursividad": 0.50, "Vitalidad": 0.30, "Adaptabilidad": 0.20},
+        "Producción": {"Perseverancia": 0.40, "Adaptabilidad": 0.40, "Recursividad": 0.20},
+        "Ayudas Administrativas": {"Perseverancia": 0.50, "Adaptabilidad": 0.30, "Tolerancia": 0.20},
+        "Ayudas Profesionales": {"Adaptabilidad": 0.35, "Recursividad": 0.35, "Tolerancia": 0.30},
+        "Conexión": {"Destreza Social": 0.40, "Sensibilidad Social": 0.30, "Vitalidad": 0.30},
+        "Contact Center": {"Destreza Social": 0.35, "Tolerancia": 0.35, "Perseverancia": 0.30},
+        "Decoración": {"Recursividad": 0.50, "Perseverancia": 0.30, "Vitalidad": 0.20},
+        "Discipulado": {"Persuasión": 0.35, "Sensibilidad Social": 0.35, "Tolerancia": 0.30},
+        "CFV - Kids": {"Sensibilidad Social": 0.35, "Vitalidad": 0.35, "Tolerancia": 0.30},
+        "Evangelismo": {"Destreza Social": 0.35, "Persuasión": 0.35, "Vitalidad": 0.30},
+        "Hospitalidad": {"Destreza Social": 0.35, "Sensibilidad Social": 0.35, "Tolerancia": 0.30},
+        "Maquillaje": {"Recursividad": 0.40, "Perseverancia": 0.30, "Sensibilidad Social": 0.30},
+        "Monitores Escuelas": {"Persuasión": 0.35, "Perseverancia": 0.35, "Adaptabilidad": 0.30},
+        "Oración": {"Sensibilidad Social": 0.40, "Tolerancia": 0.30, "Perseverancia": 0.30},
+        "PowerKids": {"Vitalidad": 0.40, "Sensibilidad Social": 0.30, "Recursividad": 0.30},
+        "Seguridad": {"Adaptabilidad": 0.40, "Perseverancia": 0.30, "Tolerancia": 0.30},
+        "Servidores": {"Destreza Social": 0.35, "Tolerancia": 0.35, "Vitalidad": 0.30},
+        "Traductores": {"Perseverancia": 0.35, "Adaptabilidad": 0.35, "Destreza Social": 0.30}
+    };
+
+    let currentPage = 0;
+    const pageSize = 10;
+    let answers = {};
+    let userData = {};
+
+    function startTest() {
+        userData = {
+            nombres: document.getElementById('field-nombres').value.trim(),
+            apellidos: document.getElementById('field-apellidos').value.trim(),
+            identificacion: document.getElementById('field-identificacion').value.trim(),
+            edad: document.getElementById('field-edad').value.trim(),
+            correo: document.getElementById('field-correo').value.trim()
         };
 
-        let currentPage = 0;
-        const pageSize = 10;
-        let answers = {};
-        let userData = {};
+        if (!userData.nombres || !userData.apellidos || !userData.identificacion || !userData.edad || !userData.correo) {
+            alert("Por favor complete todos los campos obligatorios.");
+            return;
+        }
 
-        function startTest() {
-            userData = {
-                nombres: document.getElementById('field-nombres').value.trim(),
-                apellidos: document.getElementById('field-apellidos').value.trim(),
-                identificacion: document.getElementById('field-identificacion').value.trim(),
-                edad: document.getElementById('field-edad').value.trim(),
-                correo: document.getElementById('field-correo').value.trim()
-            };
+        document.getElementById('step-data').classList.add('hidden');
+        document.getElementById('step-questions').classList.remove('hidden');
+        renderPage();
+    }
 
-            if (!userData.nombres || !userData.apellidos || !userData.identificacion || !userData.edad || !userData.correo) {
-                alert("Por favor complete todos los campos obligatorios.");
+    function renderPage() {
+        const container = document.getElementById('questions-container');
+        container.innerHTML = '';
+        
+        const start = currentPage * pageSize;
+        const pageQuestions = QUESTIONS.slice(start, start + pageSize);
+
+        pageQuestions.forEach(q => {
+            const currentVal = answers[q.id] || 3;
+            container.innerHTML += `
+                <div class="bg-slate-50 p-4 rounded-lg border">
+                    <p class="font-medium text-slate-800 mb-3">${q.id}. ${q.text}</p>
+                    <div class="flex justify-between items-center max-w-md mx-auto text-sm">
+                        <span class="text-xs text-slate-500">1</span>
+                        ${[1,2,3,4,5].map(v => `
+                            <label class="flex flex-col items-center gap-1 cursor-pointer">
+                                <input type="radio" name="q_${q.id}" value="${v}" ${currentVal == v ? 'checked' : ''} onchange="saveAnswer(${q.id},${v})" class="w-4 h-4 text-indigo-600">
+                                <span class="text-xs text-slate-600">${v}</span>
+                            </label>
+                        `).join('')}
+                        <span class="text-xs text-slate-500">5</span>
+                    </div>
+                </div>
+            `;
+        });
+
+        const totalPages = Math.ceil(QUESTIONS.length / pageSize);
+        document.getElementById('page-indicator').innerText = `Página ${currentPage + 1} de ${totalPages}`;
+        document.getElementById('progress-bar').style.width = `${((currentPage + 1) / totalPages) * 100}%`;
+
+        document.getElementById('btn-prev').classList.toggle('hidden', currentPage === 0);
+        document.getElementById('btn-next').classList.toggle('hidden', currentPage === totalPages - 1);
+        document.getElementById('btn-submit').classList.toggle('hidden', currentPage !== totalPages - 1);
+        
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function saveAnswer(qId, val) {
+        answers[qId] = parseInt(val);
+    }
+
+    function changePage(direction) {
+        currentPage += direction;
+        renderPage();
+    }
+
+    async function submitAssessment() {
+        for (let q of QUESTIONS) {
+            if (!answers[q.id]) answers[q.id] = 3;
+        }
+
+        let traitTotals = {};
+        let traitCounts = {};
+        QUESTIONS.forEach(q => {
+            traitTotals[q.trait] = (traitTotals[q.trait] || 0) + answers[q.id];
+            traitCounts[q.trait] = (traitCounts[q.trait] || 0) + 1;
+        });
+
+        let profile = {};
+        for (let trait in traitTotals) {
+            let max = traitCounts[trait] * 5;
+            let min = traitCounts[trait] * 1;
+            profile[trait] = Math.round(((traitTotals[trait] - min) / (max - min)) * 100);
+        }
+
+        let areaMatches = {};
+        for (let area in AREAS_REQUIREMENTS) {
+            let score = 0;
+            for (let trait in AREAS_REQUIREMENTS[area]) {
+                score += (profile[trait] || 0) * AREAS_REQUIREMENTS[area][trait];
+            }
+            areaMatches[area] = Math.round(score);
+        }
+
+        let sortedAreas = Object.entries(areaMatches).sort((a,b) => b[1] - a[1]);
+
+        if (_supabase) {
+            const { error } = await _supabase.from('evaluaciones').insert([{
+                nombres: userData.nombres,
+                apellidos: userData.apellidos,
+                identificacion: userData.identificacion,
+                edad: parseInt(userData.edad),
+                correo: userData.correo,
+                perfil_personalidad: profile,
+                areas_recomendadas: sortedAreas
+            }]);
+
+            if (error) {
+                alert("Error al guardar en la base de datos: " + error.message);
                 return;
             }
-
-            document.getElementById('step-data').classList.add('hidden');
-            document.getElementById('step-questions').classList.remove('hidden');
-            renderPage();
         }
 
-        function renderPage() {
-            const container = document.getElementById('questions-container');
-            container.innerHTML = '';
-            
-            const start = currentPage * pageSize;
-            const pageQuestions = QUESTIONS.slice(start, start + pageSize);
-
-            pageQuestions.forEach(q => {
-                const currentVal = answers[q.id] || 3;
-                container.innerHTML += `
-                    <div class="bg-slate-50 p-4 rounded-lg border">
-                        <p class="font-medium text-slate-800 mb-3">${q.id}. ${q.text}</p>
-                        <div class="flex justify-between items-center max-w-md mx-auto text-sm">
-                            <span class="text-xs text-slate-500">1</span>
-                            ${[1,2,3,4,5].map(v => `
-                                <label class="flex flex-col items-center gap-1 cursor-pointer">
-                                    <input type="radio" name="q_${q.id}" value="${v}" ${currentVal == v ? 'checked' : ''} onchange="saveAnswer(${q.id},${v})" class="w-4 h-4 text-indigo-600">
-                                    <span class="text-xs text-slate-600">${v}</span>
-                                </label>
-                            `).join('')}
-                            <span class="text-xs text-slate-500">5</span>
-                        </div>
-                    </div>
-                `;
-            });
-
-            const totalPages = Math.ceil(QUESTIONS.length / pageSize);
-            document.getElementById('page-indicator').innerText = `Página ${currentPage + 1} de ${totalPages}`;
-            document.getElementById('progress-bar').style.width = `${((currentPage + 1) / totalPages) * 100}%`;
-
-            document.getElementById('btn-prev').classList.toggle('hidden', currentPage === 0);
-            document.getElementById('btn-next').classList.toggle('hidden', currentPage === totalPages - 1);
-            document.getElementById('btn-submit').classList.toggle('hidden', currentPage !== totalPages - 1);
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function saveAnswer(qId, val) {
-            answers[qId] = parseInt(val);
-        }
-
-        function changePage(direction) {
-            currentPage += direction;
-            renderPage();
-        }
-
-        async function submitAssessment() {
-            for (let q of QUESTIONS) {
-                if (!answers[q.id]) answers[q.id] = 3;
-            }
-
-            let traitTotals = {};
-            let traitCounts = {};
-            QUESTIONS.forEach(q => {
-                traitTotals[q.trait] = (traitTotals[q.trait] || 0) + answers[q.id];
-                traitCounts[q.trait] = (traitCounts[q.trait] || 0) + 1;
-            });
-
-            let profile = {};
-            for (let trait in traitTotals) {
-                let max = traitCounts[trait] * 5;
-                let min = traitCounts[trait] * 1;
-                profile[trait] = Math.round(((traitTotals[trait] - min) / (max - min)) * 100);
-            }
-
-            let areaMatches = {};
-            for (let area in AREAS_REQUIREMENTS) {
-                let score = 0;
-                for (let trait in AREAS_REQUIREMENTS[area]) {
-                    score += (profile[trait] || 0) * AREAS_REQUIREMENTS[area][trait];
-                }
-                areaMatches[area] = Math.round(score);
-            }
-
-            let sortedAreas = Object.entries(areaMatches).sort((a,b) => b[1] - a[1]);
-
-            if (_supabase) {
-                const { error } = await _supabase.from('evaluaciones').insert([{
-                    nombres: userData.nombres,
-                    apellidos: userData.apellidos,
-                    identificacion: userData.identificacion,
-                    edad: parseInt(userData.edad),
-                    correo: userData.correo,
-                    perfil_personalidad: profile,
-                    areas_recomendadas: sortedAreas
-                }]);
-
-                if (error) {
-                    alert("Error guardando en base de datos: " + error.message);
-                    return;
-                }
-            }
-
-            document.getElementById('step-questions').classList.add('hidden');
-            document.getElementById('step-thanks').classList.remove('hidden');
-        }
-    </script>
-</body>
-</html>
+        document.getElementById('step-questions').classList.add('hidden');
+        document.getElementById('step-thanks').classList.remove('hidden');
+    }
+</script>
