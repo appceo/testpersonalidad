@@ -4,11 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administrativo | IGLECO</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- jsPDF para Reportes -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
@@ -17,12 +18,11 @@
     <header class="bg-white border-b border-slate-200 py-4 px-6 shadow-sm">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <!-- Logo IGLECO estilizado en código -->
                 <div class="text-2xl font-black tracking-widest text-black flex items-center">
                     IGLE<span class="font-extrabold text-slate-800">CO</span>
                 </div>
                 <div class="h-6 w-px bg-slate-300"></div>
-                <span class="text-xs font-bold tracking-wider text-slate-500 uppercase">Panel de Gestión Administrativa</span>
+                <span class="text-xs font-bold tracking-wider text-slate-500 uppercase">Panel Administrativo</span>
             </div>
             <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-mono border">Acceso Restringido</span>
         </div>
@@ -35,7 +35,7 @@
             <div class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto text-xl">🔒</div>
             <div>
                 <h2 class="text-2xl font-bold text-slate-900">Acceso Requerido</h2>
-                <p class="text-sm text-slate-500 mt-1">Ingrese el PIN de seguridad para consultar evaluaciones y descargar reportes.</p>
+                <p class="text-sm text-slate-500 mt-1">Ingrese el PIN de seguridad para acceder al panel.</p>
             </div>
             <div>
                 <input type="password" id="pin-input" placeholder="••••" maxlength="8" class="w-full p-3 border border-slate-300 rounded-lg text-center text-2xl tracking-widest outline-none focus:ring-2 focus:ring-black">
@@ -45,166 +45,24 @@
 
         <!-- PANEL DE BÚSQUEDA Y REPORTES -->
         <div id="admin-panel" class="hidden bg-white rounded-xl border border-slate-200 shadow-sm p-8 space-y-6">
-            <div class="border-b pb-4">
-                <h2 class="text-2xl font-bold text-slate-900">Consulta de Evaluaciones</h2>
-                <p class="text-sm text-slate-500">Busca participantes por apellidos o número de identificación.</p>
-            </div>
-            
-            <div class="flex gap-3">
-                <input type="text" id="search-input" placeholder="Escriba el Apellido o Identificación..." class="flex-1 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none">
-                <button onclick="searchRecords()" class="px-6 py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition flex items-center gap-2">
-                    🔍 Buscar
-                </button>
+            <div class="flex justify-between items-center border-b pb-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Consulta de Evaluaciones</h2>
+                    <p class="text-sm text-slate-500">Consulte las respuestas registradas en Google Sheets o abra la hoja centralizada.</p>
+                </div>
+                <a href="https://sheets.google.com" target="_blank" class="px-4 py-2 border border-slate-300 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg transition flex items-center gap-2">
+                    📊 Abrir Google Sheets
+                </a>
             </div>
 
-            <div class="overflow-x-auto border rounded-lg">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-slate-100 border-b text-slate-600 font-semibold uppercase text-xs">
-                        <tr>
-                            <th class="p-3">Identificación</th>
-                            <th class="p-3">Nombre Completo</th>
-                            <th class="p-3">Correo Electrónico</th>
-                            <th class="p-3">Fecha</th>
-                            <th class="p-3 text-center">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="results-table-body" class="divide-y divide-slate-100">
-                        <tr>
-                            <td colspan="5" class="p-6 text-center text-slate-400">Ingrese un término de búsqueda para ver los resultados.</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="p-6 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                <h3 class="font-bold text-slate-900 text-sm">Gestión de datos de IGLECO</h3>
+                <p class="text-xs text-slate-600 leading-relaxed">
+                    Todas las respuestas enviadas por los encuestados se almacenan automáticamente en tiempo real en tu hoja de Google Sheets. Puedes consultar el archivo centralizado para exportar reportes, filtrar por participante o imprimir resultados.
+                </p>
             </div>
         </div>
 
     </main>
 
     <script>
-        // REEMPLAZA ESTAS DOS LÍNEAS CON TUS DATOS DE SUPABASE:
-        const SUPABASE_URL = "https://TU_PROYECTO.supabase.co"; 
-        const SUPABASE_KEY = "TU_LLAVE_ANON_PUBLIC";
-        const ADMIN_PIN = "1234";
-        let _supabase = null;
-        if (!SUPABASE_URL.includes("TU_PROYECTO")) {
-            _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        }
-
-        const DESCRIPTIONS = {
-            "Destreza Social": "Capacidad para manifestar adecuadamente habilidades de comunicación, brindando un trato abierto y espontáneo.",
-            "Sensibilidad Social": "Manifestación de interés y preocupación por las necesidades ajenas, brindando ayuda y empatía.",
-            "Adaptabilidad": "Control de impulsos y emociones. Mantiene la calma, evalúa con objetividad y se adapta.",
-            "Recursividad": "Disposición para resolver problemas con efectividad y plantear soluciones novedosas.",
-            "Persuasión": "Poder y habilidad para inducir a otros a cambiar de actitud, dirigiendo y tomando iniciativa.",
-            "Perseverancia": "Realización de tareas rutinarias de manera constante, con organización y disciplina.",
-            "Tolerancia": "Capacidad para aceptar puntos de vista diferentes con prudencia y moderación.",
-            "Vitalidad": "Capacidad para realizar actividades con energía, dinamismo y ritmo de trabajo."
-        };
-
-        function checkPin() {
-            const input = document.getElementById('pin-input').value;
-            if (input === ADMIN_PIN) {
-                document.getElementById('login-box').classList.add('hidden');
-                document.getElementById('admin-panel').classList.remove('hidden');
-            } else {
-                alert("PIN incorrecto.");
-            }
-        }
-
-        async function searchRecords() {
-            const query = document.getElementById('search-input').value.trim();
-            if (!query) return;
-
-            if (!_supabase) {
-                alert("⚠️ Debe configurar SUPABASE_URL y SUPABASE_KEY en el código HTML de admin.html.");
-                return;
-            }
-
-            const { data, error } = await _supabase
-                .from('evaluaciones')
-                .select('*')
-                .or(`apellidos.ilike.%${query}%,identificacion.ilike.%${query}%`);
-
-            const tbody = document.getElementById('results-table-body');
-            tbody.innerHTML = '';
-
-            if (error) {
-                alert("Error consultando la base de datos: " + error.message);
-                return;
-            }
-
-            if (!data || data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="p-6 text-center text-slate-500">No se encontraron evaluaciones registradas con ese documento o apellido.</td></tr>`;
-                return;
-            }
-
-            data.forEach(item => {
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 transition">
-                        <td class="p-3 font-semibold text-slate-900">${item.identificacion}</td>
-                        <td class="p-3">${item.nombres} ${item.apellidos}</td>
-                        <td class="p-3 text-slate-600">${item.correo}</td>
-                        <td class="p-3 text-slate-500">${new Date(item.created_at).toLocaleDateString()}</td>
-                        <td class="p-3 text-center">
-                            <button onclick='generatePDF(${JSON.stringify(item)})' class="bg-black hover:bg-slate-800 text-white text-xs px-3 py-1.5 rounded transition inline-flex items-center gap-1">
-                                📄 Descargar PDF
-                            </button>
-                        </td>
-                    </tr>
-                `;
-            });
-        }
-
-        function generatePDF(data) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            doc.setFillColor(0, 0, 0);
-            doc.rect(0, 0, 210, 22, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(14);
-            doc.text("IGLECO - Reporte de Perfil Psicométrico", 14, 15);
-
-            doc.setTextColor(40, 40, 40);
-            doc.setFontSize(10);
-            doc.text(`Nombre: ${data.nombres} ${data.apellidos}`, 14, 32);
-            doc.text(`Identificación: ${data.identificacion}`, 14, 38);
-            doc.text(`Edad: ${data.edad} años`, 120, 32);
-            doc.text(`Correo: ${data.correo}`, 120, 38);
-
-            doc.setFontSize(11);
-            doc.text("1. Resultados por Dimensiones de Personalidad", 14, 48);
-
-            let profileRows = [];
-            for (let trait in data.perfil_personalidad) {
-                let score = data.perfil_personalidad[trait];
-                let level = score >= 66 ? "Alto" : (score >= 33 ? "Medio" : "Bajo");
-                profileRows.push([trait, `${score}%`, level, DESCRIPTIONS[trait] || ""]);
-            }
-
-            doc.autoTable({
-                startY: 52,
-                head: [['Dimensión', 'Puntaje', 'Nivel', 'Interpretación Técnica']],
-                body: profileRows,
-                headStyles: { fillColor: [0, 0, 0] },
-                columnStyles: { 3: { cellWidth: 90 } },
-                styles: { fontSize: 8 }
-            });
-
-            let finalY = doc.lastAutoTable.finalY + 10;
-            doc.text("2. Top 5 Áreas de Servicio Recomendadas", 14, finalY);
-
-            let areaRows = data.areas_recomendadas.slice(0, 5).map(a => [a[0], `${a[1]}%`]);
-
-            doc.autoTable({
-                startY: finalY + 4,
-                head: [['Área Ministerial', 'Afinidad Estimada']],
-                body: areaRows,
-                headStyles: { fillColor: [50, 50, 50] },
-                styles: { fontSize: 9 }
-            });
-
-            doc.save(`Reporte_${data.apellidos}_${data.identificacion}.pdf`);
-        }
-    </script>
-</body>
-</html>
