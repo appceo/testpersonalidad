@@ -82,7 +82,7 @@
 
     <script>
         const ADMIN_PIN = "1234";
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIuqJ7f3v20mmdThj1Ia8A6el4RrJ_KM-Le8CbD826l_1s2x2yooDNDMrya98K0v_kqA/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3jCdQhXobfC7RMKPJIxgQXKzeXLyUMeuU8VOQQr25G_QRqaJ-pTCF3Cf0rb9S8PZObQ/exec";
         let dbRecords = [];
 
         // DEFINICIONES TÉCNICAS OFICIALES DE LAS ÁREAS DE IGLECO
@@ -249,6 +249,12 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
+            // Función auxiliar para limpiar el nombre del área (ej. "Adoración (50%)" -> "Adoración")
+            function cleanAreaName(rawName) {
+                if (!rawName) return "";
+                return rawName.replace(/\s*\(\d+\%\)/g, "").trim();
+            }
+
             let perfil = {};
             try {
                 const rawPerfil = record.perfil || record['Perfil Resumen'];
@@ -262,9 +268,14 @@
             const id = record.identificacion || record.Identificacion || 'N/A';
             const edad = record.edad || record.Edad || 'N/A';
             const correo = record.correo || record.Correo || 'N/A';
-            const top1 = record.top1 || record['Top 1 Area'] || 'N/A';
-            const top2 = record.top2 || record['Top 2 Area'] || 'N/A';
-            const top3 = record.top3 || record['Top 3 Area'] || 'N/A';
+
+            const rawTop1 = record.top1 || record['Top 1 Area'] || 'N/A';
+            const rawTop2 = record.top2 || record['Top 2 Area'] || 'N/A';
+            const rawTop3 = record.top3 || record['Top 3 Area'] || 'N/A';
+
+            const cleanTop1 = cleanAreaName(rawTop1);
+            const cleanTop2 = cleanAreaName(rawTop2);
+            const cleanTop3 = cleanAreaName(rawTop3);
 
             // Encabezado Corporativo
             doc.setFillColor(0, 0, 0);
@@ -286,15 +297,15 @@
             doc.text(`Edad: ${edad} años`, 14, 46);
             doc.text(`Correo Electrónico: ${correo}`, 14, 52);
 
-            // Áreas Recomendadas con Definiciones Técnicas
+            // Áreas Sugeridas con Definiciones Técnicas Precisas
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
             doc.text("ÁREAS DE SERVICIO SUGERIDAS Y DEFINICIÓN TÉCNICA", 14, 62);
 
             const areasBody = [
-                ['Área Principal (Top 1)', top1, DEFINICIONES_AREAS[top1] || "Área enfocada en el servicio comunitario y fortalecimiento del equipo ministerial."],
-                ['Área Secundaria (Top 2)', top2, DEFINICIONES_AREAS[top2] || "Área orientada a la colaboración en procesos operativos y de acompañamiento."],
-                ['Área Alternativa (Top 3)', top3, DEFINICIONES_AREAS[top3] || "Opción complementaria para diversificar el servicio según las necesidades."]
+                ['Área Principal (Top 1)', rawTop1, DEFINICIONES_AREAS[cleanTop1] || "Acompañamiento e integración en el servicio comunitario según perfil."],
+                ['Área Secundaria (Top 2)', rawTop2, DEFINICIONES_AREAS[cleanTop2] || "Soporte colaborativo en procesos operativos y de acompañamiento."],
+                ['Área Alternativa (Top 3)', rawTop3, DEFINICIONES_AREAS[cleanTop3] || "Opción complementaria para diversificar el servicio según las necesidades."]
             ];
 
             doc.autoTable({
@@ -303,7 +314,7 @@
                 body: areasBody,
                 theme: 'striped',
                 headStyles: { fillColor: [0, 0, 0] },
-                columnStyles: { 0: { cellWidth: 38 }, 1: { cellWidth: 35 }, 2: { cellWidth: 107 } }
+                columnStyles: { 0: { cellWidth: 38 }, 1: { cellWidth: 38 }, 2: { cellWidth: 104 } }
             });
 
             // Diagnóstico Cualitativo por Categoría
