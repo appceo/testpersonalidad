@@ -82,7 +82,7 @@
 
     <script>
         const ADMIN_PIN = "1234";
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIuqJ7f3v20mmdThj1Ia8A6el4RrJ_KM-Le8CbD826l_1s2x2yooDNDMrya98K0v_kqA/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3jCdQhXobfC7RMKPJIxgQXKzeXLyUMeuU8VOQQr25G_QRqaJ-pTCF3Cf0rb9S8PZObQ/exec";
         let dbRecords = [];
 
         // DEFINICIONES TÉCNICAS OFICIALES DE LAS ÁREAS DE IGLECO
@@ -111,47 +111,47 @@
             "Medios e Infraestructura": "Mantenimiento físico, montaje de escenarios, soporte técnico de instalaciones y gestión de espacios de reunión para garantizar el correcto funcionamiento del espacio físico."
         };
 
-        // MATRIZ DE OBSERVACIONES CUALITATIVAS SEGÚN RANGO PSICOMÉTRICO
+        // BANCO DE OBSERVACIONES CUALITATIVAS AMPLIADO Y PROFUNDO
         const OBSERVACIONES = {
             "Destreza Social": {
-                alto: "Sobresaliente: Alta fluidez para entablar relaciones y romper el hielo en cualquier entorno.",
-                medio: "Desarrollado: Se relaciona con soltura y efectividad en su entorno social y ministerial.",
-                bajo: "En desarrollo: Prefiere entornos reducidos o interacción enfocada en tareas específicas."
+                alto: "Sobresaliente: Posee alta carisma y soltura natural para iniciar conversaciones y construir relaciones de confianza rápidamente. Ideal para roles de vocería, recepción de personas e integración comunitaria.",
+                medio: "Desarrollado: Demuestra buenas habilidades de comunicación interpersonal. Se desenvuelve bien en entornos conocidos y es capaz de colaborar eficazmente en equipos de trabajo establecidos.",
+                bajo: "En desarrollo: Muestra preferencia por tareas individuales o grupos pequeños. Se beneficia de ambientes estructurados con roles claros antes de asumir interacción constante con el público."
             },
             "Sensibilidad Social": {
-                alto: "Sobresaliente: Elevada empatía y compasión activa; percibe rápidamente la necesidad ajena.",
-                medio: "Desarrollado: Sensible y atento al bienestar de los demás de forma objetiva y constante.",
-                bajo: "En desarrollo: Orientado a objetivos lógicos; requiere pautas directas para la atención pastoral."
+                alto: "Sobresaliente: Demuestra profunda empatía, compasión activa y discernimiento para percibir necesidades emocionales o espirituales. Excelente perfil para consolación, consejería y cuidado pastoral.",
+                medio: "Desarrollado: Muestra un genuino interés por el bienestar de los demás manteniendo la objetividad. Capaz de brindar apoyo oportuno sin comprometer la efectividad operativa.",
+                bajo: "En desarrollo: Enfoque altamente pragmático y orientado a tareas. Requiere directrices o listas de chequeo claras cuando debe gestionar aspectos de atención humana o pastoral."
             },
             "Adaptabilidad": {
-                alto: "Sobresaliente: Excelente manejo del estrés, calma y versatilidad ante cambios imprevistos.",
-                medio: "Desarrollado: Se adapta bien a variaciones organizacionales con adecuada templanza.",
-                bajo: "En desarrollo: Trabaja mejor en entornos estables con procesos estructurados y previsibles."
+                alto: "Sobresaliente: Excepcional capacidad de respuesta ante contingencias, cambios de planes o situaciones de alta presión. Mantiene la templanza y transmite calma al equipo.",
+                medio: "Desarrollado: Maneja adecuadamente las modificaciones de rutina cuando se comunican con anticipación. Es flexible dentro de un margen razonable de previsibilidad.",
+                bajo: "En desarrollo: Altamente estructurado. Se desempeña con mayor eficiencia y seguridad en procesos estables, estandarizados y con instrucciones bien definidas desde el inicio."
             },
             "Recursividad": {
-                alto: "Sobresaliente: Altamente creativo e ingenioso para resolver problemas con recursos limitados.",
-                medio: "Desarrollado: Capaz de proponer alternativas prácticas frente a bloqueos operativos.",
-                bajo: "En desarrollo: Funciona mejor siguiendo métodos, instructivos y procedimientos probados."
+                alto: "Sobresaliente: Mente creativa e innovadora. Encuentra soluciones pragmáticas y eficientes en escenarios complejos o con recursos limitados. Aporta valor en la resolución de problemas.",
+                medio: "Desarrollado: Capaz de proponer alternativas útiles frente a imprevistos del día a día. Utiliza adecuadamente las herramientas disponibles para resolver bloqueos.",
+                bajo: "En desarrollo: Prefiere aplicar procedimientos y métodos previamente aprobados. Requiere mentoría para desarrollar iniciativa propia en situaciones no contempladas."
             },
             "Persuasión": {
-                alto: "Sobresaliente: Liderazgo e influencia natural; moviliza e inspira a otros con facilidad.",
-                medio: "Desarrollado: Expresa sus ideas con claridad e impacta de forma positiva en su equipo.",
-                bajo: "En desarrollo: Su estilo es más ejecutor o de soporte que de vocería directiva."
+                alto: "Sobresaliente: Capacidad natural de liderazgo e influencia. Comunica visiones con pasión e inspira movilización activa en grupos de personas. Apto para dirección de proyectos.",
+                medio: "Desarrollado: Expresa argumentos de forma clara y lógica. Impacta positivamente en su círculo inmediato y puede motivar a otros desde el ejemplo personal.",
+                bajo: "En desarrollo: Estilo de trabajo centrado en la ejecución silenciosa o de apoyo. Prefiere que otros asuman la vocería o toma de decisiones públicas."
             },
             "Perseverancia": {
-                alto: "Sobresaliente: Disciplina, tenacidad y orden impecables para llevar proyectos hasta el final.",
-                medio: "Desarrollado: Constante y responsable en el cumplimiento de sus compromisos asignados.",
-                bajo: "En desarrollo: Se beneficia de acompañamiento periódico para mantener el ritmo en metas largas."
+                alto: "Sobresaliente: Disciplina metódica y tenacidad notable. Cumple compromisos hasta el final, superando barreras u obstáculos a lo largo del tiempo sin perder la motivación.",
+                medio: "Desarrollado: Demuestra constancia y responsabilidad con sus asignaciones habituales. Logra concluir proyectos de mediano alcance de forma confiable.",
+                bajo: "En desarrollo: Tiende a perder el enfoque o dinamismo en proyectos de larga duración. Se beneficia de subdividir metas en entregables a corto plazo y seguimiento periódico."
             },
             "Tolerancia": {
-                alto: "Sobresaliente: Notable paciencia y apertura frente a la diversidad de opiniones y críticas.",
-                medio: "Desarrollado: Respeta y gestiona adecuadamente las diferencias de criterio.",
-                bajo: "En desarrollo: Prefiere ambientes con normas explícitas y consensos previos."
+                alto: "Sobresaliente: Excelente paciencia y madurez para gestionar desacuerdos o puntos de vista opuestos. Facilita la resolución pacífica de conflictos y promueve la unidad.",
+                medio: "Desarrollado: Mantiene un trato respetuoso frente a la diversidad de criterios. Sabe negociar diferencias y colaborar en armonía en entornos diversos.",
+                bajo: "En desarrollo: Firme en sus convicciones y expectativas. Rinde mejor en equipos donde existen acuerdos claros y límites de autoridad plenamente definidos."
             },
             "Vitalidad": {
-                alto: "Sobresaliente: Energía contagiante, dinamismo y entusiasmo para entornos exigentes.",
-                medio: "Desarrollado: Mantiene un ritmo de trabajo activo, constante y equilibrado.",
-                bajo: "En desarrollo: Rinde mejor en actividades analíticas, pausadas y de menor desgaste físico."
+                alto: "Sobresaliente: Nivel superior de energía física y entusiasmo contagioso. Excelente capacidad para jornadas dinámicas, activas o de ritmo intenso.",
+                medio: "Desarrollado: Mantiene un ritmo operativo constante, equilibrado y sostenible en el tiempo. Administra bien su esfuerzo personal.",
+                bajo: "En desarrollo: Desempeño óptimo en actividades de bajo desgaste físico, que requieran concentración, análisis o serenidad de ejecución."
             }
         };
 
@@ -249,7 +249,6 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
-            // Función auxiliar para limpiar el nombre del área (ej. "Adoración (50%)" -> "Adoración")
             function cleanAreaName(rawName) {
                 if (!rawName) return "";
                 return rawName.replace(/\s*\(\d+\%\)/g, "").trim();
