@@ -82,10 +82,8 @@
     <script>
         // REEMPLAZA ESTAS DOS LÍNEAS CON TUS DATOS DE SUPABASE:
         const SUPABASE_URL = "https://TU_PROYECTO.supabase.co"; 
-        const SUPABASE_KEY = "TU_LLAVE_ANON_PUBLIC"; 
-        
+        const SUPABASE_KEY = "TU_LLAVE_ANON_PUBLIC";
         const ADMIN_PIN = "1234";
-
         let _supabase = null;
         if (!SUPABASE_URL.includes("TU_PROYECTO")) {
             _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
