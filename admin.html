@@ -114,7 +114,7 @@
         // BANCO DE OBSERVACIONES CUALITATIVAS AMPLIADO Y PROFUNDO
         const OBSERVACIONES = {
             "Destreza Social": {
-                alto: "Sobresaliente: Posee alta carisma y soltura natural para iniciar conversaciones y construir relaciones de confianza rápidamente. Ideal para roles de vocería, recepción de personas e integración comunitaria.",
+                alto: "Sobresaliente: Posee carisma y soltura natural para iniciar conversaciones y construir relaciones de confianza rápidamente. Ideal para roles de vocería, recepción de personas e integración comunitaria.",
                 medio: "Desarrollado: Demuestra buenas habilidades de comunicación interpersonal. Se desenvuelve bien en entornos conocidos y es capaz de colaborar eficazmente en equipos de trabajo establecidos.",
                 bajo: "En desarrollo: Muestra preferencia por tareas individuales o grupos pequeños. Se beneficia de ambientes estructurados con roles claros antes de asumir interacción constante con el público."
             },
@@ -155,198 +155,27 @@
             }
         };
 
-        document.getElementById('btn-login').addEventListener('click', function() {
-            const pin = document.getElementById('pin-input').value.trim();
-            if (pin === ADMIN_PIN) {
-                document.getElementById('login-box').classList.add('hidden');
-                document.getElementById('admin-panel').classList.remove('hidden');
-                loadRecords();
-            } else {
-                alert("PIN incorrecto.");
-            }
-        });
-
-        document.getElementById('pin-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') document.getElementById('btn-login').click();
-        });
-
-        document.getElementById('btn-fetch').addEventListener('click', loadRecords);
-        document.getElementById('btn-search').addEventListener('click', searchRecords);
-        document.getElementById('search-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') searchRecords();
-        });
-
-        async function loadRecords() {
-            const status = document.getElementById('status-msg');
-            status.classList.remove('hidden');
-            status.className = "text-xs text-slate-500 font-medium";
-            status.innerText = "Conectando con Google Sheets...";
-
-            try {
-                const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'GET', redirect: 'follow' });
-                if (!response.ok) throw new Error("Error en la respuesta del servidor");
-                
-                dbRecords = await response.json();
-                status.className = "text-xs text-emerald-600 font-medium";
-                status.innerText = `Sincronización exitosa: ${dbRecords.length} registro(s) disponible(s).`;
-            } catch (e) {
-                status.className = "text-xs text-red-500 font-medium";
-                status.innerText = "Error al conectar con Google Sheets. Verifique el despliegue.";
-            }
-        }
-
-        function searchRecords() {
-            const query = document.getElementById('search-input').value.trim().toLowerCase();
-            const resultsList = document.getElementById('results-list');
-            const container = document.getElementById('results-container');
-            resultsList.innerHTML = '';
-
-            if (!query) {
-                alert("Por favor ingrese un término de búsqueda.");
-                return;
-            }
-
-            const matches = dbRecords.filter(r => {
-                const nombres = (r.nombres || r.Nombres || '').toLowerCase();
-                const apellidos = (r.apellidos || r.Apellidos || '').toLowerCase();
-                const fullName = `${nombres} ${apellidos}`;
-                const id = String(r.identificacion || r.Identificacion || '').toLowerCase();
-                
-                return fullName.includes(query) || id.includes(query);
-            });
-
-            if (matches.length === 0) {
-                resultsList.innerHTML = '<p class="text-sm text-slate-500 py-4 text-center">No se encontraron evaluaciones registradas con ese criterio.</p>';
-            } else {
-                matches.forEach((r) => {
-                    const idx = dbRecords.indexOf(r);
-                    const nombres = r.nombres || r.Nombres || '';
-                    const apellidos = r.apellidos || r.Apellidos || '';
-                    const id = r.identificacion || r.Identificacion || 'N/A';
-                    const edad = r.edad || r.Edad || 'N/A';
-                    const correo = r.correo || r.Correo || 'N/A';
-                    const top1 = r.top1 || r['Top 1 Area'] || 'N/A';
-
-                    resultsList.innerHTML += `
-                        <div class="p-4 border border-slate-200 rounded-xl bg-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                            <div>
-                                <h4 class="font-bold text-slate-900">${nombres} ${apellidos}</h4>
-                                <p class="text-xs text-slate-500 mt-0.5">ID: ${id} | Edad: ${edad} | Correo: ${correo}</p>
-                                <p class="text-xs font-semibold text-emerald-700 mt-1">Sugerencia Principal: ${top1}</p>
-                            </div>
-                            <button onclick="generatePDFForRecord(${idx})" class="px-4 py-2 bg-black hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition whitespace-nowrap">
-                                📄 Descargar PDF
-                            </button>
-                        </div>
-                    `;
-                });
-            }
-            container.classList.remove('hidden');
-        }
-
-        function generatePDFForRecord(index) {
-            const record = dbRecords[index];
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            function cleanAreaName(rawName) {
-                if (!rawName) return "";
-                return rawName.replace(/\s*\(\d+\%\)/g, "").trim();
-            }
-
-            let perfil = {};
-            try {
-                const rawPerfil = record.perfil || record['Perfil Resumen'];
-                perfil = typeof rawPerfil === 'string' ? JSON.parse(rawPerfil) : rawPerfil;
-            } catch (e) {
-                perfil = {};
-            }
-
-            const nombres = record.nombres || record.Nombres || '';
-            const apellidos = record.apellidos || record.Apellidos || '';
-            const id = record.identificacion || record.Identificacion || 'N/A';
-            const edad = record.edad || record.Edad || 'N/A';
-            const correo = record.correo || record.Correo || 'N/A';
-
-            const rawTop1 = record.top1 || record['Top 1 Area'] || 'N/A';
-            const rawTop2 = record.top2 || record['Top 2 Area'] || 'N/A';
-            const rawTop3 = record.top3 || record['Top 3 Area'] || 'N/A';
-
-            const cleanTop1 = cleanAreaName(rawTop1);
-            const cleanTop2 = cleanAreaName(rawTop2);
-            const cleanTop3 = cleanAreaName(rawTop3);
-
-            // Encabezado Corporativo
-            doc.setFillColor(0, 0, 0);
-            doc.rect(0, 0, 210, 20, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(13);
-            doc.setFont("helvetica", "bold");
-            doc.text("IGLECO - PERFILAMIENTO PSICOMÉTRICO Y MINISTERIAL", 14, 13);
-
-            // Datos Personales
-            doc.setTextColor(0, 0, 0);
-            doc.setFontSize(11);
-            doc.text("INFORMACIÓN DEL EVALUADO", 14, 28);
-            
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Nombre Completo: ${nombres} ${apellidos}`, 14, 34);
-            doc.text(`Identificación: ${id}`, 14, 40);
-            doc.text(`Edad: ${edad} años`, 14, 46);
-            doc.text(`Correo Electrónico: ${correo}`, 14, 52);
-
-            // Áreas Sugeridas con Definiciones Técnicas Precisas
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("ÁREAS DE SERVICIO SUGERIDAS Y DEFINICIÓN TÉCNICA", 14, 62);
-
-            const areasBody = [
-                ['Área Principal (Top 1)', rawTop1, DEFINICIONES_AREAS[cleanTop1] || "Acompañamiento e integración en el servicio comunitario según perfil."],
-                ['Área Secundaria (Top 2)', rawTop2, DEFINICIONES_AREAS[cleanTop2] || "Soporte colaborativo en procesos operativos y de acompañamiento."],
-                ['Área Alternativa (Top 3)', rawTop3, DEFINICIONES_AREAS[cleanTop3] || "Opción complementaria para diversificar el servicio según las necesidades."]
-            ];
-
-            doc.autoTable({
-                startY: 65,
-                head: [['Prioridad', 'Área Recomendada', 'Propósito y Alcance del Área']],
-                body: areasBody,
-                theme: 'striped',
-                headStyles: { fillColor: [0, 0, 0] },
-                columnStyles: { 0: { cellWidth: 38 }, 1: { cellWidth: 38 }, 2: { cellWidth: 104 } }
-            });
-
-            // Diagnóstico Cualitativo por Categoría
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("DIAGNÓSTICO CUALITATIVO POR CATEGORÍA", 14, doc.lastAutoTable.finalY + 10);
-
-            const traitRows = Object.keys(perfil).map(trait => {
-                const score = perfil[trait];
-                let nivel = "medio";
-                if (score >= 75) nivel = "alto";
-                else if (score < 50) nivel = "bajo";
-
-                const obsObj = OBSERVACIONES[trait] || {
-                    alto: "Desempeño sobresaliente en la categoría.",
-                    medio: "Desempeño adecuado y funcional.",
-                    bajo: "Área con oportunidad de crecimiento."
-                };
-
-                return [trait, `${score}%`, obsObj[nivel]];
-            });
-
-            doc.autoTable({
-                startY: doc.lastAutoTable.finalY + 14,
-                head: [['Rasgo Evaluado', 'Puntaje', 'Perfilamiento Cualitativo / Observación']],
-                body: traitRows.length > 0 ? traitRows : [['N/A', 'N/A', 'Sin datos disponibles']],
-                theme: 'grid',
-                headStyles: { fillColor: [0, 0, 0] },
-                columnStyles: { 0: { cellWidth: 38 }, 1: { cellWidth: 20 }, 2: { cellWidth: 122 } }
-            });
-
-            doc.save(`Reporte_IGLECO_Cualitativo_${id}.pdf`);
-        }
-    </script>
-</body>
-</html>
+        // FORTALEZAS Y OPORTUNIDADES POR RASGO
+        const CONCEPTO_DUAL = {
+            "Destreza Social": {
+                fortaleza: "Habilidad para conectar y generar vínculos interpersonales fluidos.",
+                mejora: "Puntualizar profundización en relaciones uno a uno y escucha activa."
+            },
+            "Sensibilidad Social": {
+                fortaleza: "Gran empatía y percepción activa del estado emocional y espiritual ajeno.",
+                mejora: "Establecer límites sanos para evitar el desgaste emocional por sobreinvolucramiento."
+            },
+            "Adaptabilidad": {
+                fortaleza: "Alta ecuanimidad y resiliencia frente al cambio e imprevistos.",
+                mejora: "Asegurar el respeto por los procesos organizativos básicos antes de modificar planes."
+            },
+            "Recursividad": {
+                fortaleza: "Ingenio y creatividad orientada a resolver problemas prácticos con rapidez.",
+                mejora: "Documentar y estandarizar las soluciones creadas para que sean replicables."
+            },
+            "Persuasión": {
+                fortaleza: "Capacidad de influencia, comunicación inspiradora y movilización de personas.",
+                mejora: "Equilibrar la persuasión verbal escuchando y validando las dudas del equipo."
+            },
+            "Perseverancia": {
+                fortaleza:
