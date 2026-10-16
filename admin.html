@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administrativo | IGLECO</title>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
     <!-- jsPDF para Reportes PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js](https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js](https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js)"></script>
+    <link href="[https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap)" rel="stylesheet">
     <style> body { font-family: 'Inter', sans-serif; } </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- ENCABEZADO IGLECO -->
+    <!-- ENCABEZADO CORPORATIVO IGLECO -->
     <header class="bg-white border-b border-slate-200 py-4 px-6 shadow-sm">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
                 <div class="text-2xl font-black tracking-widest text-black flex items-center">
                     IGLE<span class="font-extrabold text-slate-800">CO</span>
@@ -28,9 +28,9 @@
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto my-8 px-4">
+    <main class="max-w-5xl mx-auto my-10 px-4">
         
-        <!-- LOGIN PIN -->
+        <!-- PANTALLA DE ACCESO POR PIN -->
         <div id="login-box" class="bg-white rounded-xl border border-slate-200 shadow-xl p-8 max-w-md mx-auto text-center space-y-6">
             <div class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto text-xl">🔒</div>
             <div>
@@ -43,169 +43,185 @@
             <button type="button" id="btn-login" class="w-full py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition">Ingresar al Panel</button>
         </div>
 
-        <!-- CONTENIDO PRINCIPAL DEL PANEL -->
+        <!-- PANEL DE BÚSQUEDA Y REPORTES -->
         <div id="admin-panel" class="hidden space-y-6">
-            
-            <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h2 class="text-xl font-bold text-slate-900">Consulta de Evaluaciones Psicométricas</h2>
-                    <p class="text-xs text-slate-500">Busque participantes por nombre, apellido o número de identificación para consultar o descargar reporte PDF.</p>
-                </div>
-                <button id="btn-refresh" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border transition">
-                    🔄 Sincronizar Datos
-                </button>
-            </div>
-
-            <!-- BUSCADOR -->
-            <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Buscar por Nombres, Apellidos o Cédula / DNI</label>
-                        <input type="text" id="search-query" placeholder="Ej. Carlos o 12345678" class="w-full p-3 border border-slate-300 rounded-lg outline-none focus:ring-2 focus:ring-black">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 md:p-8 space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">Consulta de Evaluados</h2>
+                        <p class="text-sm text-slate-500">Busque por identificación o nombres para descargar el informe individual en PDF.</p>
                     </div>
-                    <div class="flex items-end">
-                        <button id="btn-search" class="w-full py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition">
-                            Buscar Registro
-                        </button>
-                    </div>
+                    <button id="btn-fetch" type="button" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border transition">
+                        🔄 Cargar/Actualizar Datos
+                    </button>
+                </div>
+
+                <!-- CAMPO DE BÚSQUEDA -->
+                <div class="flex gap-3">
+                    <input type="text" id="search-input" placeholder="Ingrese Identificación (Cédula) o Nombres..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none">
+                    <button type="button" id="btn-search" class="px-6 py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition">
+                        Buscar
+                    </button>
+                </div>
+
+                <div id="status-msg" class="text-xs text-slate-500 hidden">Cargando registros...</div>
+
+                <!-- RESULTADOS DE BÚSQUEDA -->
+                <div id="results-container" class="space-y-4 hidden">
+                    <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Resultados Encontrados</h3>
+                    <div id="results-list" class="space-y-3"></div>
                 </div>
             </div>
-
-            <!-- RESULTADOS -->
-            <div id="results-container" class="space-y-4"></div>
-
         </div>
 
     </main>
 
     <script>
         const ADMIN_PIN = "1234";
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3jCdQhXobfC7RMKPJIxgQXKzeXLyUMeuU8VOQQr25G_QRqaJ-pTCF3Cf0rb9S8PZObQ/exec";
-        
-        let allRecords = [];
+        const GOOGLE_SCRIPT_URL = "[https://script.google.com/macros/s/AKfycby3jCdQhXobfC7RMKPJIxgQXKzeXLyUMeuU8VOQQr25G_QRqaJ-pTCF3Cf0rb9S8PZObQ/exec](https://script.google.com/macros/s/AKfycby3jCdQhXobfC7RMKPJIxgQXKzeXLyUMeuU8VOQQr25G_QRqaJ-pTCF3Cf0rb9S8PZObQ/exec)";
+        let dbRecords = [];
 
-        document.getElementById('btn-login').addEventListener('click', validatePin);
-        document.getElementById('pin-input').addEventListener('keypress', function(e) { if (e.key === 'Enter') validatePin(); });
-
-        function validatePin() {
-            const inputPin = document.getElementById('pin-input').value.trim();
-            if (inputPin === ADMIN_PIN) {
+        document.getElementById('btn-login').addEventListener('click', function() {
+            const pin = document.getElementById('pin-input').value.trim();
+            if (pin === ADMIN_PIN) {
                 document.getElementById('login-box').classList.add('hidden');
                 document.getElementById('admin-panel').classList.remove('hidden');
                 loadRecords();
             } else {
-                alert("PIN incorrecto. Intente nuevamente.");
+                alert("PIN incorrecto.");
             }
-        }
-
-        async function loadRecords() {
-            const container = document.getElementById('results-container');
-            container.innerHTML = '<div class="p-8 text-center text-slate-500 font-medium">Cargando registros desde Google Sheets...</div>';
-            
-            try {
-                const response = await fetch(GOOGLE_SCRIPT_URL);
-                allRecords = await response.json();
-                renderRecords(allRecords);
-            } catch (err) {
-                container.innerHTML = '<div class="p-8 text-center text-red-500 font-medium">Error al conectar con la base de datos. Por favor reintente.</div>';
-            }
-        }
-
-        document.getElementById('btn-refresh').addEventListener('click', loadRecords);
-
-        document.getElementById('btn-search').addEventListener('click', function() {
-            const query = document.getElementById('search-query').value.trim().toLowerCase();
-            if (!query) {
-                renderRecords(allRecords);
-                return;
-            }
-            const filtered = allRecords.filter(r => 
-                (r.nombres && r.nombres.toLowerCase().includes(query)) ||
-                (r.apellidos && r.apellidos.toLowerCase().includes(query)) ||
-                (r.identificacion && String(r.identificacion).toLowerCase().includes(query))
-            );
-            renderRecords(filtered);
         });
 
-        function renderRecords(records) {
+        document.getElementById('btn-fetch').addEventListener('click', loadRecords);
+        document.getElementById('btn-search').addEventListener('click', searchRecords);
+
+        async function loadRecords() {
+            const status = document.getElementById('status-msg');
+            status.classList.remove('hidden');
+            status.innerText = "Cargando datos desde Google Sheets...";
+
+            try {
+                const response = await fetch(GOOGLE_SCRIPT_URL);
+                dbRecords = await response.json();
+                status.innerText = `Se cargaron ${dbRecords.length} registros exitosamente.`;
+            } catch (e) {
+                status.innerText = "Error al conectar con Google Sheets. Verifique la conexión.";
+            }
+        }
+
+        function searchRecords() {
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+            const resultsList = document.getElementById('results-list');
             const container = document.getElementById('results-container');
-            if (!records || records.length === 0) {
-                container.innerHTML = '<div class="p-8 text-center bg-white border border-slate-200 rounded-xl text-slate-500">No se encontraron registros coincidentes.</div>';
+            resultsList.innerHTML = '';
+
+            if (!query) {
+                alert("Por favor ingrese un término de búsqueda.");
                 return;
             }
 
-            container.innerHTML = records.map((r, index) => {
-                let perfilObj = {};
-                try { perfilObj = typeof r.perfil === 'string' ? JSON.parse(r.perfil) : r.perfil; } catch(e){}
+            const matches = dbRecords.filter(r => {
+                const fullName = `${r.Nombres || ''} ${r.Apellidos || ''}`.toLowerCase();
+                const id = String(r.Identificacion || '').toLowerCase();
+                return fullName.includes(query) || id.includes(query);
+            });
 
-                return `
-                    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm space-y-4">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b pb-3 gap-2">
+            if (matches.length === 0) {
+                resultsList.innerHTML = '<p class="text-sm text-slate-500">No se encontraron evaluaciones registradas con ese criterio.</p>';
+            } else {
+                matches.forEach((r, idx) => {
+                    resultsList.innerHTML += `
+                        <div class="p-4 border border-slate-200 rounded-xl bg-slate-50 flex justify-between items-center">
                             <div>
-                                <h3 class="text-lg font-bold text-slate-900">${r.nombres || ''} ${r.apellidos || ''}</h3>
-                                <p class="text-xs text-slate-500">ID: ${r.identificacion || 'N/A'} | Edad: ${r.edad || 'N/A'} | Correo: ${r.correo || 'N/A'}</p>
+                                <h4 class="font-bold text-slate-900">${r.Nombres} ${r.Apellidos}</h4>
+                                <p class="text-xs text-slate-500">ID: ${r.Identificacion} | Edad: ${r.Edad} | Correo: ${r.Correo}</p>
+                                <p class="text-xs font-semibold text-emerald-700 mt-1">Sugerencia: Top 1: ${r['Top 1 Area'] || 'N/A'}</p>
                             </div>
-                            <button onclick="generatePDF(${index})" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition flex items-center gap-2">
-                                📄 Descargar Reporte PDF
+                            <button onclick="generatePDF(${idx})" class="px-4 py-2 bg-black hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition">
+                                📄 Descargar PDF
                             </button>
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs">
-                            <div><span class="font-bold text-slate-700">Área Principal:</span> <br><span class="text-emerald-700 font-semibold">${r.top1 || 'N/A'}</span></div>
-                            <div><span class="font-bold text-slate-700">Segunda Opción:</span> <br><span class="text-slate-800">${r.top2 || 'N/A'}</span></div>
-                            <div><span class="font-bold text-slate-700">Tercera Opción:</span> <br><span class="text-slate-800">${r.top3 || 'N/A'}</span></div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                });
+            }
+            container.classList.remove('hidden');
         }
 
-        function getComment(trait, score) {
-            if (score >= 75) return "Desempeño sobresaliente. Muestra alta naturalidad y dominio espontáneo.";
-            if (score >= 50) return "Nivel adecuado y funcional. Aporta valor de forma constante.";
-            return "Área con oportunidad de fortalecimiento y acompañPara lograr la consulta en tiempo real y la generación de reportes en PDF desde el panel administrativo, debemos realizar dos ajustes sencillos:
+        function generatePDF(index) {
+            const record = dbRecords[index];
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
 
----
+            let perfil = {};
+            try {
+                perfil = typeof record['Perfil Resumen'] === 'string' ? JSON.parse(record['Perfil Resumen']) : record['Perfil Resumen'];
+            } catch (e) {
+                perfil = {};
+            }
 
-### Paso 1: Actualizar el código de Google Apps Script
+            // Encabezado
+            doc.setFillColor(0, 0, 0);
+            doc.rect(0, 0, 210, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(16);
+            doc.setFont("helvetica", "bold");
+            doc.text("IGLECO - REPORTE PSICOMÉTRICO MINISTERIAL", 14, 13);
 
-Abre tu hoja en **Google Sheets > Extensiones > Apps Script** y reemplaza todo el código por este para permitir que el panel consulte la base de datos (función `doGet`):
+            // Datos Personales
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(12);
+            doc.text("INFORMACIÓN DEL EVALUADO", 14, 30);
+            
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Nombre Completo: ${record.Nombres} ${record.Apellidos}`, 14, 38);
+            doc.text(`Identificación: ${record.Identificacion}`, 14, 44);
+            doc.text(`Edad: ${record.Edad}`, 14, 50);
+            doc.text(`Correo Electrónico: ${record.Correo}`, 14, 56);
 
-```javascript
-function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = JSON.parse(e.postData.contents);
-  
-  sheet.appendRow([
-    new Date(),
-    data.nombres,
-    data.apellidos,
-    data.identificacion,
-    data.edad,
-    data.correo,
-    data.top1,
-    data.top2,
-    data.top3,
-    JSON.stringify(data.perfil)
-  ]);
-  
-  return ContentService.createTextOutput(JSON.stringify({ "result": "success" }))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+            // Áreas de Servicio Recomendadas
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.text("ÁREAS DE SERVICIO SUGERIDAS", 14, 68);
 
-function doGet(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
-  var data = sheet.getDataRange().getValues();
-  var headers = data[0];
-  var rows = data.slice(1);
-  
-  var result = rows.map(function(row) {
-    var obj = {};
-    headers.forEach(function(header, index) {
-      obj[header] = row[index];
-    });
-    return obj;
-  });
-  
-  return ContentService.createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON);
-}
+            doc.autoTable({
+                startY: 72,
+                head: [['Prioridad', 'Área Recomendada']],
+                body: [
+                    ['Área Principal (Top 1)', record['Top 1 Area'] || 'N/A'],
+                    ['Área Secundaria (Top 2)', record['Top 2 Area'] || 'N/A'],
+                    ['Área Alternativa (Top 3)', record['Top 3 Area'] || 'N/A']
+                ],
+                theme: 'striped',
+                headStyles: { fillColor: [0, 0, 0] }
+            });
+
+            // Perfil de Rasgos Psicométricos
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.text("DESGLOSE DE RASGOS DE PERSONALIDAD", 14, doc.lastAutoTable.finalY + 12);
+
+            const traitRows = Object.keys(perfil).map(trait => {
+                const score = perfil[trait];
+                let desc = "Puntaje Promedio.";
+                if (score >= 75) desc = "Sobresaliente. Altamente recomendado para roles de alta exigencia en esta área.";
+                else if (score >= 50) desc = "Desarrollado. Muestra buen nivel de adecuación.";
+                else desc = "En desarrollo. Requiere acompañamiento o mentoría.";
+                
+                return [trait, `${score}%`, desc];
+            });
+
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 16,
+                head: [['Rasgo Evaluado', 'Puntaje', 'Interpretación / Comentarios']],
+                body: traitRows.length > 0 ? traitRows : [['N/A', 'N/A', 'Sin datos de perfil']],
+                theme: 'grid',
+                headStyles: { fillColor: [0, 0, 0] },
+                columnStyles: { 0: { cellWidth: 40 }, 1: { cellWidth: 25 }, 2: { cellWidth: 115 } }
+            });
+
+            doc.save(`Reporte_IGLECO_${record.Identificacion}.pdf`);
+        }
+    </script>
+</body>
+</html>
