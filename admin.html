@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Administrativo | IGLECO</title>
-    <!-- Tailwind CSS CDN -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- jsPDF para Reportes PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -104,18 +104,32 @@
 
         document.getElementById('btn-fetch').addEventListener('click', loadRecords);
         document.getElementById('btn-search').addEventListener('click', searchRecords);
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchRecords();
+            }
+        });
 
         async function loadRecords() {
             const status = document.getElementById('status-msg');
             status.classList.remove('hidden');
-            status.innerText = "Cargando datos desde Google Sheets...";
+            status.className = "text-xs text-slate-500 font-medium";
+            status.innerText = "Conectando con Google Sheets...";
 
             try {
-                const response = await fetch(GOOGLE_SCRIPT_URL);
+                const response = await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'GET',
+                    redirect: 'follow'
+                });
+                
+                if (!response.ok) throw new Error("Error en la respuesta del servidor");
+                
                 dbRecords = await response.json();
-                status.innerText = `Se cargaron ${dbRecords.length} registros exitosamente.`;
+                status.className = "text-xs text-emerald-600 font-medium";
+                status.innerText = `Sincronización exitosa: ${dbRecords.length} registro(s) disponible(s).`;
             } catch (e) {
-                status.innerText = "Error al conectar con Google Sheets. Verifique la conexión.";
+                status.className = "text-xs text-red-500 font-medium";
+                status.innerText = "Error al conectar con Google Sheets. Asegúrese de haber desplegado una 'Nueva Versión' en Apps Script.";
             }
         }
 
@@ -131,8 +145,11 @@
             }
 
             const matches = dbRecords.filter(r => {
-                const fullName = `${r.Nombres || r.nombres || ''} ${r.Apellidos || r.apellidos || ''}`.toLowerCase();
-                const id = String(r.Identificacion || r.identificacion || '').toLowerCase();
+                const nombres = (r.nombres || r.Nombres || '').toLowerCase();
+                const apellidos = (r.apellidos || r.Apellidos || '').toLowerCase();
+                const fullName = `${nombres} ${apellidos}`;
+                const id = String(r.identificacion || r.Identificacion || '').toLowerCase();
+                
                 return fullName.includes(query) || id.includes(query);
             });
 
@@ -140,12 +157,12 @@
                 resultsList.innerHTML = '<p class="text-sm text-slate-500 py-4 text-center">No se encontraron evaluaciones registradas con ese criterio.</p>';
             } else {
                 matches.forEach((r, idx) => {
-                    const nombres = r.Nombres || r.nombres || '';
-                    const apellidos = r.Apellidos || r.apellidos || '';
-                    const id = r.Identificacion || r.identificacion || 'N/A';
-                    const edad = r.Edad || r.edad || 'N/A';
-                    const correo = r.Correo || r.correo || 'N/A';
-                    const top1 = r['Top 1 Area'] || r.top1 || 'N/A';
+                    const nombres = r.nombres || r.Nombres || '';
+                    const apellidos = r.apellidos || r.Apellidos || '';
+                    const id = r.identificacion || r.Identificacion || 'N/A';
+                    const edad = r.edad || r.Edad || 'N/A';
+                    const correo = r.correo || r.Correo || 'N/A';
+                    const top1 = r.top1 || r['Top 1 Area'] || 'N/A';
 
                     resultsList.innerHTML += `
                         <div class="p-4 border border-slate-200 rounded-xl bg-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
@@ -154,7 +171,7 @@
                                 <p class="text-xs text-slate-500 mt-0.5">ID: ${id} | Edad: ${edad} | Correo: ${correo}</p>
                                 <p class="text-xs font-semibold text-emerald-700 mt-1">Sugerencia: Top 1: ${top1}</p>
                             </div>
-                            <button onclick="generatePDF(${idx})" class="px-4 py-2 bg-black hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition whitespace-nowrap">
+                            <button onclick="generatePDFForRecord(${dbRecords.indexOf(r)})" class="px-4 py-2 bg-black hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition whitespace-nowrap">
                                 📄 Descargar PDF
                             </button>
                         </div>
@@ -164,29 +181,29 @@
             container.classList.remove('hidden');
         }
 
-        function generatePDF(index) {
+        function generatePDFForRecord(index) {
             const record = dbRecords[index];
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
 
             let perfil = {};
             try {
-                const rawPerfil = record['Perfil Resumen'] || record.perfil;
+                const rawPerfil = record.perfil || record['Perfil Resumen'];
                 perfil = typeof rawPerfil === 'string' ? JSON.parse(rawPerfil) : rawPerfil;
             } catch (e) {
                 perfil = {};
             }
 
-            const nombres = record.Nombres || record.nombres || '';
-            const apellidos = record.Apellidos || record.apellidos || '';
-            const id = record.Identificacion || record.identificacion || 'N/A';
-            const edad = record.Edad || record.edad || 'N/A';
-            const correo = record.Correo || record.correo || 'N/A';
-            const top1 = record['Top 1 Area'] || record.top1 || 'N/A';
-            const top2 = record['Top 2 Area'] || record.top2 || 'N/A';
-            const top3 = record['Top 3 Area'] || record.top3 || 'N/A';
+            const nombres = record.nombres || record.Nombres || '';
+            const apellidos = record.apellidos || record.Apellidos || '';
+            const id = record.identificacion || record.Identificacion || 'N/A';
+            const edad = record.edad || record.Edad || 'N/A';
+            const correo = record.correo || record.Correo || 'N/A';
+            const top1 = record.top1 || record['Top 1 Area'] || 'N/A';
+            const top2 = record.top2 || record['Top 2 Area'] || 'N/A';
+            const top3 = record.top3 || record['Top 3 Area'] || 'N/A';
 
-            // Encabezado
+            // Encabezado Corporativo
             doc.setFillColor(0, 0, 0);
             doc.rect(0, 0, 210, 20, 'F');
             doc.setTextColor(255, 255, 255);
@@ -223,7 +240,7 @@
                 headStyles: { fillColor: [0, 0, 0] }
             });
 
-            // Perfil de Rasgos Psicométricos
+            // Perfil de Rasgos
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
             doc.text("DESGLOSE DE RASGOS DE PERSONALIDAD", 14, doc.lastAutoTable.finalY + 12);
