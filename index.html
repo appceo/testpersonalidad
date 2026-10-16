@@ -4,13 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test de Personalidad y Asignación Ministerial | IGLECO</title>
+    <!-- Tailwind CSS y Fuentes -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style> body { font-family: 'Inter', sans-serif; } </style>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- ENCABEZADO -->
+    <!-- ENCABEZADO CORPORATIVO IGLECO -->
     <header class="bg-white border-b border-slate-200 py-4 px-6 shadow-sm">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
@@ -27,45 +30,43 @@
     <main class="max-w-3xl mx-auto my-8 px-4">
         <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 md:p-8">
             
-            <!-- FORMULARIO DATOS -->
-            <form id="main-form" onsubmit="handleStart(event)">
-                <div id="step-data" class="space-y-6">
-                    <div>
-                        <h2 class="text-2xl font-bold text-slate-900">Datos del Encuestado</h2>
-                        <p class="text-sm text-slate-500">Por favor diligencie sus datos básicos antes de iniciar el test.</p>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Nombres *</label>
-                            <input type="text" id="field-nombres" required class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" placeholder="Ej. Juan Carlos">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Apellidos *</label>
-                            <input type="text" id="field-apellidos" required class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" placeholder="Ej. Pérez Gómez">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Identificación (Cédula/DNI) *</label>
-                            <input type="text" id="field-identificacion" required class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" placeholder="Ej. 12345678">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Edad *</label>
-                            <input type="number" id="field-edad" required class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" placeholder="Ej. 30">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Correo Electrónico *</label>
-                            <input type="email" id="field-correo" required class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" placeholder="correo@ejemplo.com">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="w-full mt-4 bg-black hover:bg-slate-800 text-white font-semibold py-3.5 rounded-lg transition cursor-pointer">
-                        Iniciar Evaluación
-                    </button>
+            <!-- PASO 1: DATOS PERSONALES -->
+            <div id="step-data" class="space-y-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Datos del Encuestado</h2>
+                    <p class="text-sm text-slate-500">Por favor diligencie sus datos básicos antes de iniciar el test.</p>
                 </div>
-            </form>
 
-            <!-- CUESTIONARIO -->
-            <div id="step-questions" style="display: none;" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Nombres *</label>
+                        <input type="text" id="field-nombres" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" placeholder="Ej. Juan Carlos">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Apellidos *</label>
+                        <input type="text" id="field-apellidos" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" placeholder="Ej. Pérez Gómez">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Identificación (Cédula/DNI) *</label>
+                        <input type="text" id="field-identificacion" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" placeholder="Ej. 12345678">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Edad *</label>
+                        <input type="number" id="field-edad" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" placeholder="Ej. 30">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Correo Electrónico *</label>
+                        <input type="email" id="field-correo" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" placeholder="correo@ejemplo.com">
+                    </div>
+                </div>
+
+                <button type="button" id="btn-start" onclick="startTest(event)" class="w-full mt-4 bg-black hover:bg-slate-800 text-white font-semibold py-3.5 rounded-lg transition">
+                    Iniciar Evaluación
+                </button>
+            </div>
+
+            <!-- PASO 2: CUESTIONARIO -->
+            <div id="step-questions" class="hidden space-y-6">
                 <div>
                     <div class="flex justify-between items-center mb-2">
                         <span id="page-indicator" class="text-xs font-bold uppercase text-slate-500">Página 1 de 7</span>
@@ -79,27 +80,78 @@
                 <div id="questions-container" class="space-y-4"></div>
 
                 <div class="flex justify-between items-center pt-6 border-t border-slate-200">
-                    <button type="button" id="btn-prev" onclick="changePage(-1)" class="px-5 py-2.5 border border-slate-300 hover:bg-slate-50 rounded-lg text-slate-700 font-medium" style="display: none;">
+                    <button type="button" id="btn-prev" onclick="changePage(-1)" class="px-5 py-2.5 border border-slate-300 hover:bg-slate-50 rounded-lg text-slate-700 font-medium hidden">
                         Anterior
                     </button>
                     <button type="button" id="btn-next" onclick="changePage(1)" class="px-6 py-2.5 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg ml-auto">
                         Siguiente
                     </button>
-                    <button type="button" id="btn-submit" onclick="submitAssessment()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg ml-auto" style="display: none;">
+                    <button type="button" id="btn-submit" onclick="submitAssessment()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg ml-auto hidden">
                         Finalizar y Enviar
                     </button>
                 </div>
             </div>
 
-            <!-- AGRADECIMIENTO -->
-            <div id="step-thanks" style="display: none;" class="text-center py-12 space-y-4">
+            <!-- PASO 3: AGRADECIMIENTO -->
+            <div id="step-thanks" class="hidden text-center py-12 space-y-4">
                 <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl font-bold">✓</div>
                 <h2 class="text-2xl font-bold text-slate-900">¡Evaluación Enviada con Éxito!</h2>
-                <p class="text-slate-600 max-w-md mx-auto text-sm">Muchas gracias por completar la prueba. La información ha sido registrada en el sistema de IGLECO.</p>
+                <p class="text-slate-600 max-w-md mx-auto text-sm">Muchas gracias por completar la prueba. La información ha sido registrada en el sistema de gestión ministerial de IGLECO.</p>
             </div>
 
         </div>
     </main>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "
+        // URL DE GOOGLE SCRIPT CONFIGURADA
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3jCdQhXobfC7RMKPJIxgQXKzeXLyUMeuU8VOQQr25G_QRqaJ-pTCF3Cf0rb9S8PZObQ/exec";
+
+        const QUESTIONS = [
+            {id: 1, text: "Me resulta fácil iniciar conversaciones con personas que acabo de conocer.", trait: "Destreza Social"},
+            {id: 2, text: "Mantengo la calma, la serenidad y la objetividad bajo situaciones de alta presión.", trait: "Adaptabilidad"},
+            {id: 3, text: "Propongo soluciones creativas y novedosas cuando surgen imprevistos o bloqueos.", trait: "Recursividad"},
+            {id: 4, text: "Soy altamente constante y disciplinado al ejecutar tareas detalladas y rutinarias.", trait: "Perseverancia"},
+            {id: 5, text: "Percibo rápidamente cuando alguien a mi alrededor está pasando por un mal momento.", trait: "Sensibilidad Social"},
+            {id: 6, text: "Realizo mis actividades con un nivel sobresaliente de energía, entusiasmo y dinamismo.", trait: "Vitalidad"},
+            {id: 7, text: "Suelo asumir el liderazgo e iniciativa cuando un grupo necesita dirección.", trait: "Persuasión"},
+            {id: 8, text: "Escucho y respeto puntos de vista o ideologías completamente opuestas a las mías.", trait: "Tolerancia"},
+            {id: 9, text: "Me adapto con agilidad cuando cambian los planes u objetivos en el último momento.", trait: "Adaptabilidad"},
+            {id: 10, text: "Aprovecho al máximo los recursos disponibles, incluso cuando son escasos o limitados.", trait: "Recursividad"},
+            {id: 11, text: "Disfruto hablar en público y expresar mis ideas con claridad y espontaneidad.", trait: "Destreza Social"},
+            {id: 12, text: "Termino todo lo que empiezo, asegurándome de no dejar tareas inconclusas.", trait: "Perseverancia"},
+            {id: 13, text: "Siento una profunda empatía y compasión ante las necesidades físicas o emocionales ajenas.", trait: "Sensibilidad Social"},
+            {id: 14, text: "Tengo facilidad para convencer e inspirar a otros a sumarse a una causa o proyecto.", trait: "Persuasión"},
+            {id: 15, text: "Manejo los desacuerdos mediante el diálogo pacífico y la búsqueda de consensos.", trait: "Tolerancia"},
+            {id: 16, text: "Disfruto los entornos de trabajo activos que exigen movimiento y dinamismo constante.", trait: "Vitalidad"},
+            {id: 17, text: "Suelo romper el hielo en grupos nuevos sin experimentar incomodidad.", trait: "Destreza Social"},
+            {id: 18, text: "Controlo mis emociones e impulsos para evaluar los problemas con frialdad y lógica.", trait: "Adaptabilidad"},
+            {id: 19, text: "Me gusta diseñar nuevos métodos o enfoques para mejorar procesos existentes.", trait: "Recursividad"},
+            {id: 20, text: "Me tomo el tiempo necesario para escuchar activamente y brindar apoyo emocional.", trait: "Sensibilidad Social"},
+            {id: 21, text: "Sé cómo presentar argumentos sólidos para transformar la postura de los demás.", trait: "Persuasión"},
+            {id: 22, text: "Mantengo la concentración y la calidad del trabajo aun en actividades repetitivas.", trait: "Perseverancia"},
+            {id: 23, text: "Evito confrontaciones innecesarias y procuro actuar con prudencia y moderación.", trait: "Tolerancia"},
+            {id: 24, text: "Mantengo un ritmo de trabajo intensivo durante largos períodos sin agotarme fácilmente.", trait: "Vitalidad"},
+            {id: 25, text: "Tengo un trato fluido, cálido y espontáneo al relacionarme con cualquier persona.", trait: "Destreza Social"},
+            {id: 26, text: "Acepto nuevas circunstancias e imprevistos sin mostrar resistencia o frustración.", trait: "Adaptabilidad"},
+            {id: 27, text: "Suelo anteponer las necesidades y bienestar de los demás antes que mi propia comodidad.", trait: "Sensibilidad Social"},
+            {id: 28, text: "Encuentro alternativas viables con rapidez ante problemas altamente complejos.", trait: "Recursividad"},
+            {id: 29, text: "Me motiva dirigir personas y guiar equipos orientándolos hacia el cumplimiento de metas.", trait: "Persuasión"},
+            {id: 30, text: "Sigo las normas, estructuras y procedimientos organizacionales de manera rigurosa.", trait: "Perseverancia"},
+            {id: 31, text: "Muestro paciencia y comprensión frente a las fallas o errores cometidos por otros.", trait: "Tolerancia"},
+            {id: 32, text: "Me atraen los retos exigentes que requieren una respuesta rápida y acción inmediata.", trait: "Vitalidad"},
+            {id: 33, text: "Me siento muy cómodo interactuando con personas de trasfondos culturales variados.", trait: "Destreza Social"},
+            {id: 34, text: "Conservo la seguridad y firmeza al tomar decisiones en entornos de total incertidumbre.", trait: "Adaptabilidad"},
+            {id: 35, text: "Procuro construir relaciones cercanas, atentas y basadas en el cuidado genuino.", trait: "Sensibilidad Social"},
+            {id: 36, text: "Tengo facilidad para improvisar con efectividad cuando la situación no permite planear.", trait: "Recursividad"},
+            {id: 37, text: "Influencio de manera positiva en las decisiones y comportamientos de quienes me rodean.", trait: "Persuasión"},
+            {id: 38, text: "Mi estilo de trabajo se caracteriza por el orden impecable, la puntualidad y la constancia.", trait: "Perseverancia"},
+            {id: 39, text: "Acepto y valoro las diferencias individuales sin prejuzgar ni criticar.", trait: "Tolerancia"},
+            {id: 40, text: "Transmito empuje, pasión e intensidad a las personas en los proyectos que participo.", trait: "Vitalidad"},
+            {id: 41, text: "Expreso mis pensamientos y sentimientos con naturalidad en grupos amplios.", trait: "Destreza Social"},
+            {id: 42, text: "Reacciono con cabeza fría y templanza ante desacuerdos o momentos críticos.", trait: "Adaptabilidad"},
+            {id: 43, text: "Me resulta sencillo conectar conceptos o ideas distintas para crear soluciones nuevas.", trait: "Recursividad"},
+            {id: 44, text: "Reviso detalladamente los resultados de mi trabajo para asegurar la máxima calidad.", trait: "Perseverancia"},
+            {id: 45, text: "Me conmuevo con facilidad ante el dolor ajeno y me dispongo a brindar ayuda tangible.", trait: "Sensibilidad Social"},
+            {id: 46, text: "Inyecto energía y entusiasmo constante al grupo de trabajo donde me encuentre.", trait: "Vitalidad"},
+            {id: 47, text: "Me siento cómodo asumiendo la responsabilidad de tomar decisiones por un equipo.", trait: "Persuasión"},
+            {id: 48, text: "Mantengo una actitud permisiva, abierta y transigente ante post
