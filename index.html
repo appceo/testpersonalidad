@@ -3,34 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Evaluación Ministerial y Psicométrica</title>
-    <!-- Tailwind CSS para Estilos Profesionales -->
+    <title>Test de Personalidad y Asignación Ministerial</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Supabase SDK para Base de Datos -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- jsPDF para Generación del Reporte PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
-    <!-- Navegación superior -->
     <nav class="bg-indigo-900 text-white p-4 shadow-lg">
-        <div class="max-w-5xl mx-auto flex justify-between items-center">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold flex items-center gap-2">
                 <span>⛪</span> Test de Personalidad y Asignación Ministerial
             </h1>
-            <div class="space-x-2">
-                <button onclick="switchTab('test')" class="px-4 py-2 bg-indigo-700 hover:bg-indigo-600 rounded-lg text-sm transition">Formulario</button>
-                <button onclick="switchTab('admin')" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-sm transition">Panel Administrativo</button>
-            </div>
         </div>
     </nav>
 
     <div class="max-w-4xl mx-auto my-8 p-6">
-
-        <!-- ==================== VISTA FORMULARIO ==================== -->
-        <div id="view-test" class="bg-white rounded-xl shadow-md p-8">
+        <div class="bg-white rounded-xl shadow-md p-8">
+            
+            <!-- PASO 1: DATOS PERSONALES -->
             <div id="step-data" class="space-y-4">
                 <h2 class="text-2xl font-bold text-indigo-900 border-b pb-2">Datos del Encuestado</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -55,17 +45,17 @@
                         <input type="email" id="field-correo" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" required>
                     </div>
                 </div>
-                <button onclick="startTest()" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition">Iniciar Evaluación</button>
+                <button type="button" onclick="startTest()" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition">Iniciar Evaluación</button>
             </div>
 
+            <!-- PASO 2: CUESTIONARIO -->
             <div id="step-questions" class="hidden">
-                <!-- Barra de Progreso -->
                 <div class="w-full bg-slate-200 rounded-full h-2.5 mb-6">
                     <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
                 </div>
                 <div class="flex justify-between items-center mb-4">
                     <span id="page-indicator" class="text-sm font-semibold text-indigo-900">Página 1 de 7</span>
-                    <span class="text-xs text-slate-500">Escala: 1 (Muy en desacuerdo) a 5 (Muy de acuerdo)</span>
+                    <span class="text-xs text-slate-500">Escala: 1 (En desacuerdo) a 5 (De acuerdo)</span>
                 </div>
 
                 <form id="quiz-form" class="space-y-6">
@@ -78,51 +68,38 @@
                     </div>
                 </form>
             </div>
-        </div>
 
-        <!-- ==================== VISTA ADMINISTRATIVA ==================== -->
-        <div id="view-admin" class="hidden bg-white rounded-xl shadow-md p-8">
-            <h2 class="text-2xl font-bold text-indigo-900 mb-4">Consulta de Evaluaciones</h2>
-            <div class="flex gap-2 mb-6">
-                <input type="text" id="search-input" placeholder="Buscar por Apellido o Identificación..." class="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
-                <button onclick="searchRecords()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg">Buscar</button>
+            <!-- PASO 3: MENSAJE DE ÉXITO -->
+            <div id="step-thanks" class="hidden text-center py-12 space-y-4">
+                <div class="text-5xl">✅</div>
+                <h2 class="text-3xl font-bold text-indigo-900">¡Evaluación Completada!</h2>
+                <p class="text-slate-600 max-w-md mx-auto">Tus respuestas han sido registradas exitosamente. El equipo administrativo procesará tu informe para la asignación ministerial.</p>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-100 border-b">
-                            <th class="p-3">Identificación</th>
-                            <th class="p-3">Nombre Completo</th>
-                            <th class="p-3">Correo</th>
-                            <th class="p-3">Fecha</th>
-                            <th class="p-3 text-center">Acción</th>
-                        </tr>
-                    </thead>
-                    <tbody id="results-table-body">
-                        <tr>
-                            <td colspan="5" class="p-4 text-center text-slate-500">Ingrese un parámetro de búsqueda.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
         </div>
-
     </div>
 
-    <!-- CÓDIGO JS PRINCIPAL -->
     <script>
-        // CONFIGURACIÓN DE SUPABASE (Reemplaza con tus credenciales gratuitas de supabase.com)
+        // === SUSTITUYE AQUÍ CON TUS DATOS REALES DE SUPABASE ===
         const SUPABASE_URL = "https://TU_SUPABASE_URL.supabase.co";
         const SUPABASE_KEY = "TU_SUPABASE_ANON_KEY";
-        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let _supabase = null;
 
-        // BANCO DE 64 PREGUNTAS ALEATORIZADAS
+        try {
+            if (SUPABASE_URL.includes("TU_SUPABASE_URL")) {
+                console.warn("Recuerda colocar tus credenciales reales de Supabase para guardar en la base de datos.");
+            } else {
+                _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            }
+        } catch (e) {
+            console.error("Error al conectar con Supabase:", e);
+        }
+
         const QUESTIONS = [
             {"id": 1, "text": "Me resulta fácil iniciar conversaciones con personas que acabo de conocer.", "trait": "Destreza Social"}, #[cite: 1]
             {"id": 2, "text": "Mantengo la calma, la serenidad y la objetividad bajo situaciones de alta presión.", "trait": "Adaptabilidad"}, #[cite: 1]
             {"id": 3, "text": "Propongo soluciones creativas y novedosas cuando surgen imprevistos o bloqueos.", "trait": "Recursividad"}, #[cite: 1]
-            {"id": 4, "text": "Soy altamente constante y disciplinado al ejecutar tareas detalladas y rutinarias.", "trait": "Perseverancia"}, #[cite: 1]
+            {"id": 4, "text": "Soy highly constante y disciplinado al ejecutar tareas detalladas y rutinarias.", "trait": "Perseverancia"}, #[cite: 1]
             {"id": 5, "text": "Percibo rápidamente cuando alguien a mi alrededor está pasando por un mal momento.", "trait": "Sensibilidad Social"}, #[cite: 1]
             {"id": 6, "text": "Realizo mis actividades con un nivel sobresaliente de energía, entusiasmo y dinamismo.", "trait": "Vitalidad"}, #[cite: 1]
             {"id": 7, "text": "Suelo asumir el liderazgo e iniciativa cuando un grupo necesita dirección.", "trait": "Persuasión"}, #[cite: 1]
@@ -185,9 +162,149 @@
             {"id": 64, "text": "Contagio mi entusiasmo y empuje a las personas que trabajan junto a mí.", "trait": "Vitalidad"} #[cite: 1]
         ];
 
-        // COMENTARIOS TÉCNICOS POR CATEGORÍA
-        const DESCRIPTIONS = {
-            "Destreza Social": "Habilidad para comunicarse eficazmente, generando apertura y confianza en las relaciones interpersonales.",
-            "Sensibilidad Social": "Profunda orientación de empatía y servicio altruista ante el sufrimiento o necesidad del prójimo.",
-            "Adaptabilidad": "Autocontrol emocional y serenidad objetiva para operar eficazmente bajo presión o cambios imprevistos.",
-            "Recursividad":
+        const AREAS_REQUIREMENTS = {
+            "Acompañamiento": {"Sensibilidad Social": 0.35, "Tolerancia": 0.35, "Destreza Social": 0.30},
+            "Adoración": {"Recursividad": 0.35, "Vitalidad": 0.35, "Destreza Social": 0.30},
+            "Artístico": {"Recursividad": 0.50, "Vitalidad": 0.30, "Adaptabilidad": 0.20},
+            "Producción": {"Perseverancia": 0.40, "Adaptabilidad": 0.40, "Recursividad": 0.20},
+            "Ayudas Administrativas": {"Perseverancia": 0.50, "Adaptabilidad": 0.30, "Tolerancia": 0.20},
+            "Ayudas Profesionales": {"Adaptabilidad": 0.35, "Recursividad": 0.35, "Tolerancia": 0.30},
+            "Conexión": {"Destreza Social": 0.40, "Sensibilidad Social": 0.30, "Vitalidad": 0.30},
+            "Contact Center": {"Destreza Social": 0.35, "Tolerancia": 0.35, "Perseverancia": 0.30},
+            "Decoración": {"Recursividad": 0.50, "Perseverancia": 0.30, "Vitalidad": 0.20},
+            "Discipulado": {"Persuasión": 0.35, "Sensibilidad Social": 0.35, "Tolerancia": 0.30},
+            "CFV - Kids": {"Sensibilidad Social": 0.35, "Vitalidad": 0.35, "Tolerancia": 0.30},
+            "Evangelismo": {"Destreza Social": 0.35, "Persuasión": 0.35, "Vitalidad": 0.30},
+            "Hospitalidad": {"Destreza Social": 0.35, "Sensibilidad Social": 0.35, "Tolerancia": 0.30},
+            "Maquillaje": {"Recursividad": 0.40, "Perseverancia": 0.30, "Sensibilidad Social": 0.30},
+            "Monitores Escuelas": {"Persuasión": 0.35, "Perseverancia": 0.35, "Adaptabilidad": 0.30},
+            "Oración": {"Sensibilidad Social": 0.40, "Tolerancia": 0.30, "Perseverancia": 0.30},
+            "PowerKids": {"Vitalidad": 0.40, "Sensibilidad Social": 0.30, "Recursividad": 0.30},
+            "Seguridad": {"Adaptabilidad": 0.40, "Perseverancia": 0.30, "Tolerancia": 0.30},
+            "Servidores": {"Destreza Social": 0.35, "Tolerancia": 0.35, "Vitalidad": 0.30},
+            "Traductores": {"Perseverancia": 0.35, "Adaptabilidad": 0.35, "Destreza Social": 0.30}
+        };
+
+        let currentPage = 0;
+        const pageSize = 10;
+        let answers = {};
+        let userData = {};
+
+        function startTest() {
+            userData = {
+                nombres: document.getElementById('field-nombres').value.trim(),
+                apellidos: document.getElementById('field-apellidos').value.trim(),
+                identificacion: document.getElementById('field-identificacion').value.trim(),
+                edad: document.getElementById('field-edad').value.trim(),
+                correo: document.getElementById('field-correo').value.trim()
+            };
+
+            if (!userData.nombres || !userData.apellidos || !userData.identificacion || !userData.edad || !userData.correo) {
+                alert("Por favor complete todos los campos obligatorios.");
+                return;
+            }
+
+            document.getElementById('step-data').classList.add('hidden');
+            document.getElementById('step-questions').classList.remove('hidden');
+            renderPage();
+        }
+
+        function renderPage() {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+            
+            const start = currentPage * pageSize;
+            const pageQuestions = QUESTIONS.slice(start, start + pageSize);
+
+            pageQuestions.forEach(q => {
+                const currentVal = answers[q.id] || 3;
+                container.innerHTML += `
+                    <div class="bg-slate-50 p-4 rounded-lg border">
+                        <p class="font-medium text-slate-800 mb-3">${q.id}. ${q.text}</p>
+                        <div class="flex justify-between items-center max-w-md mx-auto text-sm">
+                            <span class="text-xs text-slate-500">1</span>
+                            ${[1,2,3,4,5].map(v => `
+                                <label class="flex flex-col items-center gap-1 cursor-pointer">
+                                    <input type="radio" name="q_${q.id}" value="${v}" ${currentVal == v ? 'checked' : ''} onchange="saveAnswer(${q.id},${v})" class="w-4 h-4 text-indigo-600">
+                                    <span class="text-xs text-slate-600">${v}</span>
+                                </label>
+                            `).join('')}
+                            <span class="text-xs text-slate-500">5</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            const totalPages = Math.ceil(QUESTIONS.length / pageSize);
+            document.getElementById('page-indicator').innerText = `Página ${currentPage + 1} de ${totalPages}`;
+            document.getElementById('progress-bar').style.width = `${((currentPage + 1) / totalPages) * 100}%`;
+
+            document.getElementById('btn-prev').classList.toggle('hidden', currentPage === 0);
+            document.getElementById('btn-next').classList.toggle('hidden', currentPage === totalPages - 1);
+            document.getElementById('btn-submit').classList.toggle('hidden', currentPage !== totalPages - 1);
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function saveAnswer(qId, val) {
+            answers[qId] = parseInt(val);
+        }
+
+        function changePage(direction) {
+            currentPage += direction;
+            renderPage();
+        }
+
+        async function submitAssessment() {
+            for (let q of QUESTIONS) {
+                if (!answers[q.id]) answers[q.id] = 3;
+            }
+
+            let traitTotals = {};
+            let traitCounts = {};
+            QUESTIONS.forEach(q => {
+                traitTotals[q.trait] = (traitTotals[q.trait] || 0) + answers[q.id];
+                traitCounts[q.trait] = (traitCounts[q.trait] || 0) + 1;
+            });
+
+            let profile = {};
+            for (let trait in traitTotals) {
+                let max = traitCounts[trait] * 5;
+                let min = traitCounts[trait] * 1;
+                profile[trait] = Math.round(((traitTotals[trait] - min) / (max - min)) * 100);
+            }
+
+            let areaMatches = {};
+            for (let area in AREAS_REQUIREMENTS) {
+                let score = 0;
+                for (let trait in AREAS_REQUIREMENTS[area]) {
+                    score += (profile[trait] || 0) * AREAS_REQUIREMENTS[area][trait];
+                }
+                areaMatches[area] = Math.round(score);
+            }
+
+            let sortedAreas = Object.entries(areaMatches).sort((a,b) => b[1] - a[1]);
+
+            if (_supabase) {
+                const { error } = await _supabase.from('evaluaciones').insert([{
+                    nombres: userData.nombres,
+                    apellidos: userData.apellidos,
+                    identificacion: userData.identificacion,
+                    edad: parseInt(userData.edad),
+                    correo: userData.correo,
+                    perfil_personalidad: profile,
+                    areas_recomendadas: sortedAreas
+                }]);
+
+                if (error) {
+                    alert("Error guardando en base de datos: " + error.message);
+                    return;
+                }
+            }
+
+            document.getElementById('step-questions').classList.add('hidden');
+            document.getElementById('step-thanks').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
