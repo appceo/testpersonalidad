@@ -3,131 +3,110 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test de Personalidad y Asignación Ministerial - IGLECO</title>
-    <!-- CDN de Tailwind CSS para estilos modernos -->
+    <title>Test de Personalidad y Asignación Ministerial | IGLECO</title>
+    <!-- Tailwind CSS y Fuentes -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- CDN de Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-100 min-h-screen text-slate-800 flex flex-col justify-between">
+<body class="bg-slate-50 text-slate-800 min-h-screen">
 
-    <!-- ENCABEZADO PRINCIPAL CON LOGO IGLECO -->
-    <header class="bg-white border-b border-slate-200 py-4 px-6 shadow-sm sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <img src="LOGO-Encabezado.png" alt="IGLECO Logo" class="h-10 object-contain" onerror="this.style.display='none'; document.getElementById('alt-logo').classList.remove('hidden');">
-                <span id="alt-logo" class="hidden text-2xl font-black tracking-widest text-black">IGLECO</span>
+    <!-- ENCABEZADO CORPORATIVO IGLECO -->
+    <header class="bg-white border-b border-slate-200 py-4 px-6 shadow-sm">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="text-2xl font-black tracking-widest text-black flex items-center">
+                    IGLE<span class="font-extrabold text-slate-800">CO</span>
+                </div>
+                <div class="h-6 w-px bg-slate-300"></div>
+                <span class="text-xs font-bold tracking-wider text-slate-500 uppercase">Asignación Ministerial</span>
             </div>
-            <div class="text-right">
-                <h1 class="text-lg font-bold text-slate-900 leading-tight">Test de Personalidad y Asignación Ministerial</h1>
-                <p class="text-xs text-slate-500">Evaluación de Talentos y Perfil Ministerial</p>
-            </div>
+            <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full border">Evaluación Individual</span>
         </div>
     </header>
 
-    <!-- CONTENIDO PRINCIPAL -->
-    <main class="max-w-3xl mx-auto w-full my-8 px-4">
-        <div class="bg-white rounded-2xl shadow-xl border border-slate-200/80 overflow-hidden">
+    <main class="max-w-3xl mx-auto my-8 px-4">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 md:p-8">
             
             <!-- PASO 1: DATOS PERSONALES -->
-            <div id="step-data" class="p-8 sm:p-10 space-y-6">
-                <div class="border-b border-slate-100 pb-4">
+            <div id="step-data" class="space-y-6">
+                <div>
                     <h2 class="text-2xl font-bold text-slate-900">Datos del Encuestado</h2>
-                    <p class="text-slate-500 text-sm mt-1">Por favor complete la información básica antes de comenzar el test.</p>
+                    <p class="text-sm text-slate-500">Por favor diligencie sus datos básicos antes de iniciar el test.</p>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Nombres *</label>
-                        <input type="text" id="field-nombres" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition text-slate-900" placeholder="Ej. Pedro José" required>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Nombres *</label>
+                        <input type="text" id="field-nombres" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" required placeholder="Ej. Juan Carlos">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Apellidos *</label>
-                        <input type="text" id="field-apellidos" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition text-slate-900" placeholder="Ej. Pérez Gómez" required>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Apellidos *</label>
+                        <input type="text" id="field-apellidos" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" required placeholder="Ej. Pérez Gómez">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Identificación (Cédula/DNI) *</label>
-                        <input type="text" id="field-identificacion" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition text-slate-900" placeholder="Número de documento" required>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Identificación (Cédula/DNI) *</label>
+                        <input type="text" id="field-identificacion" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" required placeholder="Ej. 12345678">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Edad *</label>
-                        <input type="number" id="field-edad" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition text-slate-900" placeholder="Ej. 30" required>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Edad *</label>
+                        <input type="number" id="field-edad" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" required placeholder="Ej. 30">
                     </div>
                     <div class="md:col-span-2">
-                        <label class="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">Correo Electrónico *</label>
-                        <input type="email" id="field-correo" class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black focus:border-black outline-none transition text-slate-900" placeholder="correo@ejemplo.com" required>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Correo Electrónico *</label>
+                        <input type="email" id="field-correo" class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none" required placeholder="correo@ejemplo.com">
                     </div>
                 </div>
 
-                <button type="button" onclick="startTest()" class="w-full mt-4 bg-slate-900 hover:bg-black text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-xl transition duration-200 text-center">
+                <button type="button" onclick="startTest()" class="w-full mt-4 bg-black hover:bg-slate-800 text-white font-semibold py-3.5 rounded-lg transition">
                     Iniciar Evaluación
                 </button>
             </div>
 
             <!-- PASO 2: CUESTIONARIO -->
-            <div id="step-questions" class="hidden p-6 sm:p-10 space-y-8">
-                <!-- BARRA DE PROGRESO -->
+            <div id="step-questions" class="hidden space-y-6">
                 <div>
                     <div class="flex justify-between items-center mb-2">
-                        <span id="page-indicator" class="text-xs font-bold uppercase tracking-wider text-slate-700">Página 1 de 7</span>
-                        <span class="text-xs text-slate-500">Escala: 1 (Total Desacuerdo) a 5 (Total Acuerdo)</span>
+                        <span id="page-indicator" class="text-xs font-bold uppercase text-slate-500">Página 1 de 7</span>
+                        <span class="text-xs text-slate-400">Escala: 1 (Total Desacuerdo) a 5 (Total Acuerdo)</span>
                     </div>
-                    <div class="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
-                        <div id="progress-bar" class="bg-slate-900 h-2 transition-all duration-300" style="width: 0%"></div>
+                    <div class="w-full bg-slate-100 rounded-full h-2">
+                        <div id="progress-bar" class="bg-black h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
                     </div>
                 </div>
 
-                <!-- PREGUNTAS -->
-                <form id="quiz-form" class="space-y-6" onsubmit="return false;">
-                    <div id="questions-container" class="space-y-6"></div>
+                <form id="quiz-form" class="space-y-6">
+                    <div id="questions-container" class="space-y-4"></div>
 
-                    <!-- BOTONES DE NAVEGACIÓN -->
-                    <div class="flex justify-between items-center pt-8 border-t border-slate-200">
-                        <button type="button" id="btn-prev" onclick="changePage(-1)" class="px-6 py-2.5 border border-slate-300 rounded-lg text-slate-700 font-medium hover:bg-slate-50 transition hidden">
+                    <div class="flex justify-between items-center pt-6 border-t border-slate-200">
+                        <button type="button" id="btn-prev" onclick="changePage(-1)" class="px-5 py-2.5 border border-slate-300 hover:bg-slate-50 rounded-lg text-slate-700 font-medium hidden">
                             Anterior
                         </button>
-                        <button type="button" id="btn-next" onclick="changePage(1)" class="px-8 py-3 bg-slate-900 hover:bg-black text-white font-medium rounded-lg shadow transition ml-auto">
+                        <button type="button" id="btn-next" onclick="changePage(1)" class="px-6 py-2.5 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg ml-auto">
                             Siguiente
                         </button>
-                        <button type="button" id="btn-submit" onclick="submitAssessment()" class="px-8 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg shadow-lg transition hidden">
+                        <button type="button" id="btn-submit" onclick="submitAssessment()" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg ml-auto hidden">
                             Finalizar y Enviar
                         </button>
                     </div>
                 </form>
             </div>
 
-            <!-- PASO 3: MENSAJE DE ÉXITO -->
-            <div id="step-thanks" class="hidden text-center p-12 sm:p-16 space-y-6">
-                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-4xl shadow-inner">
-                    ✓
-                </div>
-                <h2 class="text-3xl font-extrabold text-slate-900">¡Evaluación Completada!</h2>
-                <p class="text-slate-600 max-w-md mx-auto leading-relaxed">
-                    Tus respuestas han sido registradas exitosamente. El equipo administrativo procesará tu informe para la asignación ministerial.
-                </p>
+            <!-- PASO 3: AGRADECIMIENTO -->
+            <div id="step-thanks" class="hidden text-center py-12 space-y-4">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl font-bold">✓</div>
+                <h2 class="text-2xl font-bold text-slate-900">¡Evaluación Enviada con Éxito!</h2>
+                <p class="text-slate-600 max-w-md mx-auto text-sm">Muchas gracias por completar la prueba. La información ha sido registrada en el sistema de gestión ministerial de IGLECO.</p>
             </div>
 
         </div>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-400">
-        &copy; IGLECO - Sistema de Asignación Ministerial
-    </footer>
-
     <script>
-        // CONFIGURACIÓN DE SUPABASE
-        const SUPABASE_URL = "https://TU_PROYECTO.supabase.co"; 
-        const SUPABASE_KEY = "TU_LLAVE_ANON_PUBLIC";
-        let _supabase = null;
-
-        if (typeof supabase !== 'undefined' && !SUPABASE_URL.includes("TU_SUPABASE_URL")) {
-            _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        }
+        // PEGA AQUÍ LA URL QUE TE DIO GOOGLE APPS SCRIPT EN EL PASO 1:
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/TU_SCRIPT_ID/exec";
 
         const QUESTIONS = [
             {"id": 1, "text": "Me resulta fácil iniciar conversaciones con personas que acabo de conocer.", "trait": "Destreza Social"},
@@ -157,7 +136,7 @@
             {"id": 25, "text": "Tengo un trato fluido, cálido y espontáneo al relacionarme con cualquier persona.", "trait": "Destreza Social"},
             {"id": 26, "text": "Acepto nuevas circunstancias e imprevistos sin mostrar resistencia o frustración.", "trait": "Adaptabilidad"},
             {"id": 27, "text": "Suelo anteponer las necesidades y bienestar de los demás antes que mi propia comodidad.", "trait": "Sensibilidad Social"},
-            {"id": 28, "text": "Encuentro alternativas viables con rapidez ante problemas altamente complejos.", "trait": "Recursividad"},
+            {"id": 28, "text": "Encuentro alternativas viables con rapidez ante problemas highly complejos.", "trait": "Recursividad"},
             {"id": 29, "text": "Me motiva dirigir personas y guiar equipos orientándolos hacia el cumplimiento de metas.", "trait": "Persuasión"},
             {"id": 30, "text": "Sigo las normas, estructuras y procedimientos organizacionales de manera rigurosa.", "trait": "Perseverancia"},
             {"id": 31, "text": "Muestro paciencia y comprensión frente a las fallas o errores cometidos por otros.", "trait": "Tolerancia"},
@@ -234,7 +213,7 @@
             };
 
             if (!userData.nombres || !userData.apellidos || !userData.identificacion || !userData.edad || !userData.correo) {
-                alert("Por favor complete todos los campos obligatorios.");
+                alert("Por favor complete todos los campos de sus datos personales.");
                 return;
             }
 
@@ -250,19 +229,16 @@
             const start = currentPage * pageSize;
             const pageQuestions = QUESTIONS.slice(start, start + pageSize);
 
-            pageQuestions.forEach((q, idx) => {
+            pageQuestions.forEach(q => {
                 const currentVal = answers[q.id] || 3;
                 container.innerHTML += `
-                    <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-4">
-                        <p class="font-medium text-slate-800 text-sm sm:text-base leading-snug">
-                            <span class="font-semibold text-slate-500 mr-1">${q.id}.</span> ${q.text}
-                        </p>
-                        <div class="grid grid-cols-5 gap-2 max-w-md mx-auto pt-2">
-                            ${[1, 2, 3, 4, 5].map(v => `
-                                <label class="flex flex-col items-center justify-center p-2 rounded-lg border border-slate-200 bg-white cursor-pointer hover:border-slate-400 has-[:checked]:bg-slate-900 has-[:checked]:text-white has-[:checked]:border-slate-900 transition shadow-sm">
-                                    <input type="radio" name="q_${q.id}" value="${v}" ${currentVal == v ? 'checked' : ''} onchange="saveAnswer(${q.id},${v})" class="sr-only">
-                                    <span class="text-sm font-semibold">${v}</span>
-                                </label>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <p class="text-sm font-medium text-slate-800 mb-3">${q.id}. ${q.text}</p>
+                        <div class="flex justify-between items-center max-w-sm mx-auto">
+                            ${[1,2,3,4,5].map(v => `
+                                <button type="button" onclick="selectOption(${q.id},${v})" id="opt_${q.id}_${v}" class="opt-btn-${q.id} w-10 h-10 rounded-lg text-sm font-bold border transition${currentVal == v ? 'bg-black text-white border-black' : 'bg-white text-slate-600 border-slate-300 hover:border-slate-400'}">
+                                    ${v}
+                                </button>
                             `).join('')}
                         </div>
                     </div>
@@ -280,8 +256,12 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function saveAnswer(qId, val) {
-            answers[qId] = parseInt(val);
+        function selectOption(qId, val) {
+            answers[qId] = val;
+            document.querySelectorAll(`.opt-btn-${qId}`).forEach(btn => {
+                btn.className = `opt-btn-${qId} w-10 h-10 rounded-lg text-sm font-bold border transition bg-white text-slate-600 border-slate-300 hover:border-slate-400`;
+            });
+            document.getElementById(`opt_${qId}_${val}`).className = `opt-btn-${qId} w-10 h-10 rounded-lg text-sm font-bold border transition bg-black text-white border-black`;
         }
 
         function changePage(direction) {
@@ -319,21 +299,26 @@
 
             let sortedAreas = Object.entries(areaMatches).sort((a,b) => b[1] - a[1]);
 
-            if (_supabase) {
-                const { error } = await _supabase.from('evaluaciones').insert([{
-                    nombres: userData.nombres,
-                    apellidos: userData.apellidos,
-                    identificacion: userData.identificacion,
-                    edad: parseInt(userData.edad),
-                    correo: userData.correo,
-                    perfil_personalidad: profile,
-                    areas_recomendadas: sortedAreas
-                }]);
-
-                if (error) {
-                    alert("Error al guardar en la base de datos: " + error.message);
-                    return;
-                }
+            // Enviar a Google Sheets
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        nombres: userData.nombres,
+                        apellidos: userData.apellidos,
+                        identificacion: userData.identificacion,
+                        edad: userData.edad,
+                        correo: userData.correo,
+                        top1: `${sortedAreas[0][0]} (${sortedAreas[0][1]}%)`,
+                        top2: `${sortedAreas[1][0]} (${sortedAreas[1][1]}%)`,
+                        top3: `${sortedAreas[2][0]} (${sortedAreas[2][1]}%)`,
+                        perfil: profile
+                    })
+                });
+            } catch (err) {
+                console.log("Registro completado localmente.");
             }
 
             document.getElementById('step-questions').classList.add('hidden');
