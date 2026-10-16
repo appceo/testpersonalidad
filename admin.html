@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrativo - Evaluaciones</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
+
+    <nav class="bg-slate-900 text-white p-4 shadow-lg">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold">🔒 Panel de Gestión Administrativa</h1>
+        </div>
+    </nav>
+
+    <div class="max-w-4xl mx-auto my-8 p-6">
+        
+        <!-- PANTALLA DE ACCESO POR PIN -->
+        <div id="login-box" class="bg-white rounded-xl shadow-md p-8 max-w-md mx-auto text-center space-y-4">
+            <h2 class="text-xl font-bold text-slate-800">Acceso Restringido</h2>
+            <p class="text-sm text-slate-500">Ingrese el PIN de seguridad para acceder a las evaluaciones:</p>
+            <input type="password" id="pin-input" placeholder="PIN de acceso" class="w-full p-3 border rounded-lg text-center text-xl tracking-widest outline-none focus:ring-2 focus:ring-indigo-500">
+            <button onclick="checkPin()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition">Ingresar</button>
+        </div>
+
+        <!-- PANEL DE BÚSQUEDA Y REPORTES (OCULTO INICIALMENTE) -->
+        <div id="admin-panel" class="hidden bg-white rounded-xl shadow-md p-8 space-y-6">
+            <h2 class="text-2xl font-bold text-indigo-900">Consulta de Evaluaciones</h2>
+            
+            <div class="flex gap-2">
+                <input type="text" id="search-input" placeholder="Buscar por Apellido o Cédula..." class="flex-1 p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none">
+                <button onclick="searchRecords()" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg">Buscar</button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100 border-b">
+                            <th class="p-3">Identificación</th>
+                            <th class="p-3">Nombre Completo</th>
+                            <th class="p-3">Correo</th>
+                            <th class="p-3">Fecha</th>
+                            <th class="p-3 text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-table-body">
+                        <tr>
+                            <td colspan="5" class="p-4 text-center text-slate-500">Ingrese un parámetro de búsqueda arriba.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://TU_SUPABASE_URL.supabase.co";
+        const SUPABASE_KEY = "TU_SUPABASE_ANON_KEY";
+        const ADMIN_PIN = "1234"; // Cambia este PIN por tu clave deseada
+        let _supabase = null;
+
+        if (!SUPABASE_URL.includes("TU_SUPABASE_URL")) {
+            _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        }
+
+        const DESCRIPTIONS = {
+            "Destreza Social": "Habilidad para comunicarse eficazmente, generando apertura y confianza en las relaciones interpersonales.",
+            "Sensibilidad Social": "Profunda orientación de empatía y servicio altruista ante el sufrimiento o necesidad del prójimo.",
+            "Adaptabilidad": "Autocontrol emocional y serenidad objetiva para operar eficazmente bajo presión o cambios imprevistos.",
+            "Recursividad": "Capacidad creativa para resolver imprevistos e innovar con los recursos disponibles.",
+            "Persuasión": "Liderazgo natural e influencia positiva para dirigir equipos hacia metas comunes.",
+            "Perseverancia": "Rigor, orden y constancia impecable en tareas estructuradas, normativas o rutinarias.",
+            "Tolerancia": "Prudencia, paciencia y disposición para resolver desacuerdos mediante la paz y el consenso.",
+            "Vitalidad": "Dinamismo, alto nivel de energía física y capacidad de trabajo continuo."
+        };
+
+        function checkPin() {
+            const input = document.getElementById('pin-input').value;
+            if (input === ADMIN_PIN) {
+                document.getElementById('login-box').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+            } else {
+                alert("PIN incorrecto.");
+            }
+        }
+
+        async function searchRecords() {
+            const query = document.getElementById('search-input').value.trim();
+            if (!query) return;
+
+            if (!_supabase) {
+                alert("Configura las credenciales de Supabase en el código.");
+                return;
+            }
+
+            const { data, error } = await _supabase
+                .from('evaluaciones')
+                .select('*')
+                .or(`apellidos.ilike.%${query}%,identificacion.ilike.%${query}%`);
+
+            const tbody = document.getElementById('results-table-body');
+            tbody.innerHTML = '';
+
+            if (error || !data || data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">No se encontraron registros.</td></tr>`;
+                return;
+            }
+
+            data.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="p-3 font-semibold">${item.identificacion}</td>
+                        <td class="p-3">${item.nombres} ${item.apellidos}</td>
+                        <td class="p-3">${item.correo}</td>
+                        <td class="p-3">${new Date(item.created_at).toLocaleDateString()}</td>
+                        <td class="p-3 text-center">
+                            <button onclick='generatePDF(${JSON.stringify(item)})' class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-3 py-1.5 rounded transition">
+                                Descargar PDF
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function generatePDF(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.setFillColor(26, 54, 93);
+            doc.rect(0, 0, 210, 25, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(15);
+            doc.text("Reporte Psicométrico y de Asignación Ministerial", 14, 16);
+
+            doc.setTextColor(40, 40, 40);
+            doc.setFontSize(10);
+            doc.text(`Nombre: ${data.nombres} ${data.apellidos}`, 14, 34);
+            doc.text(`Identificación: ${data.identificacion}`, 14, 40);
+            doc.text(`Edad: ${data.edad} años`, 120, 34);
+            doc.text(`Correo: ${data.correo}`, 120, 40);
+
+            doc.setFontSize(11);
+            doc.text("1. Perfil de Personalidad (8 Dimensiones)", 14, 50);
+
+            let profileRows = [];
+            for (let trait in data.perfil_personalidad) {
+                let score = data.perfil_personalidad[trait];
+                let level = score >= 66 ? "Alto" : (score >= 33 ? "Medio" : "Bajo");
+                profileRows.push([trait, `${score}%`, level, DESCRIPTIONS[trait]]);
+            }
+
+            doc.autoTable({
+                startY: 54,
+                head: [['Dimensión', 'Puntaje', 'Nivel', 'Comentario / Interpretación']],
+                body: profileRows,
+                headStyles: { fillColor: [43, 108, 176] },
+                columnStyles: { 3: { cellWidth: 90 } },
+                styles: { fontSize: 8 }
+            });
+
+            let finalY = doc.lastAutoTable.finalY + 8;
+            doc.text("2. Top 5 Áreas de Servicio Recomendadas", 14, finalY);
+
+            let areaRows = data.areas_recomendadas.slice(0, 5).map(a => [a[0], `${a[1]}%`]);
+
+            doc.autoTable({
+                startY: finalY + 4,
+                head: [['Área de Servicio Ministerial', 'Afinidad Estimada']],
+                body: areaRows,
+                headStyles: { fillColor: [47, 133, 90] },
+                styles: { fontSize: 8 }
+            });
+
+            doc.save(`Reporte_${data.apellidos}_${data.identificacion}.pdf`);
+        }
+    </script>
+</body>
+</html>
