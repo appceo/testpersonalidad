@@ -68,7 +68,7 @@
     </main>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIuqJ7f3v20mmdThj1Ia8A6el4RrJ_KM-Le8CbD826l_1s2x2yooDNDMrya98K0v_kqA/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/library/d/1hUGE0BXGQe4RBGiqKo-90ffCDgCMZ17_aMn98cagyVIonY7GSVvzWL8r/4";
         let dbRecords = [];
 
         // DEFINICIONES TÉCNICAS OFICIALES DE LAS ÁREAS DE IGLECO
@@ -249,6 +249,74 @@
             container.classList.remove('hidden');
         }
 
+        // LÓGICA DE GENERACIÓN DE INFORME DESCRIPTIVO POR EJES
+        function generateAxisNarrative(perfil) {
+            // Eje 1: Ejecución y Productividad (Recursividad, Perseverancia, Vitalidad)
+            const rec = perfil["Recursividad"] || 50;
+            const per = perfil["Perseverancia"] || 50;
+            const vit = perfil["Vitalidad"] || 50;
+            const avgProd = (rec + per + vit) / 3;
+
+            let prodFortaleza = "";
+            let prodMejora = "";
+
+            if (avgProd >= 70) {
+                prodFortaleza = "Excelente capacidad ejecutora y dinamismo operativo. Resuelve contingencias con agilidad y sostiene la disciplina en entregables de largo alcance.";
+                prodMejora = "Evitar la sobrecarga autoinfligida de trabajo y asegurar la estandarización documental de sus métodos innovadores.";
+            } else if (avgProd >= 50) {
+                prodFortaleza = "Desempeño constante y disciplinado en rutinas operativas habituales, utilizando recursos de forma eficiente y ordenada.";
+                prodMejora = "Estimular la iniciativa propia ante bloqueos imprevistos y fortalecer la tenacidad en proyectos de largo aliento.";
+            } else {
+                prodFortaleza = "Orientación a tareas metodológicas de ritmo pausado que requieren concentración y seguimiento paso a paso.";
+                prodMejora = "Subdividir grandes metas en objetivos semanales y contar con supervisión periódica para mantener el ritmo operativo.";
+            }
+
+            // Eje 2: Manejo Emocional (Adaptabilidad, Tolerancia)
+            const ada = perfil["Adaptabilidad"] || 50;
+            const tol = perfil["Tolerancia"] || 50;
+            const avgEmo = (ada + tol) / 2;
+
+            let emoFortaleza = "";
+            let emoMejora = "";
+
+            if (avgEmo >= 70) {
+                emoFortaleza = "Avanzado autocontrol y templanza. Conserva la serenidad bajo presión y actúa como mediador pacificador en momentos de tensión o cambio.";
+                emoMejora = "Asegurar que la alta tolerancia no postergue decisiones correctivas firmes cuando la disciplina organizativa lo exija.";
+            } else if (avgEmo >= 50) {
+                emoFortaleza = "Adecuada estabilidad emocional frente a imprevistos normales. Escucha activamente y gestiona las diferencias con madurez.";
+                emoMejora = "Comunicar con antelación las modificaciones de planes para mitigar la resistencia natural al cambio voluntario.";
+            } else {
+                emoFortaleza = "Firmeza en convicciones, apego riguroso a estándares y alto sentido del deber dentro de estructuras estables.";
+                emoMejora = "Desarrollar mayor flexibilidad comunicativa y resiliencia emocional cuando los escenarios cambien intempestivamente.";
+            }
+
+            // Eje 3: Relaciones Interpersonales (Destreza Social, Sensibilidad Social, Persuasión)
+            const des = perfil["Destreza Social"] || 50;
+            const sen = perfil["Sensibilidad Social"] || 50;
+            const perS = perfil["Persuasión"] || 50;
+            const avgRel = (des + sen + perS) / 3;
+
+            let relFortaleza = "";
+            let relMejora = "";
+
+            if (avgRel >= 70) {
+                relFortaleza = "Liderazgo carismático, empatía activa e influencia natural. Conecta de forma inmediata, motiva a grupos y detecta necesidades humanas.";
+                emoMejora = "Establecer límites sanos para evitar el agotamiento por sobreinvolucramiento en problemas ajenos.";
+            } else if (avgRel >= 50) {
+                relFortaleza = "Buenas relaciones interpersonales sostenidas en el respeto, la escucha y el apoyo oportuno dentro de equipos de trabajo.";
+                relMejora = "Ampliar progresivamente su círculo de influencia y asumir roles de vocería con mayor soltura.";
+            } else {
+                relFortaleza = "Estilo relacional prudente y respetuoso, enfocado en el cumplimiento de tareas sin generar fricciones en el entorno.";
+                relMejora = "Fomentar la participación activa en dinámicas comunitarias de integración y trabajo colaborativo.";
+            }
+
+            return {
+                productividad: { fortaleza: prodFortaleza, mejora: prodMejora },
+                emocional: { fortaleza: emoFortaleza, mejora: emoMejora },
+                relaciones: { fortaleza: relFortaleza, mejora: relMejora }
+            };
+        }
+
         function generatePDFForRecord(index) {
             const record = dbRecords[index];
             const { jsPDF } = window.jspdf;
@@ -301,7 +369,7 @@
             doc.text(`Edad: ${edad} años`, 14, 46);
             doc.text(`Correo Electrónico: ${correo}`, 14, 52);
 
-            // Áreas Sugeridas
+            // ÁREAS SUGERIDAS (Ancho corregido para evitar saltos de línea de la primera columna)
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
             doc.text("ÁREAS DE SERVICIO SUGERIDAS Y DEFINICIÓN TÉCNICA", 14, 62);
@@ -318,10 +386,10 @@
                 body: areasBody,
                 theme: 'striped',
                 headStyles: { fillColor: [0, 0, 0] },
-                columnStyles: { 0: { cellWidth: 38 }, 1: { cellWidth: 38 }, 2: { cellWidth: 104 } }
+                columnStyles: { 0: { cellWidth: 46 }, 1: { cellWidth: 38 }, 2: { cellWidth: 98 } }
             });
 
-            // Diagnóstico Cualitativo por Categoría con Badges de Nivel y Observaciones Profundas
+            // DIAGNÓSTICO CUALITATIVO PROFUNDO POR CATEGORÍA
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
             doc.text("DIAGNÓSTICO CUALITATIVO PROFUNDO POR CATEGORÍA", 14, doc.lastAutoTable.finalY + 10);
@@ -359,27 +427,35 @@
                 columnStyles: { 0: { cellWidth: 36 }, 1: { cellWidth: 38 }, 2: { cellWidth: 106 } }
             });
 
-            // CONCEPTO DUAL: FORTALEZAS Y OPORTUNIDADES DE MEJORA
-            const topTraits = sortedTraits.slice(0, 2);
-            const bottomTraits = sortedTraits.slice(-2);
-
-            let fortalezasText = topTraits.map(t => `• ${t}: ${CONCEPTO_DUAL[t]?.fortaleza || "Aporte constante al equipo."}`).join("\n");
-            let mejorasText = bottomTraits.map(t => `• ${t}: ${CONCEPTO_DUAL[t]?.mejora || "Acompañamiento periódico."}`).join("\n");
+            // INFORME DESCRIPTIVO ESTRUCTURADO POR EJES (NUEVO BLOQUE REQUERIDO)
+            const narrative = generateAxisNarrative(perfil);
 
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
-            doc.text("CONCEPTO INTEGRAL: FORTALEZAS Y OPORTUNIDADES DE MEJORA", 14, doc.lastAutoTable.finalY + 10);
+            doc.text("INFORME DESCRIPTIVO: EVALUACIÓN POR EJES CONDUCTUALES", 14, doc.lastAutoTable.finalY + 10);
+
+            const axisRows = [
+                [
+                    'EJECUCIÓN DE TAREAS Y PRODUCTIVIDAD',
+                    `• Fortaleza: ${narrative.productividad.fortaleza}\n• Oportunidad de Crecimiento: ${narrative.productividad.mejora}`
+                ],
+                [
+                    'MANEJO EMOCIONAL',
+                    `• Fortaleza: ${narrative.emocional.fortaleza}\n• Oportunidad de Crecimiento: ${narrative.emocional.mejora}`
+                ],
+                [
+                    'RELACIONES INTERPERSONALES',
+                    `• Fortaleza: ${narrative.relaciones.fortaleza}\n• Oportunidad de Crecimiento: ${narrative.relaciones.mejora}`
+                ]
+            ];
 
             doc.autoTable({
                 startY: doc.lastAutoTable.finalY + 14,
-                head: [['Eje de Diagnóstico', 'Análisis Cualitativo del Evaluado']],
-                body: [
-                    ['Principales Fortalezas', fortalezasText],
-                    ['Oportunidades de Crecimiento', mejorasText]
-                ],
+                head: [['Eje Conductual Evaluado', 'Diagnóstico Qualitativo (Fortalezas vs Oportunidades)']],
+                body: axisRows,
                 theme: 'striped',
                 headStyles: { fillColor: [0, 0, 0] },
-                columnStyles: { 0: { cellWidth: 45 }, 1: { cellWidth: 135 } }
+                columnStyles: { 0: { cellWidth: 50 }, 1: { cellWidth: 130 } }
             });
 
             doc.save(`Reporte_IGLECO_Cualitativo_${id}.pdf`);
