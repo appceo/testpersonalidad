@@ -27,7 +27,7 @@
                 <div class="h-5 w-px bg-slate-300"></div>
                 <span class="text-xs font-semibold tracking-wider text-slate-500 uppercase">Perfilamiento Ministerial</span>
             </div>
-            <div id="progress-text" class="text-xs font-bold text-slate-500 hidden font-mono">0 / 24</div>
+            <div id="progress-text" class="text-xs font-bold text-slate-500 hidden font-mono">0 / 64</div>
         </div>
         <!-- BARRA DE PROGRESO DE ALTA PRECISIÓN -->
         <div id="progress-bar-container" class="w-full bg-slate-100 h-1.5 mt-4 rounded-full overflow-hidden hidden">
@@ -41,7 +41,7 @@
         <div id="step-registration" class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-6">
             <div class="border-b border-slate-100 pb-4">
                 <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Bienvenido al Test de Perfilamiento</h1>
-                <p class="text-sm text-slate-500 mt-1">Por favor complete sus datos personales antes de iniciar las 24 preguntas de diagnóstico.</p>
+                <p class="text-sm text-slate-500 mt-1">Por favor complete sus datos personales antes de iniciar las 64 preguntas de diagnóstico.</p>
             </div>
 
             <form id="form-registration" class="space-y-4">
@@ -82,11 +82,11 @@
         <!-- PASO 2: CUESTIONARIO DE PREGUNTAS (UNA A LA VEZ) -->
         <div id="step-questions" class="hidden bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-8">
             <div class="space-y-2">
-                <span id="question-badge" class="text-xs font-bold uppercase tracking-widest text-slate-400 font-mono">Pregunta 1 de 24</span>
+                <span id="question-badge" class="text-xs font-bold uppercase tracking-widest text-slate-400 font-mono">Pregunta 1 de 64</span>
                 <h2 id="question-text" class="text-xl md:text-2xl font-bold text-slate-900 leading-snug">Cargando pregunta...</h2>
             </div>
 
-            <!-- ESCALA LIKERT SIN SELECCIÓN PREVIAMENTE MARCADA (OBLIGA A ELEGIR) -->
+            <!-- ESCALA LIKERT SIN SELECCIÓN PREVIAMENTE MARCADA -->
             <div class="space-y-3">
                 <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Seleccione el grado de afinidad con la afirmación:</p>
                 <div class="grid grid-cols-1 gap-2.5">
@@ -157,223 +157,4 @@
                 <div id="top-list" class="space-y-2 text-sm font-semibold text-slate-800"></div>
             </div>
 
-            <p class="text-xs text-slate-400">El informe cualitativo completo se encuentra disponible en el panel administrativo.</p>
-        </div>
-
-    </main>
-
-    <footer class="py-6 border-t border-slate-200 text-center text-xs text-slate-400 bg-white">
-        IGLECO © 2026 | Sistema de Perfilamiento Psicométrico y Ministerial
-    </footer>
-
-    <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIuqJ7f3v20mmdThj1Ia8A6el4RrJ_KM-Le8CbD826l_1s2x2yooDNDMrya98K0v_kqA/exec";
-
-        const PREGUNTAS = [
-            { id: 1, trait: "Destreza Social", text: "Me resulta fácil iniciar conversaciones y generar confianza rápidamente con personas que no conozco." },
-            { id: 2, trait: "Sensibilidad Social", text: "Percibo con facilidad cuando alguien a mi alrededor está pasando por una necesidad emocional o espiritual." },
-            { id: 3, trait: "Adaptabilidad", text: "Mantengo la calma y la efectividad cuando los planes cambian intempestivamente." },
-            { id: 4, trait: "Recursividad", text: "Suelo encontrar soluciones prácticas e ingeniosas frente a imprevistos o falta de recursos." },
-            { id: 5, trait: "Persuasión", text: "Tengo facilidad para comunicar visiones, inspirar e influir en las decisiones de otros." },
-            { id: 6, trait: "Perseverancia", text: "Soy constante y concluyo los proyectos que inicio, aun cuando tomen tiempo o se vuelvan rutinarios." },
-            { id: 7, trait: "Tolerancia", text: "Manejo la frustración y escucho con paciencia puntos de vista completamente opuestos al mío." },
-            { id: 8, trait: "Vitalidad", text: "Manejo un nivel de energía física y entusiasmo contagiante en jornadas de trabajo exigentes." },
-
-            { id: 9, trait: "Destreza Social", text: "Disfruto relacionarme e integrarme en grupos diversos de personas." },
-            { id: 10, trait: "Sensibilidad Social", text: "Siento un impulso genuino por consolar y acompañar a personas en vulnerabilidad o dolor." },
-            { id: 11, trait: "Adaptabilidad", text: "Me adapto con soltura a nuevos equipos de trabajo y diferentes estilos de liderazgo." },
-            { id: 12, trait: "Recursividad", text: "Prefiero proponer alternativas creativas antes que limitarme a decir que algo no se puede hacer." },
-            { id: 13, trait: "Persuasión", text: "Me siento cómodo asumiendo la vocería de un grupo para motivar a alcanzar un objetivo." },
-            { id: 14, trait: "Perseverancia", text: "La autodisciplina y el orden metódico son características habituales en mi día a día." },
-            { id: 15, trait: "Tolerancia", text: "Evito reaccionar con dureza ante la ineficiencia ajena y busco la conciliación pacífica." },
-            { id: 16, trait: "Vitalidad", text: "Rindo de manera óptima en actividades dinámicas que requieran movimiento y ritmo activo." },
-
-            { id: 17, trait: "Destreza Social", text: "Se me facilita conectar a personas entre sí y crear ambientes acogedores." },
-            { id: 18, trait: "Sensibilidad Social", text: "Invierto tiempo de manera voluntaria en escuchar y apoyar las cargas de otros." },
-            { id: 19, trait: "Adaptabilidad", text: "Respondo con ecuanimidad en entornos de alta presión o incertidumbre." },
-            { id: 20, trait: "Recursividad", text: "Optimizo procesos existentes para resolver cuellos de botella con ideas simples." },
-            { id: 21, trait: "Persuasión", text: "Logro que otros se sumen activamente a iniciativas o proyectos que propongo." },
-            { id: 22, trait: "Perseverancia", text: "Mantengo mi nivel de compromiso intacto hasta ver concluidos los objetivos fijados." },
-            { id: 23, trait: "Tolerancia", text: "Respeto los ritmos de aprendizaje y desarrollo de las demás personas sin juzgarlas." },
-            { id: 24, trait: "Vitalidad", text: "Tengo alta resistencia para afrontar eventos intensos de larga duración sin perder el dinamismo." }
-        ];
-
-        let currentIdx = 0;
-        let answers = {};
-        let userData = {};
-
-        function startTest() {
-            const nombres = document.getElementById('reg-nombres').value.trim();
-            const apellidos = document.getElementById('reg-apellidos').value.trim();
-            const id = document.getElementById('reg-id').value.trim();
-            const edad = document.getElementById('reg-edad').value.trim();
-            const correo = document.getElementById('reg-correo').value.trim();
-
-            if (!nombres || !apellidos || !id || !edad || !correo) {
-                alert("Por favor complete todos los campos obligatorios del registro.");
-                return;
-            }
-
-            userData = { nombres, apellidos, identificacion: id, edad, correo };
-
-            document.getElementById('step-registration').classList.add('hidden');
-            document.getElementById('step-questions').classList.remove('hidden');
-            document.getElementById('progress-bar-container').classList.remove('hidden');
-            document.getElementById('progress-text').classList.remove('hidden');
-
-            renderQuestion();
-        }
-
-        function renderQuestion() {
-            const q = PREGUNTAS[currentIdx];
-            document.getElementById('question-badge').innerText = `Pregunta ${currentIdx + 1} de ${PREGUNTAS.length}`;
-            document.getElementById('question-text').innerText = q.text;
-
-            // ACTUALIZAR BARRA DE PROGRESO
-            const pct = Math.round(((currentIdx + 1) / PREGUNTAS.length) * 100);
-            document.getElementById('progress-bar').style.width = `${pct}%`;
-            document.getElementById('progress-text').innerText = `${currentIdx + 1} / ${PREGUNTAS.length}`;
-
-            // LIMPIAR SELECCIÓN PREVIA (SIN VALOR PREDETERMINADO 3)
-            const radios = document.getElementsByName('likert-val');
-            radios.forEach(r => r.checked = false);
-
-            // SI YA HABÍA RESPONDIDO ESTA PREGUNTA, RESTAURAR SU SELECCIÓN
-            if (answers[q.id]) {
-                const selectedRadio = document.querySelector(`input[name="likert-val"][value="${answers[q.id]}"]`);
-                if (selectedRadio) selectedRadio.checked = true;
-            }
-
-            // CONTROL DE BOTÓN ANTERIOR
-            document.getElementById('btn-prev').style.visibility = currentIdx === 0 ? 'hidden' : 'visible';
-            document.getElementById('btn-next').innerText = currentIdx === PREGUNTAS.length - 1 ? 'Finalizar Evaluación ✓' : 'Siguiente →';
-        }
-
-        function nextQuestion() {
-            const q = PREGUNTAS[currentIdx];
-            const selectedRadio = document.querySelector('input[name="likert-val"]:checked');
-
-            if (!selectedRadio) {
-                alert("Por favor seleccione una opción para continuar.");
-                return;
-            }
-
-            answers[q.id] = parseInt(selectedRadio.value);
-
-            if (currentIdx < PREGUNTAS.length - 1) {
-                currentIdx++;
-                renderQuestion();
-            } else {
-                submitTest();
-            }
-        }
-
-        function prevQuestion() {
-            if (currentIdx > 0) {
-                currentIdx--;
-                renderQuestion();
-            }
-        }
-
-        function submitTest() {
-            // CÁLCULO DE PUNTAJES POR RASGO (8 RASGOS × 3 PREGUNTAS LIKERT DE 1 A 5)
-            const traitScores = {
-                "Destreza Social": 0,
-                "Sensibilidad Social": 0,
-                "Adaptabilidad": 0,
-                "Recursividad": 0,
-                "Persuasión": 0,
-                "Perseverancia": 0,
-                "Tolerancia": 0,
-                "Vitalidad": 0
-            };
-
-            PREGUNTAS.forEach(q => {
-                const val = answers[q.id] || 3;
-                traitScores[q.trait] += val;
-            });
-
-            // NORMALIZACIÓN A PORCENTAJE (Puntaje Mínimo 3 = 0%, Máximo 15 = 100%)
-            const perfilPct = {};
-            Object.keys(traitScores).forEach(t => {
-                const raw = traitScores[t];
-                perfilPct[t] = Math.round(((raw - 3) / 12) * 100);
-            });
-
-            // ALGORITMO P-E FIT: MATCH CON ÁREAS DE SERVICIO IGLECO
-            const topAreas = calculateTopAreas(perfilPct);
-
-            const payload = {
-                nombres: userData.nombres,
-                apellidos: userData.apellidos,
-                identificacion: userData.identificacion,
-                edad: userData.edad,
-                correo: userData.correo,
-                top1: `${topAreas[0].name} (${topAreas[0].score}%)`,
-                top2: `${topAreas[1].name} (${topAreas[1].score}%)`,
-                top3: `${topAreas[2].name} (${topAreas[2].score}%)`,
-                perfil: perfilPct
-            };
-
-            document.getElementById('step-questions').classList.add('hidden');
-            document.getElementById('progress-bar-container').classList.add('hidden');
-            document.getElementById('step-completion').classList.remove('hidden');
-
-            const topListEl = document.getElementById('top-list');
-            topListEl.innerHTML = `
-                <p>1. ${topAreas[0].name} <span class="text-xs text-emerald-600 font-bold">(${topAreas[0].score}% de afinidad)</span></p>
-                <p>2. ${topAreas[1].name} <span class="text-xs text-slate-500 font-bold">(${topAreas[1].score}% de afinidad)</span></p>
-                <p>3. ${topAreas[2].name} <span class="text-xs text-slate-500 font-bold">(${topAreas[2].score}% de afinidad)</span></p>
-            `;
-
-            // ENVÍO DE DATOS A GOOGLE SHEETS
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            }).catch(e => console.error("Error al registrar en Sheets:", e));
-        }
-
-        function calculateTopAreas(perfil) {
-            const matrix = {
-                "Acompañamiento": { "Sensibilidad Social": 0.4, "Tolerancia": 0.3, "Destreza Social": 0.3 },
-                "Adoración": { "Vitalidad": 0.4, "Perseverancia": 0.3, "Adaptabilidad": 0.3 },
-                "Artístico": { "Recursividad": 0.4, "Vitalidad": 0.3, "Destreza Social": 0.3 },
-                "Producción": { "Perseverancia": 0.4, "Adaptabilidad": 0.3, "Recursividad": 0.3 },
-                "Ayudas Administrativas": { "Perseverancia": 0.5, "Adaptabilidad": 0.3, "Tolerancia": 0.2 },
-                "Ayudas Profesionales": { "Recursividad": 0.4, "Perseverancia": 0.3, "Sensibilidad Social": 0.3 },
-                "Conexión": { "Destreza Social": 0.5, "Sensibilidad Social": 0.3, "Vitalidad": 0.2 },
-                "Contact Center": { "Sensibilidad Social": 0.4, "Tolerancia": 0.3, "Destreza Social": 0.3 },
-                "Decoración": { "Recursividad": 0.5, "Perseverancia": 0.3, "Vitalidad": 0.2 },
-                "Discipulado": { "Persuasión": 0.4, "Sensibilidad Social": 0.3, "Perseverancia": 0.3 },
-                "CFV - Kids": { "Vitalidad": 0.4, "Sensibilidad Social": 0.3, "Recursividad": 0.3 },
-                "Evangelismo": { "Destreza Social": 0.4, "Persuasión": 0.4, "Vitalidad": 0.2 },
-                "Hospitalidad": { "Sensibilidad Social": 0.4, "Destreza Social": 0.3, "Tolerancia": 0.3 },
-                "Maquillaje": { "Recursividad": 0.4, "Perseverancia": 0.3, "Tolerancia": 0.3 },
-                "Monitores Escuelas": { "Perseverancia": 0.4, "Adaptabilidad": 0.3, "Tolerancia": 0.3 },
-                "Oración": { "Sensibilidad Social": 0.4, "Perseverancia": 0.4, "Tolerancia": 0.2 },
-                "PowerKids": { "Vitalidad": 0.5, "Recursividad": 0.3, "Destreza Social": 0.2 },
-                "Seguridad": { "Adaptabilidad": 0.4, "Tolerancia": 0.3, "Perseverancia": 0.3 },
-                "Servidores": { "Tolerancia": 0.4, "Destreza Social": 0.3, "Vitalidad": 0.3 },
-                "Traductores": { "Perseverancia": 0.4, "Adaptabilidad": 0.3, "Recursividad": 0.3 },
-                "Comunicaciones y Redes": { "Recursividad": 0.4, "Persuasión": 0.3, "Vitalidad": 0.3 },
-                "Medios e Infraestructura": { "Adaptabilidad": 0.4, "Perseverancia": 0.4, "Recursividad": 0.2 }
-            };
-
-            const scores = [];
-            Object.keys(matrix).forEach(area => {
-                const reqs = matrix[area];
-                let total = 0;
-                Object.keys(reqs).forEach(trait => {
-                    total += (perfil[trait] || 50) * reqs[trait];
-                });
-                scores.push({ name: area, score: Math.round(total) });
-            });
-
-            scores.sort((a, b) => b.score - a.score);
-            return scores;
-        }
-    </script>
-</body>
-</html>
+            <p class="text-
