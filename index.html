@@ -72,7 +72,7 @@
                 </div>
 
                 <div class="pt-4">
-                    <button type="button" onclick="startTest()" class="w-full py-4 bg-black hover:bg-slate-800 text-white font-bold rounded-xl transition shadow-md text-sm uppercase tracking-wider">
+                    <button type="button" onclick="startTest()" class="w-full py-4 bg-black hover:bg-slate-800 text-white font-bold rounded-xl transition shadow-md text-sm uppercase tracking-wider cursor-pointer">
                         Comenzar Evaluación →
                     </button>
                 </div>
@@ -86,7 +86,7 @@
                 <h2 id="question-text" class="text-xl md:text-2xl font-bold text-slate-900 leading-snug">Cargando pregunta...</h2>
             </div>
 
-            <!-- ESCALA LIKERT LIMPIA SIN PORCENTAJES (EVITA SESGOS) -->
+            <!-- ESCALA LIKERT LIMPIA SIN PORCENTAJES NI SELECCIÓN PREVIA -->
             <div class="space-y-3">
                 <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Seleccione el grado de afinidad con la afirmación:</p>
                 <div class="grid grid-cols-1 gap-2.5">
@@ -131,28 +131,32 @@
                 <button type="button" id="btn-prev" onclick="prevQuestion()" class="px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-black transition">
                     ← Anterior
                 </button>
-                <button type="button" id="btn-next" onclick="nextQuestion()" class="px-6 py-3 bg-black hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-sm">
+                <button type="button" id="btn-next" onclick="nextQuestion()" class="px-6 py-3 bg-black hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-sm cursor-pointer">
                     Siguiente →
                 </button>
             </div>
         </div>
 
-        <!-- PASO 3: CONFIRMACIÓN Y RESULTADO AL USUARIO -->
-        <div id="step-completion" class="hidden bg-white border border-slate-200 rounded-2xl p-8 text-center space-y-6 shadow-sm">
-            <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-3xl font-bold">
+        <!-- PASO 3: MESA DE CONFIRMACIÓN INSTITUCIONAL SIN REVELAR RESULTADOS -->
+        <div id="step-completion" class="hidden bg-white border border-slate-200 rounded-2xl p-10 text-center space-y-6 shadow-sm">
+            <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-4xl font-bold">
                 ✓
             </div>
-            <div>
-                <h2 class="text-2xl font-black text-slate-900">¡Evaluación Finalizada con Éxito!</h2>
-                <p class="text-sm text-slate-500 mt-2 max-w-md mx-auto">Sus respuestas han sido registradas y procesadas mediante el modelo psicométrico oficial de IGLECO.</p>
+            <div class="space-y-2">
+                <h2 class="text-2xl font-black text-slate-900">¡Evaluación Completada Exitosamente!</h2>
+                <p class="text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
+                    Sus respuestas han sido registradas y procesadas mediante el modelo psicométrico oficial de <strong>IGLECO</strong>.
+                </p>
             </div>
 
-            <div id="user-top-results" class="bg-slate-50 border border-slate-200 rounded-xl p-6 text-left space-y-3 max-w-md mx-auto">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Sus Áreas de Afinidad Recomendadas:</h3>
-                <div id="top-list" class="space-y-2 text-sm font-semibold text-slate-800"></div>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 max-w-md mx-auto text-center space-y-2">
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Próximo Paso en el Proceso</p>
+                <p class="text-sm text-slate-700">
+                    El equipo administrativo y pastoral revisará su informe cualitativo para ponerse en contacto con usted y orientar su asignación ministerial.
+                </p>
             </div>
 
-            <p class="text-xs text-slate-400">El informe cualitativo completo se encuentra disponible en el panel administrativo.</p>
+            <p class="text-xs text-slate-400">Gracias por su disposición y vocación de servicio.</p>
         </div>
 
     </main>
@@ -382,14 +386,7 @@
             document.getElementById('progress-bar-container').classList.add('hidden');
             document.getElementById('step-completion').classList.remove('hidden');
 
-            const topListEl = document.getElementById('top-list');
-            topListEl.innerHTML = `
-                <p>1. ${topAreas[0].name} <span class="text-xs text-emerald-600 font-bold">(${topAreas[0].score}% de afinidad)</span></p>
-                <p>2. ${topAreas[1].name} <span class="text-xs text-slate-500 font-bold">(${topAreas[1].score}% de afinidad)</span></p>
-                <p>3. ${topAreas[2].name} <span class="text-xs text-slate-500 font-bold">(${topAreas[2].score}% de afinidad)</span></p>
-            `;
-
-            // ENVÍO DE DATOS A GOOGLE SHEETS
+            // ENVÍO DE DATOS A GOOGLE SHEETS EN SEGUNDO PLANO
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
