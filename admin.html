@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 0; }
+        .hidden { display: none !important; }
         .card-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     </style>
 </head>
@@ -27,29 +28,14 @@
                 <div class="h-6 w-px bg-slate-300"></div>
                 <span class="text-xs font-bold tracking-wider text-slate-500 uppercase">Panel Administrativo</span>
             </div>
-            <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-mono border border-slate-200">Acceso Restringido</span>
+            <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-mono border border-slate-200">Acceso Directo</span>
         </div>
     </header>
 
     <main class="max-w-5xl mx-auto my-10 px-4">
-        
-        <!-- PANTALLA DE ACCESO POR PIN -->
-        <div id="login-box" class="card-box p-8 max-w-md mx-auto text-center space-y-6">
-            <div class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto text-xl">🔒</div>
-            <div>
-                <h2 class="text-2xl font-bold text-slate-900">Acceso Requerido</h2>
-                <p class="text-sm text-slate-500 mt-1">Ingrese el PIN de seguridad para acceder al panel.</p>
-            </div>
-            <div class="space-y-4">
-                <input type="password" id="pin-input" placeholder="••••" maxlength="8" onkeydown="if(event.key==='Enter') executeLogin()" class="w-full p-3 border border-slate-300 rounded-lg text-center text-2xl tracking-widest outline-none focus:ring-2 focus:ring-black">
-                <button type="button" onclick="executeLogin()" class="w-full py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition shadow-sm cursor-pointer">
-                    Ingresar al Panel
-                </button>
-            </div>
-        </div>
 
-        <!-- PANEL DE BÚSQUEDA Y REPORTES -->
-        <div id="admin-panel" style="display: none;" class="space-y-6">
+        <!-- PANEL DE BÚSQUEDA Y REPORTES (DIRECTO) -->
+        <div id="admin-panel" class="space-y-6">
             <div class="card-box p-6 md:p-8 space-y-6">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-4">
                     <div>
@@ -69,7 +55,7 @@
                     </button>
                 </div>
 
-                <div id="status-msg" class="text-xs text-slate-500 hidden font-medium">Cargando registros...</div>
+                <div id="status-msg" class="text-xs text-slate-500 font-medium">Cargando registros de evaluación...</div>
 
                 <!-- RESULTADOS DE BÚSQUEDA -->
                 <div id="results-container" class="space-y-4 hidden border-t border-slate-100 pt-4">
@@ -84,18 +70,6 @@
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIuqJ7f3v20mmdThj1Ia8A6el4RrJ_KM-Le8CbD826l_1s2x2yooDNDMrya98K0v_kqA/exec";
         let dbRecords = [];
-
-        function executeLogin() {
-            const input = document.getElementById('pin-input');
-            const pin = input ? input.value.trim() : '';
-            if (pin === '1234') {
-                document.getElementById('login-box').style.display = 'none';
-                document.getElementById('admin-panel').style.display = 'block';
-                loadRecords();
-            } else {
-                alert('PIN incorrecto. Ingrese 1234');
-            }
-        }
 
         // DEFINICIONES TÉCNICAS OFICIALES DE LAS ÁREAS DE IGLECO
         const DEFINICIONES_AREAS = {
@@ -162,10 +136,15 @@
             },
             "Vitalidad": {
                 alto: "Refleja energía contagiante, vigor físico y dinamismo para responder en escenarios de ritmo acelerado y alta exigencia operativa. Transmite entusiasmo al equipo.\n• Entorno Ideal: Ministerio juvenil, recreación infantil (PowerKids/Kids), montajes pesados, campamentos y evangelismo masivo.\n• Orientación Pastoral: Encauzar su abundante energía hacia metas organizadas para evitar la dispersión o el cansancio prematuro.",
-                medio: "Despliega un ritmo de trabajo activo, regular y sustained. Mantiene un equilibrio saludable entre el esfuerzo físico y la pausa necesaria para el rendimiento constante.\n• Entorno Ideal: Protocolo de servicio regular, logística de reuniones, monitoreo de clases y trabajo de oficina.\n• Orientación Pastoral: Proporcionar roles con exigencia física razonable que le permitan mantener un desempeño constante sin desgaste.",
+                medio: "Despliega un ritmo de trabajo activo, regular y sostenido. Mantiene un equilibrio saludable entre el esfuerzo físico y la pausa necesaria para el rendimiento constante.\n• Entorno Ideal: Protocolo de servicio regular, logística de reuniones, monitoreo de clases y trabajo de oficina.\n• Orientación Pastoral: Proporcionar roles con exigencia física razonable que le permitan mantener un desempeño constante sin desgaste.",
                 bajo: "Sobresale en labores reflexivas, analíticas, de concentración o de baja demanda física. Aporta calma, profundidad de análisis y meticulosidad al proceso.\n• Entorno Ideal: Intercesión, revisión de documentos, diseño, edición de textos, llamadas de seguimiento y planeación estratégica.\n• Orientación Pastoral: Asignarle entornos de trabajo cómodos y pausados donde su capacidad de concentración sea el factor diferenciador."
             }
         };
+
+        // CARGA AUTOMÁTICA AL ABRIR LA PÁGINA
+        window.addEventListener('DOMContentLoaded', () => {
+            loadRecords();
+        });
 
         async function loadRecords() {
             const status = document.getElementById('status-msg');
@@ -257,4 +236,84 @@
 
             const ada = perfil["Adaptabilidad"] || 50;
             const tol = perfil["Tolerancia"] || 50;
-            const avgEmo = (ada + tol) /
+            const avgEmo = (ada + tol) / 2;
+
+            let emoFortaleza = "";
+            let emoMejora = "";
+
+            if (avgEmo >= 70) {
+                emoFortaleza = "Avanzado autocontrol y templanza. Conserva la serenidad bajo presión y actúa como mediador pacificador en momentos de tensión o cambio.";
+                emoMejora = "Asegurar que la alta tolerancia no postergue decisiones correctivas firmes cuando la disciplina organizativa lo exija.";
+            } else if (avgEmo >= 50) {
+                emoFortaleza = "Adecuada estabilidad emocional frente a imprevistos normales. Escucha activamente y gestiona las diferencias con madurez.";
+                emoMejora = "Comunicar con antelación las modificaciones de planes para mitigar la resistencia natural al cambio voluntario.";
+            } else {
+                emoFortaleza = "Firmeza en convicciones, apego riguroso a estándares y alto sentido del deber dentro de estructuras estables.";
+                emoMejora = "Desarrollar mayor flexibilidad comunicativa y resiliencia emocional cuando los escenarios cambien intempestivamente.";
+            }
+
+            const des = perfil["Destreza Social"] || 50;
+            const sen = perfil["Sensibilidad Social"] || 50;
+            const perS = perfil["Persuasión"] || 50;
+            const avgRel = (des + sen + perS) / 3;
+
+            let relFortaleza = "";
+            let relMejora = "";
+
+            if (avgRel >= 70) {
+                relFortaleza = "Liderazgo carismático, empatía activa e influencia natural. Conecta de forma inmediata, motiva a grupos y detecta necesidades humanas.";
+                emoMejora = "Establecer límites sanos para evitar el agotamiento por sobreinvolucramiento en problemas ajenos.";
+            } else if (avgRel >= 50) {
+                relFortaleza = "Buenas relaciones interpersonales sostenidas en el respeto, la escucha y el apoyo oportuno dentro de equipos de trabajo.";
+                relMejora = "Ampliar progresivamente su círculo de influencia y asumir roles de vocería con mayor soltura.";
+            } else {
+                relFortaleza = "Estilo relacional prudente y respetuoso, enfocado en el cumplimiento de tareas sin generar fricciones en el entorno.";
+                relMejora = "Fomentar la participación activa en dinámicas comunitarias de integración y trabajo colaborativo.";
+            }
+
+            return {
+                productividad: { fortaleza: prodFortaleza, mejora: prodMejora },
+                emocional: { fortaleza: emoFortaleza, mejora: emoMejora },
+                relaciones: { fortaleza: relFortaleza, mejora: relMejora }
+            };
+        }
+
+        function generatePDFForRecord(index) {
+            const record = dbRecords[index];
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            function cleanAreaName(rawName) {
+                if (!rawName) return "";
+                return rawName.replace(/\s*\(\d+\%\)/g, "").trim();
+            }
+
+            let perfil = {};
+            try {
+                const rawPerfil = record.perfil || record['Perfil Resumen'];
+                perfil = typeof rawPerfil === 'string' ? JSON.parse(rawPerfil) : rawPerfil;
+            } catch (e) {
+                perfil = {};
+            }
+
+            const nombres = record.nombres || record.Nombres || '';
+            const apellidos = record.apellidos || record.Apellidos || '';
+            const id = record.identificacion || record.Identificacion || 'N/A';
+            const edad = record.edad || record.Edad || 'N/A';
+            const correo = record.correo || record.Correo || 'N/A';
+
+            const rawTop1 = record.top1 || record['Top 1 Area'] || 'N/A';
+            const rawTop2 = record.top2 || record['Top 2 Area'] || 'N/A';
+            const rawTop3 = record.top3 || record['Top 3 Area'] || 'N/A';
+
+            const cleanTop1 = cleanAreaName(rawTop1);
+            const cleanTop2 = cleanAreaName(rawTop2);
+            const cleanTop3 = cleanAreaName(rawTop3);
+
+            // Encabezado Corporativo
+            doc.setFillColor(0, 0, 0);
+            doc.rect(0, 0, 210, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(13);
+            doc.setFont("helvetica", "bold");
+            doc.text("IGLECO - PERFILAMIENTO PSICOMÉTRICO Y MINISTERIAL
