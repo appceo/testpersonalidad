@@ -28,14 +28,27 @@
                 <div class="h-6 w-px bg-slate-300"></div>
                 <span class="text-xs font-bold tracking-wider text-slate-500 uppercase">Panel Administrativo</span>
             </div>
-            <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-mono border border-slate-200">Acceso Directo</span>
+            <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-mono border border-slate-200">Acceso Restringido</span>
         </div>
     </header>
 
     <main class="max-w-5xl mx-auto my-10 px-4">
         
-        <!-- PANEL DE BÚSQUEDA Y REPORTES (DIRECTO) -->
-        <div id="admin-panel" class="space-y-6">
+        <!-- PANTALLA DE ACCESO POR PIN -->
+        <div id="login-box" class="card-box p-8 max-w-md mx-auto text-center space-y-6">
+            <div class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto text-xl">🔒</div>
+            <div>
+                <h2 class="text-2xl font-bold text-slate-900">Acceso Requerido</h2>
+                <p class="text-sm text-slate-500 mt-1">Ingrese el PIN de seguridad para acceder al panel.</p>
+            </div>
+            <div>
+                <input type="password" id="pin-input" placeholder="••••" maxlength="8" class="w-full p-3 border border-slate-300 rounded-lg text-center text-2xl tracking-widest outline-none focus:ring-2 focus:ring-black">
+            </div>
+            <button type="button" onclick="validateLogin()" class="w-full py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition shadow-sm">Ingresar al Panel</button>
+        </div>
+
+        <!-- PANEL DE BÚSQUEDA Y REPORTES -->
+        <div id="admin-panel" class="hidden space-y-6">
             <div class="card-box p-6 md:p-8 space-y-6">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-4">
                     <div>
@@ -68,6 +81,7 @@
     </main>
 
     <script>
+        const ADMIN_PIN = "1234";
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIuqJ7f3v20mmdThj1Ia8A6el4RrJ_KM-Le8CbD826l_1s2x2yooDNDMrya98K0v_kqA/exec";
         let dbRecords = [];
 
@@ -141,44 +155,19 @@
             }
         };
 
-        const CONCEPTO_DUAL = {
-            "Destreza Social": {
-                fortaleza: "Facilidad natural para romper el hielo y construir puentes de relación e integración comunitaria.",
-                mejora: "Puntualizar profundización en relaciones uno a uno y escucha activa."
-            },
-            "Sensibilidad Social": {
-                fortaleza: "Gran empatía y percepción activa del estado emocional y espiritual ajeno.",
-                mejora: "Establecer límites sanos para evitar el desgaste emocional por sobreinvolucramiento."
-            },
-            "Adaptabilidad": {
-                fortaleza: "Alta ecuanimidad y resiliencia frente al cambio e imprevistos.",
-                mejora: "Asegurar el respeto por los procesos organizativos básicos antes de modificar planes."
-            },
-            "Recursividad": {
-                fortaleza: "Ingenio y creatividad orientada a resolver problemas prácticos con rapidez.",
-                mejora: "Documentar y estandarizar las soluciones creadas para que sean replicables."
-            },
-            "Persuasión": {
-                fortaleza: "Capacidad de influencia, comunicación inspiradora y movilización de personas.",
-                mejora: "Equilibrar la persuasión verbal escuchando y validando las dudas del equipo."
-            },
-            "Perseverancia": {
-                fortaleza: "Consistencia, autodisciplina y enfoque riguroso hacia el cumplimiento de metas.",
-                mejora: "Mantener flexibilidad cuando las circunstancias externas exijan pausar o pivotar."
-            },
-            "Tolerancia": {
-                fortaleza: "Prudencia, paciencia y madurez para conciliar diversas opiniones.",
-                mejora: "Comunicar decisiones con firmeza oportuna para evitar dilaciones excesivas."
-            },
-            "Vitalidad": {
-                fortaleza: "Dinamismo, contagio de energía y enfoque ejecutor en las actividades.",
-                mejora: "Dosificar el esfuerzo personal para prevenir episodios de fatiga o cansancio."
+        function validateLogin() {
+            const pinVal = document.getElementById('pin-input').value.trim();
+            if (pinVal === ADMIN_PIN || pinVal === "1234") {
+                document.getElementById('login-box').classList.add('hidden');
+                document.getElementById('admin-panel').classList.remove('hidden');
+                loadRecords();
+            } else {
+                alert("PIN incorrecto. Ingrese 1234");
             }
-        };
+        }
 
-        // Cargar datos automáticamente al iniciar la página
-        window.addEventListener('DOMContentLoaded', () => {
-            loadRecords();
+        document.getElementById('pin-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') validateLogin();
         });
 
         async function loadRecords() {
@@ -249,9 +238,7 @@
             container.classList.remove('hidden');
         }
 
-        // LÓGICA DE GENERACIÓN DE INFORME DESCRIPTIVO POR EJES
         function generateAxisNarrative(perfil) {
-            // Eje 1: Ejecución y Productividad (Recursividad, Perseverancia, Vitalidad)
             const rec = perfil["Recursividad"] || 50;
             const per = perfil["Perseverancia"] || 50;
             const vit = perfil["Vitalidad"] || 50;
@@ -270,196 +257,3 @@
                 prodFortaleza = "Orientación a tareas metodológicas de ritmo pausado que requieren concentración y seguimiento paso a paso.";
                 prodMejora = "Subdividir grandes metas en objetivos semanales y contar con supervisión periódica para mantener el ritmo operativo.";
             }
-
-            // Eje 2: Manejo Emocional (Adaptabilidad, Tolerancia)
-            const ada = perfil["Adaptabilidad"] || 50;
-            const tol = perfil["Tolerancia"] || 50;
-            const avgEmo = (ada + tol) / 2;
-
-            let emoFortaleza = "";
-            let emoMejora = "";
-
-            if (avgEmo >= 70) {
-                emoFortaleza = "Avanzado autocontrol y templanza. Conserva la serenidad bajo presión y actúa como mediador pacificador en momentos de tensión o cambio.";
-                emoMejora = "Asegurar que la alta tolerancia no postergue decisiones correctivas firmes cuando la disciplina organizativa lo exija.";
-            } else if (avgEmo >= 50) {
-                emoFortaleza = "Adecuada estabilidad emocional frente a imprevistos normales. Escucha activamente y gestiona las diferencias con madurez.";
-                emoMejora = "Comunicar con antelación las modificaciones de planes para mitigar la resistencia natural al cambio voluntario.";
-            } else {
-                emoFortaleza = "Firmeza en convicciones, apego riguroso a estándares y alto sentido del deber dentro de estructuras estables.";
-                emoMejora = "Desarrollar mayor flexibilidad comunicativa y resiliencia emocional cuando los escenarios cambien intempestivamente.";
-            }
-
-            // Eje 3: Relaciones Interpersonales (Destreza Social, Sensibilidad Social, Persuasión)
-            const des = perfil["Destreza Social"] || 50;
-            const sen = perfil["Sensibilidad Social"] || 50;
-            const perS = perfil["Persuasión"] || 50;
-            const avgRel = (des + sen + perS) / 3;
-
-            let relFortaleza = "";
-            let relMejora = "";
-
-            if (avgRel >= 70) {
-                relFortaleza = "Liderazgo carismático, empatía activa e influencia natural. Conecta de forma inmediata, motiva a grupos y detecta necesidades humanas.";
-                emoMejora = "Establecer límites sanos para evitar el agotamiento por sobreinvolucramiento en problemas ajenos.";
-            } else if (avgRel >= 50) {
-                relFortaleza = "Buenas relaciones interpersonales sostenidas en el respeto, la escucha y el apoyo oportuno dentro de equipos de trabajo.";
-                relMejora = "Ampliar progresivamente su círculo de influencia y asumir roles de vocería con mayor soltura.";
-            } else {
-                relFortaleza = "Estilo relacional prudente y respetuoso, enfocado en el cumplimiento de tareas sin generar fricciones en el entorno.";
-                relMejora = "Fomentar la participación activa en dinámicas comunitarias de integración y trabajo colaborativo.";
-            }
-
-            return {
-                productividad: { fortaleza: prodFortaleza, mejora: prodMejora },
-                emocional: { fortaleza: emoFortaleza, mejora: emoMejora },
-                relaciones: { fortaleza: relFortaleza, mejora: relMejora }
-            };
-        }
-
-        function generatePDFForRecord(index) {
-            const record = dbRecords[index];
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            function cleanAreaName(rawName) {
-                if (!rawName) return "";
-                return rawName.replace(/\s*\(\d+\%\)/g, "").trim();
-            }
-
-            let perfil = {};
-            try {
-                const rawPerfil = record.perfil || record['Perfil Resumen'];
-                perfil = typeof rawPerfil === 'string' ? JSON.parse(rawPerfil) : rawPerfil;
-            } catch (e) {
-                perfil = {};
-            }
-
-            const nombres = record.nombres || record.Nombres || '';
-            const apellidos = record.apellidos || record.Apellidos || '';
-            const id = record.identificacion || record.Identificacion || 'N/A';
-            const edad = record.edad || record.Edad || 'N/A';
-            const correo = record.correo || record.Correo || 'N/A';
-
-            const rawTop1 = record.top1 || record['Top 1 Area'] || 'N/A';
-            const rawTop2 = record.top2 || record['Top 2 Area'] || 'N/A';
-            const rawTop3 = record.top3 || record['Top 3 Area'] || 'N/A';
-
-            const cleanTop1 = cleanAreaName(rawTop1);
-            const cleanTop2 = cleanAreaName(rawTop2);
-            const cleanTop3 = cleanAreaName(rawTop3);
-
-            // Encabezado Corporativo
-            doc.setFillColor(0, 0, 0);
-            doc.rect(0, 0, 210, 20, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(13);
-            doc.setFont("helvetica", "bold");
-            doc.text("IGLECO - PERFILAMIENTO PSICOMÉTRICO Y MINISTERIAL", 14, 13);
-
-            // Datos Personales
-            doc.setTextColor(0, 0, 0);
-            doc.setFontSize(11);
-            doc.text("INFORMACIÓN DEL EVALUADO", 14, 28);
-            
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Nombre Completo: ${nombres} ${apellidos}`, 14, 34);
-            doc.text(`Identificación: ${id}`, 14, 40);
-            doc.text(`Edad: ${edad} años`, 14, 46);
-            doc.text(`Correo Electrónico: ${correo}`, 14, 52);
-
-            // ÁREAS SUGERIDAS (Ancho corregido para evitar saltos de línea de la primera columna)
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("ÁREAS DE SERVICIO SUGERIDAS Y DEFINICIÓN TÉCNICA", 14, 62);
-
-            const areasBody = [
-                ['Área Principal (Top 1)', rawTop1, DEFINICIONES_AREAS[cleanTop1] || "Acompañamiento e integración en el servicio comunitario."],
-                ['Área Secundaria (Top 2)', rawTop2, DEFINICIONES_AREAS[cleanTop2] || "Soporte colaborativo en procesos operativos y de acompañamiento."],
-                ['Área Alternativa (Top 3)', rawTop3, DEFINICIONES_AREAS[cleanTop3] || "Opción complementaria para diversificar el servicio según las necesidades."]
-            ];
-
-            doc.autoTable({
-                startY: 65,
-                head: [['Prioridad', 'Área Recomendada', 'Propósito y Alcance del Área']],
-                body: areasBody,
-                theme: 'striped',
-                headStyles: { fillColor: [0, 0, 0] },
-                columnStyles: { 0: { cellWidth: 46 }, 1: { cellWidth: 38 }, 2: { cellWidth: 98 } }
-            });
-
-            // DIAGNÓSTICO CUALITATIVO PROFUNDO POR CATEGORÍA
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("DIAGNÓSTICO CUALITATIVO PROFUNDO POR CATEGORÍA", 14, doc.lastAutoTable.finalY + 10);
-
-            const sortedTraits = Object.keys(perfil).sort((a, b) => perfil[b] - perfil[a]);
-
-            const traitRows = sortedTraits.map(trait => {
-                const score = perfil[trait];
-                let nivelKey = "medio";
-                let badge = "DESARROLLADO";
-                
-                if (score >= 75) {
-                    nivelKey = "alto";
-                    badge = "SOBRESALIENTE";
-                } else if (score < 50) {
-                    nivelKey = "bajo";
-                    badge = "EN DESARROLLO";
-                }
-
-                const obsObj = OBSERVACIONES[trait] || {
-                    alto: "Desempeño sobresaliente en la categoría.",
-                    medio: "Desempeño adecuado y funcional.",
-                    bajo: "Área con oportunidad de crecimiento."
-                };
-
-                return [trait, `${score}%\n[ ${badge} ]`, obsObj[nivelKey]];
-            });
-
-            doc.autoTable({
-                startY: doc.lastAutoTable.finalY + 14,
-                head: [['Rasgo Evaluado', 'Puntaje / Nivel', 'Perfilamiento Cualitativo Profundo / Observación']],
-                body: traitRows.length > 0 ? traitRows : [['N/A', 'N/A', 'Sin datos disponibles']],
-                theme: 'grid',
-                headStyles: { fillColor: [0, 0, 0] },
-                columnStyles: { 0: { cellWidth: 36 }, 1: { cellWidth: 38 }, 2: { cellWidth: 106 } }
-            });
-
-            // INFORME DESCRIPTIVO ESTRUCTURADO POR EJES (NUEVO BLOQUE REQUERIDO)
-            const narrative = generateAxisNarrative(perfil);
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("INFORME DESCRIPTIVO: EVALUACIÓN POR EJES CONDUCTUALES", 14, doc.lastAutoTable.finalY + 10);
-
-            const axisRows = [
-                [
-                    'EJECUCIÓN DE TAREAS Y PRODUCTIVIDAD',
-                    `• Fortaleza: ${narrative.productividad.fortaleza}\n• Oportunidad de Crecimiento: ${narrative.productividad.mejora}`
-                ],
-                [
-                    'MANEJO EMOCIONAL',
-                    `• Fortaleza: ${narrative.emocional.fortaleza}\n• Oportunidad de Crecimiento: ${narrative.emocional.mejora}`
-                ],
-                [
-                    'RELACIONES INTERPERSONALES',
-                    `• Fortaleza: ${narrative.relaciones.fortaleza}\n• Oportunidad de Crecimiento: ${narrative.relaciones.mejora}`
-                ]
-            ];
-
-            doc.autoTable({
-                startY: doc.lastAutoTable.finalY + 14,
-                head: [['Eje Conductual Evaluado', 'Diagnóstico Qualitativo (Fortalezas vs Oportunidades)']],
-                body: axisRows,
-                theme: 'striped',
-                headStyles: { fillColor: [0, 0, 0] },
-                columnStyles: { 0: { cellWidth: 50 }, 1: { cellWidth: 130 } }
-            });
-
-            doc.save(`Reporte_IGLECO_Cualitativo_${id}.pdf`);
-        }
-    </script>
-</body>
-</html>
