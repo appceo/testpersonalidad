@@ -12,30 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 0; }
-        .hidden { display: none !important; }
         .card-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     </style>
-    <script>
-        // FUNCIÓN DE AUTENTICACIÓN DISPONIBLE GLOBALMENTE DESDE EL INICIO
-        function handleLoginSubmit(event) {
-            if (event) event.preventDefault();
-            const pinInput = document.getElementById('pin-input');
-            const val = pinInput ? pinInput.value.replace(/\s+/g, '').trim() : '';
-
-            if (val === '1234' || val === '' || val.length > 0) {
-                // Muestra el panel directamente
-                document.getElementById('login-box').style.display = 'none';
-                document.getElementById('admin-panel').classList.remove('hidden');
-                document.getElementById('admin-panel').style.display = 'block';
-                if (typeof loadRecords === 'function') {
-                    loadRecords();
-                }
-            } else {
-                alert('PIN incorrecto. Ingrese 1234');
-            }
-            return false;
-        }
-    </script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
 
@@ -55,25 +33,23 @@
 
     <main class="max-w-5xl mx-auto my-10 px-4">
         
-        <!-- PANTALLA DE ACCESO POR PIN NATIVA -->
+        <!-- PANTALLA DE ACCESO POR PIN -->
         <div id="login-box" class="card-box p-8 max-w-md mx-auto text-center space-y-6">
             <div class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto text-xl">🔒</div>
             <div>
                 <h2 class="text-2xl font-bold text-slate-900">Acceso Requerido</h2>
                 <p class="text-sm text-slate-500 mt-1">Ingrese el PIN de seguridad para acceder al panel.</p>
             </div>
-            <form onsubmit="return handleLoginSubmit(event)" class="space-y-4">
-                <div>
-                    <input type="password" id="pin-input" placeholder="••••" autocomplete="off" class="w-full p-3 border border-slate-300 rounded-lg text-center text-2xl tracking-widest outline-none focus:ring-2 focus:ring-black">
-                </div>
-                <button type="submit" class="w-full py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition shadow-sm cursor-pointer">
+            <div class="space-y-4">
+                <input type="password" id="pin-input" placeholder="••••" maxlength="8" onkeydown="if(event.key==='Enter') executeLogin()" class="w-full p-3 border border-slate-300 rounded-lg text-center text-2xl tracking-widest outline-none focus:ring-2 focus:ring-black">
+                <button type="button" onclick="executeLogin()" class="w-full py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition shadow-sm cursor-pointer">
                     Ingresar al Panel
                 </button>
-            </form>
+            </div>
         </div>
 
         <!-- PANEL DE BÚSQUEDA Y REPORTES -->
-        <div id="admin-panel" class="hidden space-y-6">
+        <div id="admin-panel" style="display: none;" class="space-y-6">
             <div class="card-box p-6 md:p-8 space-y-6">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-4">
                     <div>
@@ -87,7 +63,7 @@
 
                 <!-- CAMPO DE BÚSQUEDA -->
                 <div class="flex flex-col md:flex-row gap-3">
-                    <input type="text" id="search-input" placeholder="Ingrese Identificación (Cédula) o Nombres..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none text-sm">
+                    <input type="text" id="search-input" onkeydown="if(event.key==='Enter') searchRecords()" placeholder="Ingrese Identificación (Cédula) o Nombres..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none text-sm">
                     <button type="button" onclick="searchRecords()" class="px-6 py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition text-sm whitespace-nowrap cursor-pointer">
                         Buscar Registro
                     </button>
@@ -108,6 +84,18 @@
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIuqJ7f3v20mmdThj1Ia8A6el4RrJ_KM-Le8CbD826l_1s2x2yooDNDMrya98K0v_kqA/exec";
         let dbRecords = [];
+
+        function executeLogin() {
+            const input = document.getElementById('pin-input');
+            const pin = input ? input.value.trim() : '';
+            if (pin === '1234') {
+                document.getElementById('login-box').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                loadRecords();
+            } else {
+                alert('PIN incorrecto. Ingrese 1234');
+            }
+        }
 
         // DEFINICIONES TÉCNICAS OFICIALES DE LAS ÁREAS DE IGLECO
         const DEFINICIONES_AREAS = {
@@ -174,7 +162,7 @@
             },
             "Vitalidad": {
                 alto: "Refleja energía contagiante, vigor físico y dinamismo para responder en escenarios de ritmo acelerado y alta exigencia operativa. Transmite entusiasmo al equipo.\n• Entorno Ideal: Ministerio juvenil, recreación infantil (PowerKids/Kids), montajes pesados, campamentos y evangelismo masivo.\n• Orientación Pastoral: Encauzar su abundante energía hacia metas organizadas para evitar la dispersión o el cansancio prematuro.",
-                medio: "Despliega un ritmo de trabajo activo, regular y sostenido. Mantiene un equilibrio saludable entre el esfuerzo físico y la pausa necesaria para el rendimiento constante.\n• Entorno Ideal: Protocolo de servicio regular, logística de reuniones, monitoreo de clases y trabajo de oficina.\n• Orientación Pastoral: Proporcionar roles con exigencia física razonable que le permitan mantener un desempeño constante sin desgaste.",
+                medio: "Despliega un ritmo de trabajo activo, regular y sustained. Mantiene un equilibrio saludable entre el esfuerzo físico y la pausa necesaria para el rendimiento constante.\n• Entorno Ideal: Protocolo de servicio regular, logística de reuniones, monitoreo de clases y trabajo de oficina.\n• Orientación Pastoral: Proporcionar roles con exigencia física razonable que le permitan mantener un desempeño constante sin desgaste.",
                 bajo: "Sobresale en labores reflexivas, analíticas, de concentración o de baja demanda física. Aporta calma, profundidad de análisis y meticulosidad al proceso.\n• Entorno Ideal: Intercesión, revisión de documentos, diseño, edición de textos, llamadas de seguimiento y planeación estratégica.\n• Orientación Pastoral: Asignarle entornos de trabajo cómodos y pausados donde su capacidad de concentración sea el factor diferenciador."
             }
         };
@@ -212,7 +200,7 @@
             const matches = dbRecords.filter(r => {
                 const nombres = (r.nombres || r.Nombres || '').toLowerCase();
                 const apellidos = (r.apellidos || r.Apellidos || '').toLowerCase();
-                const fullName = `${nombres}${apellidos}`;
+                const fullName = `${nombres} ${apellidos}`;
                 const id = String(r.identificacion || r.Identificacion || '').toLowerCase();
                 
                 return fullName.includes(query) || id.includes(query);
@@ -233,6 +221,40 @@
                     resultsList.innerHTML += `
                         <div class="p-4 border border-slate-200 rounded-xl bg-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
                             <div>
-                                <h4 class="font-bold text-slate-900">${nombres}${apellidos}</h4>
-                                <p class="text-xs text-slate-500 mt-0.5">ID: ${id} | Edad: ${edad} \vert{} Correo:${correo}</p>
-                                <p class="text-xs font-semibold text-emerald-700 mt-1">Sugerencia Principal: ${top1}</p
+                                <h4 class="font-bold text-slate-900">${nombres} ${apellidos}</h4>
+                                <p class="text-xs text-slate-500 mt-0.5">ID: ${id} | Edad: ${edad} | Correo: ${correo}</p>
+                                <p class="text-xs font-semibold text-emerald-700 mt-1">Sugerencia Principal: ${top1}</p>
+                            </div>
+                            <button onclick="generatePDFForRecord(${idx})" class="px-4 py-2 bg-black hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition whitespace-nowrap cursor-pointer">
+                                📄 Descargar PDF
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+            container.classList.remove('hidden');
+        }
+
+        function generateAxisNarrative(perfil) {
+            const rec = perfil["Recursividad"] || 50;
+            const per = perfil["Perseverancia"] || 50;
+            const vit = perfil["Vitalidad"] || 50;
+            const avgProd = (rec + per + vit) / 3;
+
+            let prodFortaleza = "";
+            let prodMejora = "";
+
+            if (avgProd >= 70) {
+                prodFortaleza = "Excelente capacidad ejecutora y dinamismo operativo. Resuelve contingencias con agilidad y sostiene la disciplina en entregables de largo alcance.";
+                prodMejora = "Evitar la sobrecarga autoinfligida de trabajo y asegurar la estandarización documental de sus métodos innovadores.";
+            } else if (avgProd >= 50) {
+                prodFortaleza = "Desempeño constante y disciplinado en rutinas operativas habituales, utilizando recursos de forma eficiente y ordenada.";
+                prodMejora = "Estimular la iniciativa propia ante bloqueos imprevistos y fortalecer la tenacidad en proyectos de largo aliento.";
+            } else {
+                prodFortaleza = "Orientación a tareas metodológicas de ritmo pausado que requieren concentración y seguimiento paso a paso.";
+                prodMejora = "Subdividir grandes metas en objetivos semanales y contar con supervisión periódica para mantener el ritmo operativo.";
+            }
+
+            const ada = perfil["Adaptabilidad"] || 50;
+            const tol = perfil["Tolerancia"] || 50;
+            const avgEmo = (ada + tol) /
