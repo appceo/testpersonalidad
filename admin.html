@@ -41,14 +41,14 @@
                 <p class="text-sm text-slate-500 mt-1">Ingrese el PIN de seguridad para acceder al panel.</p>
             </div>
             <div class="space-y-4">
-                <input type="password" id="pin-input" placeholder="••••" maxlength="8" onkeydown="if(event.key==='Enter') loginAdmin()" class="w-full p-3 border border-slate-300 rounded-lg text-center text-2xl tracking-widest outline-none focus:ring-2 focus:ring-black">
-                <button type="button" onclick="loginAdmin()" class="w-full py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition shadow-sm cursor-pointer">
+                <input type="password" id="pin-input" placeholder="••••" maxlength="8" onkeydown="if(event.key==='Enter') executeLogin()" class="w-full p-3 border border-slate-300 rounded-lg text-center text-2xl tracking-widest outline-none focus:ring-2 focus:ring-black">
+                <button type="button" onclick="executeLogin()" class="w-full py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition shadow-sm cursor-pointer">
                     Ingresar al Panel
                 </button>
             </div>
         </div>
 
-        <!-- PANEL DE BÚSQUEDA Y REPORTES -->
+        <!-- PANEL DE BÚSQUEDA Y REPORTES (INICIALMENTE OCULTO MEDIANTE STYLE DIRECTO) -->
         <div id="admin-panel" style="display: none;" class="space-y-6">
             <div class="card-box p-6 md:p-8 space-y-6">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-4">
@@ -69,7 +69,7 @@
                     </button>
                 </div>
 
-                <div id="status-msg" class="text-xs text-slate-500 font-medium">Iniciando conexión con servidor...</div>
+                <div id="status-msg" style="display: none;" class="text-xs font-medium">Conectando...</div>
 
                 <!-- RESULTADOS DE BÚSQUEDA -->
                 <div id="results-container" style="display: none;" class="space-y-4 border-t border-slate-100 pt-4">
@@ -85,15 +85,17 @@
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIuqJ7f3v20mmdThj1Ia8A6el4RrJ_KM-Le8CbD826l_1s2x2yooDNDMrya98K0v_kqA/exec";
         let dbRecords = [];
 
-        function loginAdmin() {
+        // FUNCIÓN DE AUTENTICACIÓN
+        function executeLogin() {
             const input = document.getElementById('pin-input');
             const pin = input ? input.value.trim() : '';
+            
             if (pin === '1234') {
                 document.getElementById('login-box').style.display = 'none';
                 document.getElementById('admin-panel').style.display = 'block';
                 loadRecords();
             } else {
-                alert('PIN incorrecto. Ingrese 1234');
+                alert('PIN incorrecto. Ingrese el PIN de seguridad asignado (1234).');
             }
         }
 
@@ -103,7 +105,7 @@
             "Adoración": "Dirección y ejecución del ministerio de música e instrumentación en las reuniones. Busca facilitar un entorno de conexión espiritual comunitaria a través de la excelencia musical y una actitud de servicio constante.",
             "Artístico": "Expresión creativa mediante disciplinas como las artes escénicas, danza, teatro y composición visual. Diseñado para transmitir mensajes bíblicos y conceptuales de forma estética e innovadora.",
             "Producción": "Gestión técnica y operativa del soporte logístico de audio, iluminación, transmisión en vivo y sistemas de presentación visual durante los servicios y eventos.",
-            "Ayudas Administrativas": "Soporte organizativo en la gestión de archivos, bases de datos, logística de suministros, llamadas de seguimiento y sistematización de procesos internos de la iglesia.",
+            "Ayudas Administrativas": "Soporte organizativo en la gestión de archivos, bases de datos, logística de suministros, llamadas de seguimiento y systematización de procesos internos de la iglesia.",
             "Ayudas Profesionales": "Orientación especializada en áreas técnicas (asesoría jurídica, contable, psicológica, médica o de arquitectura) brindada a miembros de la comunidad o a la estructura ministerial según sus necesidades.",
             "Conexión": "Acogida y primer contacto con personas que visitan la iglesia por primera vez. Se encarga de la integración fluida de los asistentes a los grupos de amistad o ruta de consolidación.",
             "Contact Center": "Atención remota (telefónica, chat o correo) para responder inquietudes, brindar información sobre horarios/eventos, registrar solicitudes de oración y mantener una línea abierta de comunicación con la membresía.",
@@ -138,7 +140,7 @@
             "Adaptabilidad": {
                 alto: "Destaca por su ecuanimidad y resiliencia ante contingencias, imprevistos o reestructuraciones de último momento. Conserva la calma y reorganiza recursos con naturalidad sin perder la efectividad.\n• Entorno Ideal: Coordinación de eventos en vivo, producción de servicios, resolución de crisis o misiones de avanzada.\n• Orientación Pastoral: Aprovechar su flexibilidad para gestionar imprevistos operacionales transmitiendo paz al equipo.",
                 medio: "Responde con flexibilidad y madurez ante cambios organizacionales, siempre que cuente con explicaciones de contexto razonables o un tiempo mínimo de asimilación.\n• Entorno Ideal: Equipos operativos estables, programas continuos con adaptaciones estacionales y soporte docente.\n• Orientación Pastoral: Mantener una comunicación transparente sobre cambios futuros para maximizar su compromiso y rendimiento.",
-                bajo: "Requiere estabilidad, previsibilidad y procesos claramente definidos. Experimenta incomodidad frente a la improvisación o alteraciones abruptas en las reglas acordadas.\n• Entorno Ideal: Procesos estandarizados, manuales de procedimiento, archivo, planificación previa e inventarios.\n• Orientación Pastoral: Entregar instrucciones precisas, cronogramas detallados y evitar modificaciones intempestivas en sus asignaciones."
+                bajo: "Requiere estabilidad, previsibilidad y procesos claramente definidos. Experimenta incomodidad frente a la improvisación o alterations abruptas en las reglas acordadas.\n• Entorno Ideal: Procesos estandarizados, manuales de procedimiento, archivo, planificación previa e inventarios.\n• Orientación Pastoral: Entregar instrucciones precisas, cronogramas detallados y evitar modificaciones intempestivas en sus asignaciones."
             },
             "Recursividad": {
                 alto: "Sobresale por su mentalidad innovadora e ingenio práctico. Encuentra alternativas eficientes frente a bloqueos complejos o limitaciones severas de recursos físicos o presupuestales.\n• Entorno Ideal: Innovación de proyectos, diseño de estrategias, arte, resolución de cuellos de botella y arranque de obras.\n• Orientación Pastoral: Canalizar su creatividad dentro del marco doctrinal e institucional, validando previamente sus propuestas antes de ejecutarlas.",
@@ -167,6 +169,7 @@
             }
         };
 
+        // SINCRONIZACIÓN CON GOOGLE SHEETS
         async function loadRecords() {
             const status = document.getElementById('status-msg');
             status.style.display = "block";
@@ -181,4 +184,273 @@
                 dbRecords = Array.isArray(data) ? data : (data.records || []);
                 
                 status.className = "text-xs text-emerald-600 font-medium";
-                status.innerText = `S
+                status.innerText = `Sincronización exitosa: ${dbRecords.length} registro(s) disponible(s).`;
+            } catch (e) {
+                console.error("Error al cargar registros:", e);
+                status.className = "text-xs text-red-500 font-medium";
+                status.innerText = "Error al conectar con Google Sheets. Verifique la conexión o intente sincronizar nuevamente.";
+            }
+        }
+
+        // BÚSQUEDA DE REGISTROS
+        function searchRecords() {
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+            const resultsList = document.getElementById('results-list');
+            const container = document.getElementById('results-container');
+            resultsList.innerHTML = '';
+
+            if (!query) {
+                alert("Por favor ingrese un término de búsqueda.");
+                return;
+            }
+
+            const matches = dbRecords.filter(r => {
+                const nombres = (r.nombres || r.Nombres || '').toLowerCase();
+                const apellidos = (r.apellidos || r.Apellidos || '').toLowerCase();
+                const fullName = `${nombres} ${apellidos}`;
+                const id = String(r.identificacion || r.Identificacion || '').toLowerCase();
+                
+                return fullName.includes(query) || id.includes(query);
+            });
+
+            if (matches.length === 0) {
+                resultsList.innerHTML = '<p class="text-sm text-slate-500 py-4 text-center">No se encontraron evaluaciones registradas con ese criterio.</p>';
+            } else {
+                matches.forEach((r) => {
+                    const idx = dbRecords.indexOf(r);
+                    const nombres = r.nombres || r.Nombres || '';
+                    const apellidos = r.apellidos || r.Apellidos || '';
+                    const id = r.identificacion || r.Identificacion || 'N/A';
+                    const edad = r.edad || r.Edad || 'N/A';
+                    const correo = r.correo || r.Correo || 'N/A';
+                    const top1 = r.top1 || r['Top 1 Area'] || 'N/A';
+
+                    resultsList.innerHTML += `
+                        <div class="p-4 border border-slate-200 rounded-xl bg-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                            <div>
+                                <h4 class="font-bold text-slate-900">${nombres} ${apellidos}</h4>
+                                <p class="text-xs text-slate-500 mt-0.5">ID: ${id} | Edad: ${edad} | Correo: ${correo}</p>
+                                <p class="text-xs font-semibold text-emerald-700 mt-1">Sugerencia Principal: ${top1}</p>
+                            </div>
+                            <button onclick="generatePDFForRecord(${idx})" class="px-4 py-2 bg-black hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition whitespace-nowrap cursor-pointer">
+                                📄 Descargar PDF
+                            </button>
+                        </div>
+                    `;
+                });
+            }
+            container.style.display = "block";
+        }
+
+        // GENERACIÓN DE INFORME POR EJES
+        function generateAxisNarrative(perfil) {
+            const rec = perfil["Recursividad"] || 50;
+            const per = perfil["Perseverancia"] || 50;
+            const vit = perfil["Vitalidad"] || 50;
+            const avgProd = (rec + per + vit) / 3;
+
+            let prodFortaleza = "";
+            let prodMejora = "";
+
+            if (avgProd >= 70) {
+                prodFortaleza = "Excelente capacidad ejecutora y dinamismo operativo. Resuelve contingencias con agilidad y sostiene la disciplina en entregables de largo alcance.";
+                prodMejora = "Evitar la sobrecarga autoinfligida de trabajo y asegurar la estandarización documental de sus métodos innovadores.";
+            } else if (avgProd >= 50) {
+                prodFortaleza = "Desempeño constante y disciplinado en rutinas operativas habituales, utilizando recursos de forma eficiente y ordenada.";
+                prodMejora = "Estimular la iniciativa propia ante bloqueos imprevistos y fortalecer la tenacidad en proyectos de largo aliento.";
+            } else {
+                prodFortaleza = "Orientación a tareas metodológicas de ritmo pausado que requieren concentración y seguimiento paso a paso.";
+                prodMejora = "Subdividir grandes metas en objetivos semanales y contar con supervisión periódica para mantener el ritmo operativo.";
+            }
+
+            const ada = perfil["Adaptabilidad"] || 50;
+            const tol = perfil["Tolerancia"] || 50;
+            const avgEmo = (ada + tol) / 2;
+
+            let emoFortaleza = "";
+            let emoMejora = "";
+
+            if (avgEmo >= 70) {
+                emoFortaleza = "Avanzado autocontrol y templanza. Conserva la serenidad bajo presión y actúa como mediador pacificador en momentos de tensión o cambio.";
+                emoMejora = "Asegurar que la alta tolerancia no postergue decisiones correctivas firmes cuando la disciplina organizativa lo exija.";
+            } else if (avgEmo >= 50) {
+                emoFortaleza = "Adecuada estabilidad emocional frente a imprevistos normales. Escucha activamente y gestiona las diferencias con madurez.";
+                emoMejora = "Comunicar con antelación las modificaciones de planes para mitigar la resistencia natural al cambio voluntario.";
+            } else {
+                emoFortaleza = "Firmeza en convicciones, apego riguroso a estándares y alto sentido del deber dentro de estructuras estables.";
+                emoMejora = "Desarrollar mayor flexibilidad comunicativa y resiliencia emocional cuando los escenarios cambien intempestivamente.";
+            }
+
+            const des = perfil["Destreza Social"] || 50;
+            const sen = perfil["Sensibilidad Social"] || 50;
+            const perS = perfil["Persuasión"] || 50;
+            const avgRel = (des + sen + perS) / 3;
+
+            let relFortaleza = "";
+            let relMejora = "";
+
+            if (avgRel >= 70) {
+                relFortaleza = "Liderazgo carismático, empatía activa e influencia natural. Conecta de forma inmediata, motiva a grupos y detecta necesidades humanas.";
+                emoMejora = "Establecer límites sanos para evitar el agotamiento por sobreinvolucramiento en problemas ajenos.";
+            } else if (avgRel >= 50) {
+                relFortaleza = "Buenas relaciones interpersonales sostenidas en el respeto, la escucha y el apoyo oportuno dentro de equipos de trabajo.";
+                relMejora = "Ampliar progresivamente su círculo de influencia y asumir roles de vocería con mayor soltura.";
+            } else {
+                relFortaleza = "Estilo relacional prudente y respetuoso, enfocado en el cumplimiento de tareas sin generar fricciones en el entorno.";
+                relMejora = "Fomentar la participación activa en dinámicas comunitarias de integración y trabajo colaborativo.";
+            }
+
+            return {
+                productividad: { fortaleza: prodFortaleza, mejora: prodMejora },
+                emocional: { fortaleza: emoFortaleza, mejora: emoMejora },
+                relaciones: { fortaleza: relFortaleza, mejora: relMejora }
+            };
+        }
+
+        // CONSTRUCCIÓN DEL PDF EN BLANCO Y NEGRO CORPORATIVO
+        function generatePDFForRecord(index) {
+            const record = dbRecords[index];
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            function cleanAreaName(rawName) {
+                if (!rawName) return "";
+                return rawName.replace(/\s*\(\d+\%\)/g, "").trim();
+            }
+
+            let perfil = {};
+            try {
+                const rawPerfil = record.perfil || record['Perfil Resumen'];
+                perfil = typeof rawPerfil === 'string' ? JSON.parse(rawPerfil) : rawPerfil;
+            } catch (e) {
+                perfil = {};
+            }
+
+            const nombres = record.nombres || record.Nombres || '';
+            const apellidos = record.apellidos || record.Apellidos || '';
+            const id = record.identificacion || record.Identificacion || 'N/A';
+            const edad = record.edad || record.Edad || 'N/A';
+            const correo = record.correo || record.Correo || 'N/A';
+
+            const rawTop1 = record.top1 || record['Top 1 Area'] || 'N/A';
+            const rawTop2 = record.top2 || record['Top 2 Area'] || 'N/A';
+            const rawTop3 = record.top3 || record['Top 3 Area'] || 'N/A';
+
+            const cleanTop1 = cleanAreaName(rawTop1);
+            const cleanTop2 = cleanAreaName(rawTop2);
+            const cleanTop3 = cleanAreaName(rawTop3);
+
+            // Encabezado Corporativo
+            doc.setFillColor(0, 0, 0);
+            doc.rect(0, 0, 210, 20, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(13);
+            doc.setFont("helvetica", "bold");
+            doc.text("IGLECO - PERFILAMIENTO PSICOMÉTRICO Y MINISTERIAL", 14, 13);
+
+            // Datos Personales
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(11);
+            doc.text("INFORMACIÓN DEL EVALUADO", 14, 28);
+            
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Nombre Completo: ${nombres} ${apellidos}`, 14, 34);
+            doc.text(`Identificación: ${id}`, 14, 40);
+            doc.text(`Edad: ${edad} años`, 14, 46);
+            doc.text(`Correo Electrónico: ${correo}`, 14, 52);
+
+            // ÁREAS SUGERIDAS CON MÁRGENES Y ANCHOS CORREGIDOS
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("ÁREAS DE SERVICIO SUGERIDAS Y DEFINICIÓN TÉCNICA", 14, 62);
+
+            const areasBody = [
+                ['Área Principal (Top 1)', rawTop1, DEFINICIONES_AREAS[cleanTop1] || "Acompañamiento e integración en el servicio comunitario."],
+                ['Área Secundaria (Top 2)', rawTop2, DEFINICIONES_AREAS[cleanTop2] || "Soporte colaborativo en procesos operativos y de acompañamiento."],
+                ['Área Alternativa (Top 3)', rawTop3, DEFINICIONES_AREAS[cleanTop3] || "Opción complementaria para diversificar el servicio según las necesidades."]
+            ];
+
+            doc.autoTable({
+                startY: 65,
+                head: [['Prioridad', 'Área Recomendada', 'Propósito y Alcance del Área']],
+                body: areasBody,
+                theme: 'striped',
+                headStyles: { fillColor: [0, 0, 0] },
+                columnStyles: { 0: { cellWidth: 46 }, 1: { cellWidth: 38 }, 2: { cellWidth: 98 } }
+            });
+
+            // DIAGNÓSTICO CUALITATIVO PROFUNDO POR CATEGORÍA
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("DIAGNÓSTICO CUALITATIVO PROFUNDO POR CATEGORÍA", 14, doc.lastAutoTable.finalY + 10);
+
+            const sortedTraits = Object.keys(perfil).sort((a, b) => perfil[b] - perfil[a]);
+
+            const traitRows = sortedTraits.map(trait => {
+                const score = perfil[trait];
+                let nivelKey = "medio";
+                let badge = "DESARROLLADO";
+                
+                if (score >= 75) {
+                    nivelKey = "alto";
+                    badge = "SOBRESALIENTE";
+                } else if (score < 50) {
+                    nivelKey = "bajo";
+                    badge = "EN DESARROLLO";
+                }
+
+                const obsObj = OBSERVACIONES[trait] || {
+                    alto: "Desempeño sobresaliente en la categoría.",
+                    medio: "Desempeño adecuado y funcional.",
+                    bajo: "Área con oportunidad de crecimiento."
+                };
+
+                return [trait, `${score}%\n[ ${badge} ]`, obsObj[nivelKey]];
+            });
+
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 14,
+                head: [['Rasgo Evaluado', 'Puntaje / Nivel', 'Perfilamiento Cualitativo Profundo / Observación']],
+                body: traitRows.length > 0 ? traitRows : [['N/A', 'N/A', 'Sin datos disponibles']],
+                theme: 'grid',
+                headStyles: { fillColor: [0, 0, 0] },
+                columnStyles: { 0: { cellWidth: 36 }, 1: { cellWidth: 38 }, 2: { cellWidth: 106 } }
+            });
+
+            // INFORME DESCRIPTIVO ESTRUCTURADO POR EJES
+            const narrative = generateAxisNarrative(perfil);
+
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("INFORME DESCRIPTIVO: EVALUACIÓN POR EJES CONDUCTUALES", 14, doc.lastAutoTable.finalY + 10);
+
+            const axisRows = [
+                [
+                    'EJECUCIÓN DE TAREAS Y PRODUCTIVIDAD',
+                    `• Fortaleza: ${narrative.productividad.fortaleza}\n• Oportunidad de Crecimiento: ${narrative.productividad.mejora}`
+                ],
+                [
+                    'MANEJO EMOCIONAL',
+                    `• Fortaleza: ${narrative.emocional.fortaleza}\n• Oportunidad de Crecimiento: ${narrative.emocional.mejora}`
+                ],
+                [
+                    'RELACIONES INTERPERSONALES',
+                    `• Fortaleza: ${narrative.relaciones.fortaleza}\n• Oportunidad de Crecimiento: ${narrative.relaciones.mejora}`
+                ]
+            ];
+
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 14,
+                head: [['Eje Conductual Evaluado', 'Diagnóstico Cualitativo (Fortalezas vs Oportunidades)']],
+                body: axisRows,
+                theme: 'striped',
+                headStyles: { fillColor: [0, 0, 0] },
+                columnStyles: { 0: { cellWidth: 50 }, 1: { cellWidth: 130 } }
+            });
+
+            doc.save(`Reporte_IGLECO_Cualitativo_${id}.pdf`);
+        }
+    </script>
+</body>
+</html>
