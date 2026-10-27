@@ -48,13 +48,13 @@
             </div>
         </div>
 
-        <!-- PANEL DE BÚSQUEDA Y REPORTES (INICIALMENTE OCULTO MEDIANTE STYLE DIRECTO) -->
+        <!-- PANEL DE BÚSQUEDA Y REPORTES -->
         <div id="admin-panel" style="display: none;" class="space-y-6">
             <div class="card-box p-6 md:p-8 space-y-6">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-4">
                     <div>
                         <h2 class="text-2xl font-bold text-slate-900">Consulta de Evaluados</h2>
-                        <p class="text-sm text-slate-500">Busque por identificación o nombres para descargar el informe cualitativo individual en PDF.</p>
+                        <p class="text-sm text-slate-500">Busque por identificación o nombres para visualizar en pantalla o descargar el informe en PDF.</p>
                     </div>
                     <button onclick="loadRecords()" type="button" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 transition flex items-center gap-1 cursor-pointer">
                         🔄 Sincronizar Datos
@@ -81,95 +81,75 @@
 
     </main>
 
+    <!-- MODAL DE VISUALIZACIÓN EN PANTALLA -->
+    <div id="preview-modal" style="display: none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 space-y-6 shadow-2xl relative">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-black text-2xl font-bold cursor-pointer">✕</button>
+            <div id="modal-content" class="space-y-6"></div>
+        </div>
+    </div>
+
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIuqJ7f3v20mmdThj1Ia8A6el4RrJ_KM-Le8CbD826l_1s2x2yooDNDMrya98K0v_kqA/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3jCdQhXobfC7RMKPJIxgQXKzeXLyUMeuU8VOQQr25G_QRqaJ-pTCF3Cf0rb9S8PZObQ/exec";
         let dbRecords = [];
 
-        // FUNCIÓN DE AUTENTICACIÓN
         function executeLogin() {
             const input = document.getElementById('pin-input');
             const pin = input ? input.value.trim() : '';
-            
             if (pin === '1234') {
                 document.getElementById('login-box').style.display = 'none';
                 document.getElementById('admin-panel').style.display = 'block';
                 loadRecords();
             } else {
-                alert('PIN incorrecto. Ingrese el PIN de seguridad asignado (1234).');
+                alert('PIN incorrecto. Ingrese 1234');
             }
         }
 
-        // DEFINICIONES TÉCNICAS OFICIALES DE LAS ÁREAS DE IGLECO
+        // CATÁLOGO DE LOS 16 TIPOS DE PERSONALIDAD MBTI
+        const TIPOS_PERSONALIDAD = {
+            "ISTJ": { nombre: "Logístico", desc: "Pragmático, responsable, enfocado en el orden, la tradición y los procesos estructurados. Cumple sus deberes con alta fidelidad sin necesidad de supervisión constante." },
+            "INFJ": { nombre: "Consejero", desc: "Visionario, empático y orientado a guiar a las personas en su crecimiento espiritual y personal. Posee un discernimiento profundo y una gran sensibilidad." },
+            "INTJ": { nombre: "Arquitecto", desc: "Pensador estratégico, analítico y planificador de largo alcance. Diseña estructuras y sistemas eficientes para el desarrollo institucional." },
+            "ISFJ": { nombre: "Defensor", desc: "Leal, altruista y dedicado al cuidado de los demás. Trabaja con diligencia constante tras bambalinas creando entornos acogedores." },
+            "ISTP": { nombre: "Virtuoso", desc: "Práctico, observador y altamente recursivo en entornos operativos y técnicos. Resuelve contingencias con lógica e ingenio." },
+            "ISFP": { nombre: "Aventurero", desc: "Sensible, artístico y guiado por la expresión estética e intuitiva. Aporta calidez y creatividad sin buscar protagonismo." },
+            "INFP": { nombre: "Mediador", desc: "Idealista, compasivo y guiado por valores profundos. Excelente en el acompañamiento individual y en la restauración del alma." },
+            "INTP": { nombre: "Lógico", desc: "Analítico, curioso y enfocado en la solidez conceptual y bíblica. Examina la enseñanza y la estructura organizativa con rigor." },
+            "ESTP": { nombre: "Emprendedor", desc: "Dinámico, pragmático y orientado a la acción inmediata. Responde con agilidad en eventos masivos y contingencias en vivo." },
+            "ESFP": { nombre: "Animador", desc: "Espontáneo, entusiasta y enérgico. Conecta inmediatamente con grupos e inyecta alegría y dinamismo en la comunidad." },
+            "ENFP": { nombre: "Activista", desc: "Inspirador, creativo y motivador por naturaleza. Moviliza personas hacia causas comunitarias y evangelísticas con gran soltura." },
+            "ENTP": { nombre: "Orador", desc: "Persuasivo, innovador y articulador de ideas. Le agrada debatir, proponer estrategias audaces y desafiar el statu quo." },
+            "ESTJ": { nombre: "Ejecutivo", desc: "Organizador nato, estructurado y orientado a resultados medibles. Excelente en la logística, administración y coordinación de equipos." },
+            "ESFJ": { nombre: "Cónsul", desc: "Atento, colaborativo y centrado en la armonía social. Se destaca en la recepción, la hospitalidad y la cohesión de la membresía." },
+            "ENFJ": { nombre: "Donador", desc: "Líder inspirador, mentor compasivo y facilitador del potencial de otros. Guía equipos con empatía y firmeza espiritual." },
+            "ENTJ": { nombre: "Comandante", desc: "Líder estratégico, decidido y con visión global. Asume la dirección con autoridad, fijando metas claras y movilizando recursos." }
+        };
+
         const DEFINICIONES_AREAS = {
-            "Acompañamiento": "Cuidado pastoral y soporte emocional primario a personas o familias en situaciones de vulnerabilidad, duelo o transición personal. Requiere empatía activa, capacidad de escucha libre de juicios y confidencialidad.",
-            "Adoración": "Dirección y ejecución del ministerio de música e instrumentación en las reuniones. Busca facilitar un entorno de conexión espiritual comunitaria a través de la excelencia musical y una actitud de servicio constante.",
-            "Artístico": "Expresión creativa mediante disciplinas como las artes escénicas, danza, teatro y composición visual. Diseñado para transmitir mensajes bíblicos y conceptuales de forma estética e innovadora.",
-            "Producción": "Gestión técnica y operativa del soporte logístico de audio, iluminación, transmisión en vivo y sistemas de presentación visual durante los servicios y eventos.",
-            "Ayudas Administrativas": "Soporte organizativo en la gestión de archivos, bases de datos, logística de suministros, llamadas de seguimiento y systematización de procesos internos de la iglesia.",
-            "Ayudas Profesionales": "Orientación especializada en áreas técnicas (asesoría jurídica, contable, psicológica, médica o de arquitectura) brindada a miembros de la comunidad o a la estructura ministerial según sus necesidades.",
-            "Conexión": "Acogida y primer contacto con personas que visitan la iglesia por primera vez. Se encarga de la integración fluida de los asistentes a los grupos de amistad o ruta de consolidación.",
-            "Contact Center": "Atención remota (telefónica, chat o correo) para responder inquietudes, brindar información sobre horarios/eventos, registrar solicitudes de oración y mantener una línea abierta de comunicación con la membresía.",
-            "Decoración": "Ambientación y diseño espacial de los diferentes entornos del templo o eventos especiales, asegurando una estética coherente con la identidad visual corporativa y el propósito del evento.",
-            "Discipulado": "Formación, mentoría y guía en el crecimiento espiritual mediante el estudio de la Biblia, el modelamiento de vida cristiana y la facilitación de pequeños grupos de enseñanza.",
-            "CFV - Kids": "Formación espiritual y pedagógica dirigida a la infancia temprana y escolar. Adapta contenidos bíblicos mediante metodologías didácticas, dinámicas y un entorno de cuidado seguro.",
-            "Evangelismo": "Proyección hacia la comunidad externa mediante brigadas, actividades de alcance social e iniciativas interactivas orientadas a presentar el mensaje del evangelio a personas no creyentes.",
-            "Hospitalidad": "Preparación y gestión de alimentos, bebidas, atención a invitados especiales y preparación de espacios de convivencia para generar un ambiente cálido y acogedor en la iglesia.",
-            "Maquillaje": "Caracterización y arreglo estético del personal de producción visual, cámaras, obras teatrales o contenido audiovisual institucional, respetando los estándares de iluminación y pantalla.",
-            "Monitores Escuelas": "Apoyo logístico, control de asistencia, asistencia a docentes y dinamización en las aulas durante las academias, talleres o programas formales de formación de la iglesia.",
-            "Oración": "Cobertura de intercesión continua por las peticiones de la comunidad, eventos institucionales, liderazgo y necesidades pastorales particulares a través de turnos y vigilias de oración.",
-            "PowerKids": "Actividades de alto impacto, animación y dinamismo enfocadas en preadolescentes y niños mayores, combinando recreación activa, liderazgo juvenil y enseñanza bíblica práctica.",
-            "Seguridad": "Prevención, protocolo de respuesta ante emergencias, control de accesos y resguardo del orden físico e integridad de las personas en las instalaciones de la iglesia.",
-            "Servidores": "Logística interna y protocolo durante los servicios: acomodación de personas, apoyo en la recolección de ofrendas, mantenimiento del orden en el auditorio y guía al asistente.",
-            "Traductores": "Interpretación simultánea o traducción de contenidos escritos/audiovisuales para personas de habla hispana con limitaciones auditivas (lengua de señas) o hablantes de otros idiomas.",
-            "Comunicaciones y Redes": "Diseño gráfico, fotografía, redacción y gestión de medios digitales/redes sociales para la difusión de las actividades e identidad de la iglesia.",
-            "Medios e Infraestructura": "Mantenimiento físico, montaje de escenarios, soporte técnico de instalaciones y gestión de espacios de reunión para garantizar el correcto funcionamiento del espacio físico."
+            "Acompañamiento": "Cuidado pastoral y soporte emocional primario a personas o familias en situaciones de vulnerabilidad o transición.",
+            "Adoración": "Dirección y ejecución del ministerio de música e instrumentación en las reuniones para facilitar la conexión espiritual.",
+            "Artístico": "Expresión creativa mediante artes escénicas, danza, teatro y composición visual para transmitir mensajes bíblicos.",
+            "Producción": "Gestión técnica y operativa del soporte logístico de audio, iluminación y transmisión en vivo.",
+            "Ayudas Administrativas": "Soporte organizativo en gestión de archivos, bases de datos y logística de suministros.",
+            "Ayudas Profesionales": "Orientación especializada en áreas técnicas (derecho, contabilidad, psicología) según necesidades.",
+            "Conexión": "Acogida y primer contacto con visitantes para su integración fluida a los grupos de la iglesia.",
+            "Contact Center": "Atención remota telefónica o virtual para responder inquietudes y registrar solicitudes.",
+            "Decoración": "Ambientación y diseño espacial de los diferentes entornos del templo o eventos especiales.",
+            "Discipulado": "Formación, mentoría y guía en el crecimiento espiritual mediante el estudio bíblico grupal.",
+            "CFV - Kids": "Formación espiritual y pedagógica dirigida a la infancia temprana y escolar.",
+            "Evangelismo": "Proyección hacia la comunidad externa mediante brigadas y actividades de alcance social.",
+            "Hospitalidad": "Atención a invitados especiales y preparación de espacios de convivencia y alimentos.",
+            "Maquillaje": "Caracterización y arreglo estético del personal de producción visual y cámaras.",
+            "Monitores Escuelas": "Apoyo logístico, control de asistencia y dinamización en las aulas durante talleres.",
+            "Oración": "Cobertura de intercesión continua por las peticiones de la comunidad y necesidades pastorales.",
+            "PowerKids": "Actividades de alto impacto y animación dinámicas enfocadas en preadolescentes y niños.",
+            "Seguridad": "Prevención, control de accesos y resguardo de la integridad física en las instalaciones.",
+            "Servidores": "Logística interna y protocolo durante los servicios: acomodación y guía al asistente.",
+            "Traductores": "Interpretación simultánea en lengua de señas u otros idiomas durante las reuniones.",
+            "Comunicaciones y Redes": "Diseño gráfico, fotografía y gestión de medios digitales/redes sociales.",
+            "Medios e Infraestructura": "Mantenimiento físico, montaje de escenarios y gestión de espacios de reunión."
         };
 
-        // BANCO DE OBSERVACIONES CUALITATIVAS PROFUNDAS POR RASGO
-        const OBSERVACIONES = {
-            "Destreza Social": {
-                alto: "Muestra fluidez superior y soltura espontánea para iniciar vínculos e integrarse a diversos entornos. Genera confianza inmediata y facilita la cohesión en grupos heterogéneos.\n• Entorno Ideal: Vocería, recepción de nuevos asistentes, relaciones públicas o consolidación comunitaria.\n• Orientación Pastoral: Asignar responsabilidades de conexión e integración, velando por que mantenga la profundización en la relación tras el primer contacto.",
-                medio: "Demuestra competencias comunicativas sólidas y funcionales. Se relaciona con efectividad en entornos conocidos y se adapta paulatinamente a nuevos grupos con adecuada diplomacia.\n• Entorno Ideal: Integración en equipos ministeriales permanentes, labores colaborativas y atención en mesa.\n• Orientación Pastoral: Brindar espacios donde pueda ampliar progresivamente su red de contactos y asumir roles moderados de acogida.",
-                bajo: "Prefiere interacciones selectivas, círculos pequeños o roles enfocados en tareas específicas de baja exposición pública. Valora la privacidad y las conversaciones de contenido estructurado.\n• Entorno Ideal: Trabajo analítico, soporte operativo interno, logística técnica o tareas de concentración individual.\n• Orientación Pastoral: Respetar su ritmo social, asignando funciones claras sin forzar escenarios de sobreexposición mediática o pública."
-            },
-            "Sensibilidad Social": {
-                alto: "Evidencia alta empatía, ternura espiritual y discernimiento activo ante el dolor o necesidad ajena. Percibe detalles emocionales imperceptibles para otros y actúa con compasión oportuna.\n• Entorno Ideal: Consejería, consolación, cuidado de enfermos, visitas pastorales o intercesión de soporte.\n• Orientación Pastoral: Enseñar el establecimiento de límites saludables para proteger su estabilidad emocional y prevenir el agotamiento ministerial.",
-                medio: "Equilibra la calidez humana y la compasión con la objetividad operativa. Demuestra interés real por el bienestar del prójimo sin perder el enfoque en las metas encomendadas.\n• Entorno Ideal: Acompañamiento grupal, mentoría de alumnos, logística de atención a invitados y servidores.\n• Orientación Pastoral: Fomentar su participación en espacios de escucha activa donde su criterio equilibrado aporte sabiduría.",
-                bajo: "Presenta una perspectiva predominantemente lógica, pragmática y centrada en resultados medibles. Puede percibir las demandas emocionales complejas como factores distractores de la tarea.\n• Entorno Ideal: Administración, control de procesos, auditoría interna, seguridad o infraestructura física.\n• Orientación Pastoral: Brindar pautas y protocolos claros sobre la importancia del cuidado humano en los procesos administrativos que lidera."
-            },
-            "Adaptabilidad": {
-                alto: "Destaca por su ecuanimidad y resiliencia ante contingencias, imprevistos o reestructuraciones de último momento. Conserva la calma y reorganiza recursos con naturalidad sin perder la efectividad.\n• Entorno Ideal: Coordinación de eventos en vivo, producción de servicios, resolución de crisis o misiones de avanzada.\n• Orientación Pastoral: Aprovechar su flexibilidad para gestionar imprevistos operacionales transmitiendo paz al equipo.",
-                medio: "Responde con flexibilidad y madurez ante cambios organizacionales, siempre que cuente con explicaciones de contexto razonables o un tiempo mínimo de asimilación.\n• Entorno Ideal: Equipos operativos estables, programas continuos con adaptaciones estacionales y soporte docente.\n• Orientación Pastoral: Mantener una comunicación transparente sobre cambios futuros para maximizar su compromiso y rendimiento.",
-                bajo: "Requiere estabilidad, previsibilidad y procesos claramente definidos. Experimenta incomodidad frente a la improvisación o alterations abruptas en las reglas acordadas.\n• Entorno Ideal: Procesos estandarizados, manuales de procedimiento, archivo, planificación previa e inventarios.\n• Orientación Pastoral: Entregar instrucciones precisas, cronogramas detallados y evitar modificaciones intempestivas en sus asignaciones."
-            },
-            "Recursividad": {
-                alto: "Sobresale por su mentalidad innovadora e ingenio práctico. Encuentra alternativas eficientes frente a bloqueos complejos o limitaciones severas de recursos físicos o presupuestales.\n• Entorno Ideal: Innovación de proyectos, diseño de estrategias, arte, resolución de cuellos de botella y arranque de obras.\n• Orientación Pastoral: Canalizar su creatividad dentro del marco doctrinal e institucional, validando previamente sus propuestas antes de ejecutarlas.",
-                medio: "Demuestra capacidad de resolver inconvenientes habituales de forma práctica y efectiva. Utiliza con criterio los recursos asignados sin atascarse ante imprevistos menores.\n• Entorno Ideal: Mantenimiento operativo, coordinación logística intermedia y facilitación de recursos en talleres.\n• Orientación Pastoral: Estimular su autoconfianza para que plantee soluciones propias antes de escalar dudas sencillas a la directiva.",
-                bajo: "Prefiere apegarse a instructivos, métodos validados y directrices preestablecidas. Busca la confirmación de la autoridad antes de intentar vías no probadas.\n• Entorno Ideal: Tareas repetitivas de alta precisión, ejecución de guiones técnicos, soporte de seguridad y control.\n• Orientación Pastoral: Suministrar procedimientos paso a paso y brindar acompañamiento cercano cuando enfrente escenarios novedosos."
-            },
-            "Persuasión": {
-                alto: "Posee liderazgo inspirador, elocuencia y soltura argumentativa para motivar, movilizar y transformar posturas en grupos. Comunica la visión con entusiasmo contagioso.\n• Entorno Ideal: Capacitación, predicación, dirección de equipos, reclutamiento de voluntarios y campañas de alcance.\n• Orientación Pastoral: Formar en humildad y escucha activa para asegurar que su capacidad de influencia sirva a la edificación colectiva.",
-                medio: "Comunica ideas con claridad, coherencia y convicción personal. Logra influir positivamente en su entorno cercano desde el testimonio, la lógica y el trato respetuoso.\n• Entorno Ideal: Liderazgo de pequeñas células, enseñanza grupal, coordinación de comités específicos y mentoría.\n• Orientación Pastoral: Impulsar su desarrollo expositivo asignándole la vocería de proyectos progresivamente más amplios.",
-                bajo: "Siente mayor comodidad en roles de apoyo ejecutivo, trabajo silencioso de soporte o ejecución metodológica sin exposición directiva o discursiva pública.\n• Entorno Ideal: Soporte tras bambalinas, edición, montaje, logística interna, custodia y mantenimiento.\n• Orientación Pastoral: Valorar públicamente su fiel labor de soporte sin presionarlo para asumir roles expositivos que generen ansiedad."
-            },
-            "Perseverancia": {
-                alto: "Evidencia tenacidad, disciplina inquebrantable y alto nivel de compromiso. Mantiene el foco en metas de largo alcance superando la monotonía o la resistencia del entorno.\n• Entorno Ideal: Proyectos estratégicos de larga duración, construcción de sedes, consolidación de procesos y discipulado continuo.\n• Orientación Pastoral: Monitorear sus cargas de trabajo para evitar el sobreagotamiento derivado de su propia autoexigencia.",
-                medio: "Mantiene constancia y responsabilidad continua en sus responsabilidades asignadas. Concluye de manera confiable las metas a mediano plazo en los tiempos previstos.\n• Entorno Ideal: Programas trimestrales o semestrales, docencia periódica, turnos rotativos de servicio y gestión de aulas.\n• Orientación Pastoral: Establecer hitos de verificación parciales que mantengan su dinamismo a lo largo de ciclos extendidos.",
-                bajo: "Fluctúa en su nivel de entrega cuando las tareas se vuelven rutinarias o exigen plazos largos. Rinde mejor con incentivos de corto alcance y tareas dinámicas de rápida resolución.\n• Entorno Ideal: Tareas por objetivos inmediatos, eventos de un solo día, comisiones temporales de trabajo y brigadas puntuales.\n• Orientación Pastoral: Dividir los proyectos grandes en metas semanales y brindar mentoría frecuente para fortalecer la autodisciplina."
-            },
-            "Tolerancia": {
-                alto: "Manifiesta notable paciencia, serenidad y apertura para escuchar y conciliar puntos de vista diversos o encontrados. Promueve la cultura de paz y armonía en contextos complejos.\n• Entorno Ideal: Mediación de conflictos, atención a personas difíciles, recepción de quejas/sugerencias y arbitraje.\n• Orientación Pastoral: Guardar que su elevada transigencia no comprometa la firmeza necesaria al corregir conductas o aplicar normas.",
-                medio: "Mantiene un trato respetuoso, educado y tolerante frente a las diferencias individuales. Colabora en armonía y tolera adecuadamente la frustración laboral diaria.\n• Entorno Ideal: Trabajo en equipos multidisciplinarios, comités de servicio comunitario y atención al público general.\n• Orientación Pastoral: Reforzar sus habilidades de comunicación asertiva para que exprese sus desacuerdos constructivamente.",
-                bajo: "Presenta posturas firmes, rígidas o altamente normativas. Valora el cumplimiento estricto del deber y puede mostrar impaciencia ante la ineficiencia o el incumplimiento ajeno.\n• Entorno Ideal: Aplicación de reglamentos, auditoría de estándares de calidad, seguridad física e inspección operativa.\n• Orientación Pastoral: Disponerlo en entornos donde primen la norma y el orden, aconsejando gracia y templanza en su trato interpersonal."
-            },
-            "Vitalidad": {
-                alto: "Refleja energía contagiante, vigor físico y dinamismo para responder en escenarios de ritmo acelerado y alta exigencia operativa. Transmite entusiasmo al equipo.\n• Entorno Ideal: Ministerio juvenil, recreación infantil (PowerKids/Kids), montajes pesados, campamentos y evangelismo masivo.\n• Orientación Pastoral: Encauzar su abundante energía hacia metas organizadas para evitar la dispersión o el cansancio prematuro.",
-                medio: "Despliega un ritmo de trabajo activo, regular y sostenido. Mantiene un equilibrio saludable entre el esfuerzo físico y la pausa necesaria para el rendimiento constante.\n• Entorno Ideal: Protocolo de servicio regular, logística de reuniones, monitoreo de clases y trabajo de oficina.\n• Orientación Pastoral: Proporcionar roles con exigencia física razonable que le permitan mantener un desempeño constante sin desgaste.",
-                bajo: "Sobresale en labores reflexivas, analíticas, de concentración o de baja demanda física. Aporta calma, profundidad de análisis y meticulosidad al proceso.\n• Entorno Ideal: Intercesión, revisión de documentos, diseño, edición de textos, llamadas de seguimiento y planeación estratégica.\n• Orientación Pastoral: Asignarle entornos de trabajo cómodos y pausados donde su capacidad de concentración sea el factor diferenciador."
-            }
-        };
-
-        // SINCRONIZACIÓN CON GOOGLE SHEETS
         async function loadRecords() {
             const status = document.getElementById('status-msg');
             status.style.display = "block";
@@ -186,13 +166,11 @@
                 status.className = "text-xs text-emerald-600 font-medium";
                 status.innerText = `Sincronización exitosa: ${dbRecords.length} registro(s) disponible(s).`;
             } catch (e) {
-                console.error("Error al cargar registros:", e);
                 status.className = "text-xs text-red-500 font-medium";
-                status.innerText = "Error al conectar con Google Sheets. Verifique la conexión o intente sincronizar nuevamente.";
+                status.innerText = "Error al conectar con Google Sheets.";
             }
         }
 
-        // BÚSQUEDA DE REGISTROS
         function searchRecords() {
             const query = document.getElementById('search-input').value.trim().toLowerCase();
             const resultsList = document.getElementById('results-list');
@@ -232,9 +210,14 @@
                                 <p class="text-xs text-slate-500 mt-0.5">ID: ${id} | Edad: ${edad} | Correo: ${correo}</p>
                                 <p class="text-xs font-semibold text-emerald-700 mt-1">Sugerencia Principal: ${top1}</p>
                             </div>
-                            <button onclick="generatePDFForRecord(${idx})" class="px-4 py-2 bg-black hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition whitespace-nowrap cursor-pointer">
-                                📄 Descargar PDF
-                            </button>
+                            <div class="flex gap-2 w-full md:w-auto">
+                                <button onclick="viewInScreen(${idx})" class="flex-1 md:flex-none px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-lg border border-slate-300 transition cursor-pointer">
+                                    👁️ Ver en Pantalla
+                                </button>
+                                <button onclick="generatePDFForRecord(${idx})" class="flex-1 md:flex-none px-4 py-2 bg-black hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition cursor-pointer">
+                                    📄 Descargar PDF
+                                </button>
+                            </div>
                         </div>
                     `;
                 });
@@ -242,43 +225,88 @@
             container.style.display = "block";
         }
 
-        // GENERACIÓN DE INFORME POR EJES
+        // ALGORITMO DE DEDUCCIÓN DE PERSONALIDAD 16 TIPOS (MBTI)
+        function derivePersonalityType(perfil) {
+            const des = perfil["Destreza Social"] || 50;
+            const perS = perfil["Persuasión"] || 50;
+            const E = (des + perS) / 2 >= 55 ? 'E' : 'I';
+
+            const rec = perfil["Recursividad"] || 50;
+            const vit = perfil["Vitalidad"] || 50;
+            const N = (rec + vit) / 2 >= 55 ? 'N' : 'S';
+
+            const sen = perfil["Sensibilidad Social"] || 50;
+            const tol = perfil["Tolerancia"] || 50;
+            const F = (sen + tol) / 2 >= 55 ? 'F' : 'T';
+
+            const per = perfil["Perseverancia"] || 50;
+            const ada = perfil["Adaptabilidad"] || 50;
+            const J = per >= ada ? 'J' : 'P';
+
+            const code = `${E}${N}${F}${J}`;
+            const info = TIPOS_PERSONALIDAD[code] || { nombre: "Perfil Equilibrado", desc: "Demuestra una combinación versátil de rasgos analíticos y sociales." };
+
+            return { code, nombre: info.nombre, desc: info.desc };
+        }
+
+        // DEDUCCIÓN DE ORIENTACIÓN PRÁCTICA AL SERVICIO EN LA IGLESIA
+        function deriveServiceOrientation(perfil) {
+            const des = perfil["Destreza Social"] || 50;
+            const sen = perfil["Sensibilidad Social"] || 50;
+            const perS = perfil["Persuasión"] || 50;
+            const per = perfil["Perseverancia"] || 50;
+            const rec = perfil["Recursividad"] || 50;
+
+            let orientacion = "";
+            let detalles = "";
+
+            if ((des + sen) / 2 >= 65) {
+                orientacion = "Orientación de Servicio Directo a Personas (Cuidado y Recepción)";
+                detalles = "Perfil ideal para estar en contacto permanente con los asistentes, brindando acogida, consuelo, apoyo emocional y acompañamiento en grupos.";
+            } else if (per >= 65 && des < 55) {
+                orientacion = "Orientación a Labores Administrativas y Metodológicas (Estructura Interna)";
+                detalles = "Excelente para el soporte en el orden operativo tras bambalinas, sistematización de datos, archivo, control logístico e inventarios.";
+            } else if (rec >= 65) {
+                orientacion = "Orientación Creativa, Técnica y de Producción (Soporte Operativo)";
+                detalles = "Destaca en entornos dinámicos que demandan solución práctica de problemas, montaje, arte, medios de comunicación o infraestructura física.";
+            } else if (perS >= 65) {
+                orientacion = "Orientación de Liderazgo, Vocería y Movilización (Dirección de Equipos)";
+                detalles = "Facilidad para guiar proyectos, capacitar voluntarios, liderar comités o motivar hacia metas grupales con comunicación persuasiva.";
+            } else {
+                orientacion = "Perfil Operativo Polivalente / Soporte Silencioso de Bajo Perfil";
+                detalles = "Prefiere ejecutar instrucciones claras dentro de rutinas estables sin requerir alta exposición pública, actuando como un pilar confiable de apoyo.";
+            }
+
+            return { orientacion, detalles };
+        }
+
+        // NARRATIVA CUALITATIVA GENERAL POR EJES
         function generateAxisNarrative(perfil) {
             const rec = perfil["Recursividad"] || 50;
             const per = perfil["Perseverancia"] || 50;
             const vit = perfil["Vitalidad"] || 50;
             const avgProd = (rec + per + vit) / 3;
 
-            let prodFortaleza = "";
-            let prodMejora = "";
-
+            let prodDesc = "";
             if (avgProd >= 70) {
-                prodFortaleza = "Excelente capacidad ejecutora y dinamismo operativo. Resuelve contingencias con agilidad y sostiene la disciplina en entregables de largo alcance.";
-                prodMejora = "Evitar la sobrecarga autoinfligida de trabajo y asegurar la estandarización documental de sus métodos innovadores.";
+                prodDesc = "En cuanto a la Ejecución de Tareas y Productividad, el evaluado refleja un dinamismo operativo sobresaliente, caracterizado por una marcada agilidad para resolver imprevistos y sostener la disciplina en entregables exigentes.";
             } else if (avgProd >= 50) {
-                prodFortaleza = "Desempeño constante y disciplinado en rutinas operativas habituales, utilizando recursos de forma eficiente y ordenada.";
-                prodMejora = "Estimular la iniciativa propia ante bloqueos imprevistos y fortalecer la tenacidad en proyectos de largo aliento.";
+                prodDesc = "En el ámbito de la Ejecución de Tareas y Productividad, demuestra un desempeño constante, metódico y funcional dentro de procesos bien estructurados y rutinas estables.";
             } else {
-                prodFortaleza = "Orientación a tareas metodológicas de ritmo pausado que requieren concentración y seguimiento paso a paso.";
-                prodMejora = "Subdividir grandes metas en objetivos semanales y contar con supervisión periódica para mantener el ritmo operativo.";
+                prodDesc = "Respecto a la Ejecución de Tareas y Productividad, muestra inclinación hacia tareas de ritmo pausado y secuencial que requieren acompañamiento paso a paso e instrucciones claras.";
             }
 
             const ada = perfil["Adaptabilidad"] || 50;
             const tol = perfil["Tolerancia"] || 50;
             const avgEmo = (ada + tol) / 2;
 
-            let emoFortaleza = "";
-            let emoMejora = "";
-
+            let emoDesc = "";
             if (avgEmo >= 70) {
-                emoFortaleza = "Avanzado autocontrol y templanza. Conserva la serenidad bajo presión y actúa como mediador pacificador en momentos de tensión o cambio.";
-                emoMejora = "Asegurar que la alta tolerancia no postergue decisiones correctivas firmes cuando la disciplina organizativa lo exija.";
+                emoDesc = "En la dimensión del Manejo Emocional, evidencia alta madurez, templanza y autocontrol ante escenarios de presión o imprevistos, actuando como un agente de serenidad en el grupo.";
             } else if (avgEmo >= 50) {
-                emoFortaleza = "Adecuada estabilidad emocional frente a imprevistos normales. Escucha activamente y gestiona las diferencias con madurez.";
-                emoMejora = "Comunicar con antelación las modificaciones de planes para mitigar la resistencia natural al cambio voluntario.";
+                emoDesc = "En cuanto al Manejo Emocional, conserva una estabilidad adecuada frente a contingencias habituales, requiriendo un margen normal de adaptación ante cambios organizacionales.";
             } else {
-                emoFortaleza = "Firmeza en convicciones, apego riguroso a estándares y alto sentido del deber dentro de estructuras estables.";
-                emoMejora = "Desarrollar mayor flexibilidad comunicativa y resiliencia emocional cuando los escenarios cambien intempestivamente.";
+                emoDesc = "En el área del Manejo Emocional, refleja un alto apego a la norma y a las reglas establecidas, pudiendo experimentar incomprensión ante la improvisación o alteraciones imprevistas.";
             }
 
             const des = perfil["Destreza Social"] || 50;
@@ -286,28 +314,120 @@
             const perS = perfil["Persuasión"] || 50;
             const avgRel = (des + sen + perS) / 3;
 
-            let relFortaleza = "";
-            let relMejora = "";
-
+            let relDesc = "";
             if (avgRel >= 70) {
-                relFortaleza = "Liderazgo carismático, empatía activa e influencia natural. Conecta de forma inmediata, motiva a grupos y detecta necesidades humanas.";
-                emoMejora = "Establecer límites sanos para evitar el agotamiento por sobreinvolucramiento en problemas ajenos.";
+                relDesc = "En lo referente a las Relaciones Interpersonales, se distingue por su empatía activa, soltura comunicativa y capacidad natural para conectar de forma cercana con diversos tipos de personas.";
             } else if (avgRel >= 50) {
-                relFortaleza = "Buenas relaciones interpersonales sostenidas en el respeto, la escucha y el apoyo oportuno dentro de equipos de trabajo.";
-                relMejora = "Ampliar progresivamente su círculo de influencia y asumir roles de vocería con mayor soltura.";
+                relDesc = "En la esfera de las Relaciones Interpersonales, interactúa con educación, respeto y buen trato, adaptándose favorablemente al trabajo colaborativo en equipos formales.";
             } else {
-                relFortaleza = "Estilo relacional prudente y respetuoso, enfocado en el cumplimiento de tareas sin generar fricciones en el entorno.";
-                relMejora = "Fomentar la participación activa en dinámicas comunitarias de integración y trabajo colaborativo.";
+                relDesc = "En lo relativo a Relaciones Interpersonales, mantiene un estilo cauto y reservado, priorizando círculos de confianza reducidos y enfocado en la tarea por encima de la socialización.";
             }
 
-            return {
-                productividad: { fortaleza: prodFortaleza, mejora: prodMejora },
-                emocional: { fortaleza: emoFortaleza, mejora: emoMejora },
-                relaciones: { fortaleza: relFortaleza, mejora: relMejora }
-            };
+            return { prodDesc, emoDesc, relDesc };
         }
 
-        // CONSTRUCCIÓN DEL PDF EN BLANCO Y NEGRO CORPORATIVO
+        // ANÁLISIS GENERAL DE FORTALEZAS Y OPORTUNIDADES
+        function generateGeneralSWOT(perfil) {
+            const sorted = Object.keys(perfil).sort((a, b) => perfil[b] - perfil[a]);
+            const topTraits = sorted.slice(0, 3);
+            const lowTraits = sorted.slice(-2);
+
+            const fortalezas = `Demuestra una marcada solvencia en ${topTraits.join(', ')}, lo que le permite aportar valor inmediato en la resolución de problemas, el compromiso con el deber y la colaboración comunitaria.`;
+            const oportunidades = `Sus principales áreas de crecimiento radican en fortalecer ${lowTraits.join(' y ')}, gestionando la autorregulación para mantener el equilibrio entre el rendimiento y la flexibilidad.`;
+
+            return { fortalezas, oportunidades };
+        }
+
+        // MOSTRAR RESULTADOS EN PANTALLA (MODAL)
+        function viewInScreen(index) {
+            const record = dbRecords[index];
+            let perfil = {};
+            try {
+                const rawPerfil = record.perfil || record['Perfil Resumen'];
+                perfil = typeof rawPerfil === 'string' ? JSON.parse(rawPerfil) : rawPerfil;
+            } catch (e) { perfil = {}; }
+
+            const nombres = record.nombres || record.Nombres || '';
+            const apellidos = record.apellidos || record.Apellidos || '';
+            const id = record.identificacion || record.Identificacion || 'N/A';
+            const edad = record.edad || record.Edad || 'N/A';
+            const correo = record.correo || record.Correo || 'N/A';
+
+            const rawTop1 = record.top1 || record['Top 1 Area'] || 'N/A';
+            const rawTop2 = record.top2 || record['Top 2 Area'] || 'N/A';
+            const rawTop3 = record.top3 || record['Top 3 Area'] || 'N/A';
+
+            const pType = derivePersonalityType(perfil);
+            const sOrient = deriveServiceOrientation(perfil);
+            const axisNav = generateAxisNarrative(perfil);
+            const swot = generateGeneralSWOT(perfil);
+
+            const content = document.getElementById('modal-content');
+            content.innerHTML = `
+                <div class="border-b border-slate-200 pb-4">
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Informe Cualitativo de Evaluación</span>
+                    <h2 class="text-2xl font-black text-slate-900">${nombres} ${apellidos}</h2>
+                    <p class="text-xs text-slate-500 mt-1">ID: ${id} | Edad: ${edad} años | Correo: ${correo}</p>
+                </div>
+
+                <!-- TIPO DE PERSONALIDAD -->
+                <div class="bg-slate-900 text-white p-5 rounded-xl space-y-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Arquetipo de Personalidad Sugerido</span>
+                    <h3 class="text-xl font-bold">${pType.code} - ${pType.nombre}</h3>
+                    <p class="text-xs text-slate-300 leading-relaxed">${pType.desc}</p>
+                </div>
+
+                <!-- ÁREAS RECOMENDADAS -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700">Áreas de Servicio Sugeridas</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                        <div class="p-3 border border-slate-200 rounded-lg bg-emerald-50/50">
+                            <span class="font-bold text-emerald-800">1. ${rawTop1}</span>
+                        </div>
+                        <div class="p-3 border border-slate-200 rounded-lg bg-slate-50">
+                            <span class="font-bold text-slate-700">2. ${rawTop2}</span>
+                        </div>
+                        <div class="p-3 border border-slate-200 rounded-lg bg-slate-50">
+                            <span class="font-bold text-slate-700">3. ${rawTop3}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ORIENTACIÓN DE SERVICIO PRÁCTICO -->
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 space-y-2 text-xs">
+                    <h3 class="font-bold text-blue-900 uppercase tracking-wider">Orientación de Servicio Práctico en la Iglesia</h3>
+                    <p class="font-bold text-slate-800">${sOrient.orientacion}</p>
+                    <p class="text-slate-600 leading-relaxed">${sOrient.detalles}</p>
+                </div>
+
+                <!-- NARRATIVA POR EJES CONDUCTUALES -->
+                <div class="space-y-3 text-xs">
+                    <h3 class="font-bold uppercase tracking-wider text-slate-700">Descripción Cualitativa por Ejes Conductuales</h3>
+                    <div class="p-4 border border-slate-200 rounded-xl space-y-2 bg-slate-50">
+                        <p>• <strong>Ejecución y Productividad:</strong> ${axisNav.prodDesc}</p>
+                        <p>• <strong>Manejo Emocional:</strong> ${axisNav.emoDesc}</p>
+                        <p>• <strong>Relaciones Interpersonales:</strong> ${axisNav.relDesc}</p>
+                    </div>
+                </div>
+
+                <!-- FORTALEZAS Y OPORTUNIDADES GLOBALES -->
+                <div class="space-y-3 text-xs">
+                    <h3 class="font-bold uppercase tracking-wider text-slate-700">Análisis General de Fortalezas y Oportunidades</h3>
+                    <div class="p-4 border border-slate-200 rounded-xl space-y-2 bg-white">
+                        <p>• <strong>Fortalezas Generales:</strong> ${swot.fortalezas}</p>
+                        <p>• <strong>Oportunidades de Crecimiento:</strong> ${swot.oportunidades}</p>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('preview-modal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('preview-modal').style.display = 'none';
+        }
+
+        // GENERACIÓN DEL PDF ESTRUCTURADO Y COMPLETO
         function generatePDFForRecord(index) {
             const record = dbRecords[index];
             const { jsPDF } = window.jspdf;
@@ -315,16 +435,14 @@
 
             function cleanAreaName(rawName) {
                 if (!rawName) return "";
-                return rawName.replace(/\s*\(\d+\%\)/g, "").trim();
+                return rawName.replace(/\s*\(\d+%\)/g, "").trim();
             }
 
             let perfil = {};
             try {
                 const rawPerfil = record.perfil || record['Perfil Resumen'];
                 perfil = typeof rawPerfil === 'string' ? JSON.parse(rawPerfil) : rawPerfil;
-            } catch (e) {
-                perfil = {};
-            }
+            } catch (e) { perfil = {}; }
 
             const nombres = record.nombres || record.Nombres || '';
             const apellidos = record.apellidos || record.Apellidos || '';
@@ -340,7 +458,12 @@
             const cleanTop2 = cleanAreaName(rawTop2);
             const cleanTop3 = cleanAreaName(rawTop3);
 
-            // Encabezado Corporativo
+            const pType = derivePersonalityType(perfil);
+            const sOrient = deriveServiceOrientation(perfil);
+            const axisNav = generateAxisNarrative(perfil);
+            const swot = generateGeneralSWOT(perfil);
+
+            // ENCABEZADO
             doc.setFillColor(0, 0, 0);
             doc.rect(0, 0, 210, 20, 'F');
             doc.setTextColor(255, 255, 255);
@@ -348,7 +471,7 @@
             doc.setFont("helvetica", "bold");
             doc.text("IGLECO - PERFILAMIENTO PSICOMÉTRICO Y MINISTERIAL", 14, 13);
 
-            // Datos Personales
+            // DATOS PERSONALES
             doc.setTextColor(0, 0, 0);
             doc.setFontSize(11);
             doc.text("INFORMACIÓN DEL EVALUADO", 14, 28);
@@ -360,96 +483,94 @@
             doc.text(`Edad: ${edad} años`, 14, 46);
             doc.text(`Correo Electrónico: ${correo}`, 14, 52);
 
-            // ÁREAS SUGERIDAS CON MÁRGENES Y ANCHOS CORREGIDOS
+            // ARQUETIPO DE PERSONALIDAD (16 TIPOS)
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
-            doc.text("ÁREAS DE SERVICIO SUGERIDAS Y DEFINICIÓN TÉCNICA", 14, 62);
-
-            const areasBody = [
-                ['Área Principal (Top 1)', rawTop1, DEFINICIONES_AREAS[cleanTop1] || "Acompañamiento e integración en el servicio comunitario."],
-                ['Área Secundaria (Top 2)', rawTop2, DEFINICIONES_AREAS[cleanTop2] || "Soporte colaborativo en procesos operativos y de acompañamiento."],
-                ['Área Alternativa (Top 3)', rawTop3, DEFINICIONES_AREAS[cleanTop3] || "Opción complementaria para diversificar el servicio según las necesidades."]
-            ];
+            doc.text("PERFILAMIENTO DE PERSONALIDAD (SISTEMA DE 16 TIPOS)", 14, 62);
 
             doc.autoTable({
                 startY: 65,
-                head: [['Prioridad', 'Área Recomendada', 'Propósito y Alcance del Área']],
-                body: areasBody,
+                head: [['Arquetipo Deduce', 'Descripción del Perfil de Personalidad']],
+                body: [[ `${pType.code} - ${pType.nombre}`, pType.desc ]],
                 theme: 'striped',
                 headStyles: { fillColor: [0, 0, 0] },
-                columnStyles: { 0: { cellWidth: 46 }, 1: { cellWidth: 38 }, 2: { cellWidth: 98 } }
+                columnStyles: { 0: { cellWidth: 50 }, 1: { cellWidth: 130 } }
             });
 
-            // DIAGNÓSTICO CUALITATIVO PROFUNDO POR CATEGORÍA
+            // ÁREAS RECOMENDADAS
             doc.setFont("helvetica", "bold");
             doc.setFontSize(11);
-            doc.text("DIAGNÓSTICO CUALITATIVO PROFUNDO POR CATEGORÍA", 14, doc.lastAutoTable.finalY + 10);
+            doc.text("ÁREAS DE SERVICIO SUGERIDAS Y PROPÓSITO", 14, doc.lastAutoTable.finalY + 10);
 
-            const sortedTraits = Object.keys(perfil).sort((a, b) => perfil[b] - perfil[a]);
-
-            const traitRows = sortedTraits.map(trait => {
-                const score = perfil[trait];
-                let nivelKey = "medio";
-                let badge = "DESARROLLADO";
-                
-                if (score >= 75) {
-                    nivelKey = "alto";
-                    badge = "SOBRESALIENTE";
-                } else if (score < 50) {
-                    nivelKey = "bajo";
-                    badge = "EN DESARROLLO";
-                }
-
-                const obsObj = OBSERVACIONES[trait] || {
-                    alto: "Desempeño sobresaliente en la categoría.",
-                    medio: "Desempeño adecuado y funcional.",
-                    bajo: "Área con oportunidad de crecimiento."
-                };
-
-                return [trait, `${score}%\n[ ${badge} ]`, obsObj[nivelKey]];
-            });
-
-            doc.autoTable({
-                startY: doc.lastAutoTable.finalY + 14,
-                head: [['Rasgo Evaluado', 'Puntaje / Nivel', 'Perfilamiento Cualitativo Profundo / Observación']],
-                body: traitRows.length > 0 ? traitRows : [['N/A', 'N/A', 'Sin datos disponibles']],
-                theme: 'grid',
-                headStyles: { fillColor: [0, 0, 0] },
-                columnStyles: { 0: { cellWidth: 36 }, 1: { cellWidth: 38 }, 2: { cellWidth: 106 } }
-            });
-
-            // INFORME DESCRIPTIVO ESTRUCTURADO POR EJES
-            const narrative = generateAxisNarrative(perfil);
-
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("INFORME DESCRIPTIVO: EVALUACIÓN POR EJES CONDUCTUALES", 14, doc.lastAutoTable.finalY + 10);
-
-            const axisRows = [
-                [
-                    'EJECUCIÓN DE TAREAS Y PRODUCTIVIDAD',
-                    `• Fortaleza: ${narrative.productividad.fortaleza}\n• Oportunidad de Crecimiento: ${narrative.productividad.mejora}`
-                ],
-                [
-                    'MANEJO EMOCIONAL',
-                    `• Fortaleza: ${narrative.emocional.fortaleza}\n• Oportunidad de Crecimiento: ${narrative.emocional.mejora}`
-                ],
-                [
-                    'RELACIONES INTERPERSONALES',
-                    `• Fortaleza: ${narrative.relaciones.fortaleza}\n• Oportunidad de Crecimiento: ${narrative.relaciones.mejora}`
-                ]
+            const areasBody = [
+                ['Área Principal (Top 1)', rawTop1, DEFINICIONES_AREAS[cleanTop1] || "Acompañamiento e integración comunitaria."],
+                ['Área Secundaria (Top 2)', rawTop2, DEFINICIONES_AREAS[cleanTop2] || "Soporte colaborativo en procesos operativos."],
+                ['Área Alternativa (Top 3)', rawTop3, DEFINICIONES_AREAS[cleanTop3] || "Opción complementaria de servicio."]
             ];
 
             doc.autoTable({
                 startY: doc.lastAutoTable.finalY + 14,
-                head: [['Eje Conductual Evaluado', 'Diagnóstico Cualitativo (Fortalezas vs Oportunidades)']],
+                head: [['Prioridad', 'Área Recomendada', 'Propósito']],
+                body: areasBody,
+                theme: 'striped',
+                headStyles: { fillColor: [0, 0, 0] },
+                columnStyles: { 0: { cellWidth: 46 }, 1: { cellWidth: 44 }, 2: { cellWidth: 90 } }
+            });
+
+            // ORIENTACIÓN PRÁCTICA AL SERVICIO
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("ORIENTACIÓN PRÁCTICA AL SERVICIO MINISTERIAL", 14, doc.lastAutoTable.finalY + 10);
+
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 14,
+                head: [['Perfil Funcional de Servicio', 'Perspectiva y Aplicación Práctica en la Iglesia']],
+                body: [[ sOrient.orientacion, sOrient.detalles ]],
+                theme: 'grid',
+                headStyles: { fillColor: [0, 0, 0] },
+                columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 120 } }
+            });
+
+            // DESCRIPCIÓN CUALITATIVA POR EJES
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("OBSERVACIONES CUALITATIVAS POR EJES CONDUCTUALES", 14, doc.lastAutoTable.finalY + 10);
+
+            const axisRows = [
+                [ 'Ejecución y Productividad', axisNav.prodDesc ],
+                [ 'Manejo Emocional', axisNav.emoDesc ],
+                [ 'Relaciones Interpersonales', axisNav.relDesc ]
+            ];
+
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 14,
+                head: [['Eje Evaluado', 'Observación Cualitativa General']],
                 body: axisRows,
                 theme: 'striped',
                 headStyles: { fillColor: [0, 0, 0] },
                 columnStyles: { 0: { cellWidth: 50 }, 1: { cellWidth: 130 } }
             });
 
-            doc.save(`Reporte_IGLECO_Cualitativo_${id}.pdf`);
+            // ANÁLISIS GENERAL DE FORTALEZAS Y OPORTUNIDADES
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("ANÁLISIS GENERAL DE FORTALEZAS Y OPORTUNIDADES", 14, doc.lastAutoTable.finalY + 10);
+
+            const swotRows = [
+                [ 'Fortalezas Generales', swot.fortalezas ],
+                [ 'Oportunidades de Crecimiento', swot.oportunidades ]
+            ];
+
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 14,
+                head: [['Categoría', 'Análisis Cualitativo Global']],
+                body: swotRows,
+                theme: 'grid',
+                headStyles: { fillColor: [0, 0, 0] },
+                columnStyles: { 0: { cellWidth: 50 }, 1: { cellWidth: 130 } }
+            });
+
+            doc.save(`Reporte_IGLECO_${id}.pdf`);
         }
     </script>
 </body>
