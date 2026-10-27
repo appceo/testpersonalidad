@@ -3,602 +3,465 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Administrativo | IGLECO</title>
+    <title>Evaluación Psicométrica y Ministerial | IGLECO</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- jsPDF para Reportes PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 0; }
-        .card-box { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background-color: #f8fafc; color: #0f172a; }
+        .scale-card { transition: all 0.2s ease-in-out; }
+        .scale-card:hover { transform: translateY(-2px); border-color: #0f172a; }
+        .scale-radio:checked + label { background-color: #0f172a; color: #ffffff; border-color: #0f172a; font-weight: 600; }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen">
+<body class="min-h-screen flex flex-col justify-between bg-slate-50">
 
-    <!-- ENCABEZADO CORPORATIVO IGLECO -->
-    <header class="bg-white border-b border-slate-200 py-4 px-6 shadow-sm">
-        <div class="max-w-5xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="text-2xl font-black tracking-widest text-black flex items-center">
+    <!-- ENCABEZADO CORPORATIVO -->
+    <header class="bg-white border-b border-slate-200 py-4 px-6 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-3xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="text-2xl font-black tracking-widest text-black">
                     IGLE<span class="font-extrabold text-slate-800">CO</span>
                 </div>
-                <div class="h-6 w-px bg-slate-300"></div>
-                <span class="text-xs font-bold tracking-wider text-slate-500 uppercase">Panel Administrativo</span>
+                <div class="h-5 w-px bg-slate-300"></div>
+                <span class="text-xs font-semibold tracking-wider text-slate-500 uppercase">Perfilamiento Ministerial</span>
             </div>
-            <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-mono border border-slate-200">Acceso Restringido</span>
+            <div id="progress-text" class="text-xs font-bold text-slate-500 hidden font-mono">0 / 64</div>
+        </div>
+        <!-- BARRA DE PROGRESO DE ALTA PRECISIÓN -->
+        <div id="progress-bar-container" class="w-full bg-slate-100 h-1.5 mt-4 rounded-full overflow-hidden hidden">
+            <div id="progress-bar" class="bg-black h-full w-0 transition-all duration-300"></div>
         </div>
     </header>
 
-    <main class="max-w-5xl mx-auto my-10 px-4">
-        
-        <!-- PANTALLA DE ACCESO POR PIN -->
-        <div id="login-box" class="card-box p-8 max-w-md mx-auto text-center space-y-6">
-            <div class="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center mx-auto text-xl">🔒</div>
-            <div>
-                <h2 class="text-2xl font-bold text-slate-900">Acceso Requerido</h2>
-                <p class="text-sm text-slate-500 mt-1">Ingrese el PIN de seguridad para acceder al panel.</p>
+    <main class="max-w-3xl mx-auto my-8 px-4 w-full flex-1">
+
+        <!-- PASO 1: DATOS BÁSICOS DEL EVALUADO -->
+        <div id="step-registration" class="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-6">
+            <div class="border-b border-slate-100 pb-4 flex justify-between items-start">
+                <div>
+                    <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight">Bienvenido al Test de Perfilamiento</h1>
+                    <p class="text-sm text-slate-500 mt-1">Por favor complete sus datos personales antes de iniciar las 64 preguntas de diagnóstico.</p>
+                </div>
             </div>
-            <div class="space-y-4">
-                <input type="password" id="pin-input" placeholder="••••" maxlength="8" onkeydown="if(event.key==='Enter') executeLogin()" class="w-full p-3 border border-slate-300 rounded-lg text-center text-2xl tracking-widest outline-none focus:ring-2 focus:ring-black">
-                <button type="button" onclick="executeLogin()" class="w-full py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition shadow-sm cursor-pointer">
-                    Ingresar al Panel
+
+            <div id="resume-banner" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-4 flex justify-between items-center">
+                <div class="text-xs text-amber-800">
+                    <strong>📌 Progreso guardado encontrado:</strong> Tienes una prueba en curso.
+                </div>
+                <button onclick="resumeSavedTest()" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-lg transition cursor-pointer">
+                    Continuar donde quedé →
+                </button>
+            </div>
+
+            <form id="form-registration" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Nombres *</label>
+                        <input type="text" id="reg-nombres" required placeholder="Ej. Carlos Arturo" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-black outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Apellidos *</label>
+                        <input type="text" id="reg-apellidos" required placeholder="Ej. Rosas Moreno" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-black outline-none text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Identificación (Cédula) *</label>
+                        <input type="text" id="reg-id" required placeholder="12345678" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-black outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Edad *</label>
+                        <input type="number" id="reg-edad" min="10" max="99" required placeholder="30" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-black outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">Correo Electrónico *</label>
+                        <input type="email" id="reg-correo" required placeholder="ejemplo@correo.com" class="w-full p-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-black outline-none text-sm">
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button type="button" onclick="startTest()" class="w-full py-4 bg-black hover:bg-slate-800 text-white font-bold rounded-xl transition shadow-md text-sm uppercase tracking-wider cursor-pointer">
+                        Comenzar Evaluación →
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- PASO 2: CUESTIONARIO DE PREGUNTAS -->
+        <div id="step-questions" class="hidden bg-white border border-slate-200 rounded-2xl p-8 shadow-sm space-y-8">
+            <div class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <span id="question-badge" class="text-xs font-bold uppercase tracking-widest text-slate-400 font-mono">Pregunta 1 de 64</span>
+                    <span class="text-xs text-emerald-600 font-semibold flex items-center gap-1">💾 Progreso guardado automáticamente</span>
+                </div>
+                <h2 id="question-text" class="text-xl md:text-2xl font-bold text-slate-900 leading-snug">Cargando pregunta...</h2>
+            </div>
+
+            <!-- ESCALA LIKERT -->
+            <div class="space-y-3">
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Seleccione el grado de afinidad con la afirmación:</p>
+                <div class="grid grid-cols-1 gap-2.5">
+                    <div class="scale-card">
+                        <input type="radio" name="likert-val" id="opt-1" value="1" class="scale-radio hidden">
+                        <label for="opt-1" class="flex items-center justify-between p-4 border border-slate-200 rounded-xl cursor-pointer text-sm font-medium hover:bg-slate-50 transition">
+                            <span>1. Totalmente en desacuerdo</span>
+                        </label>
+                    </div>
+
+                    <div class="scale-card">
+                        <input type="radio" name="likert-val" id="opt-2" value="2" class="scale-radio hidden">
+                        <label for="opt-2" class="flex items-center justify-between p-4 border border-slate-200 rounded-xl cursor-pointer text-sm font-medium hover:bg-slate-50 transition">
+                            <span>2. En desacuerdo</span>
+                        </label>
+                    </div>
+
+                    <div class="scale-card">
+                        <input type="radio" name="likert-val" id="opt-3" value="3" class="scale-radio hidden">
+                        <label for="opt-3" class="flex items-center justify-between p-4 border border-slate-200 rounded-xl cursor-pointer text-sm font-medium hover:bg-slate-50 transition">
+                            <span>3. Neutral / Indiferente</span>
+                        </label>
+                    </div>
+
+                    <div class="scale-card">
+                        <input type="radio" name="likert-val" id="opt-4" value="4" class="scale-radio hidden">
+                        <label for="opt-4" class="flex items-center justify-between p-4 border border-slate-200 rounded-xl cursor-pointer text-sm font-medium hover:bg-slate-50 transition">
+                            <span>4. De acuerdo</span>
+                        </label>
+                    </div>
+
+                    <div class="scale-card">
+                        <input type="radio" name="likert-val" id="opt-5" value="5" class="scale-radio hidden">
+                        <label for="opt-5" class="flex items-center justify-between p-4 border border-slate-200 rounded-xl cursor-pointer text-sm font-medium hover:bg-slate-50 transition">
+                            <span>5. Totalmente de acuerdo</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                <button type="button" id="btn-prev" onclick="prevQuestion()" class="px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-slate-500 hover:text-black transition">
+                    ← Anterior
+                </button>
+                <button type="button" id="btn-next" onclick="nextQuestion()" class="px-6 py-3 bg-black hover:bg-slate-800 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-sm cursor-pointer">
+                    Siguiente →
                 </button>
             </div>
         </div>
 
-        <!-- PANEL DE BÚSQUEDA Y REPORTES -->
-        <div id="admin-panel" style="display: none;" class="space-y-6">
-            <div class="card-box p-6 md:p-8 space-y-6">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-slate-900">Consulta de Evaluados</h2>
-                        <p class="text-sm text-slate-500">Busque por identificación o nombres para visualizar en pantalla o descargar el informe cualitativo individual en PDF.</p>
-                    </div>
-                    <button onclick="loadRecords()" type="button" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 transition flex items-center gap-1 cursor-pointer">
-                        🔄 Sincronizar Datos
-                    </button>
-                </div>
-
-                <!-- CAMPO DE BÚSQUEDA -->
-                <div class="flex flex-col md:flex-row gap-3">
-                    <input type="text" id="search-input" onkeydown="if(event.key==='Enter') searchRecords()" placeholder="Ingrese Identificación (Cédula) o Nombres..." class="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-black outline-none text-sm">
-                    <button type="button" onclick="searchRecords()" class="px-6 py-3 bg-black hover:bg-slate-800 text-white font-semibold rounded-lg transition text-sm whitespace-nowrap cursor-pointer">
-                        Buscar Registro
-                    </button>
-                </div>
-
-                <div id="status-msg" style="display: none;" class="text-xs font-medium">Conectando...</div>
-
-                <!-- RESULTADOS DE BÚSQUEDA -->
-                <div id="results-container" style="display: none;" class="space-y-4 border-t border-slate-100 pt-4">
-                    <h3 class="font-bold text-slate-900 text-xs uppercase tracking-wider text-slate-500">Resultados Encontrados</h3>
-                    <div id="results-list" class="space-y-3"></div>
-                </div>
+        <!-- PASO 3: CONFIRMACIÓN INSTITUCIONAL -->
+        <div id="step-completion" class="hidden bg-white border border-slate-200 rounded-2xl p-10 text-center space-y-6 shadow-sm">
+            <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto text-4xl font-bold">
+                ✓
             </div>
+            <div class="space-y-2">
+                <h2 class="text-2xl font-black text-slate-900">¡Evaluación Completada Exitosamente!</h2>
+                <p class="text-sm text-slate-600 max-w-lg mx-auto leading-relaxed">
+                    Sus respuestas han sido registradas y procesadas mediante el modelo psicométrico oficial de <strong>IGLECO</strong>.
+                </p>
+            </div>
+
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-6 max-w-md mx-auto text-center space-y-2">
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Próximo Paso en el Proceso</p>
+                <p class="text-sm text-slate-700">
+                    El equipo administrativo y pastoral revisará su informe cualitativo para ponerse en contacto con usted y orientar su asignación ministerial.
+                </p>
+            </div>
+
+            <p class="text-xs text-slate-400">Gracias por su disposición y vocación de servicio.</p>
         </div>
 
     </main>
 
-    <!-- MODAL DE VISUALIZACIÓN EN PANTALLA -->
-    <div id="preview-modal" style="display: none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex justify-center items-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6 md:p-8 space-y-6 shadow-2xl relative">
-            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-black text-2xl font-bold cursor-pointer">✕</button>
-            <div id="modal-content" class="space-y-6"></div>
-        </div>
-    </div>
+    <footer class="py-6 border-t border-slate-200 text-center text-xs text-slate-400 bg-white">
+        IGLECO © 2026 | Sistema de Perfilamiento Psicométrico y Ministerial
+    </footer>
 
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3jCdQhXobfC7RMKPJIxgQXKzeXLyUMeuU8VOQQr25G_QRqaJ-pTCF3Cf0rb9S8PZObQ/exec";
-        let dbRecords = [];
 
-        function executeLogin() {
-            const input = document.getElementById('pin-input');
-            const pin = input ? input.value.trim() : '';
-            if (pin === '1234') {
-                document.getElementById('login-box').style.display = 'none';
-                document.getElementById('admin-panel').style.display = 'block';
-                loadRecords();
-            } else {
-                alert('PIN incorrecto. Ingrese 1234');
+        const PREGUNTAS_BASE = [
+            { id: 1, trait: "Destreza Social", text: "Me resulta fácil iniciar conversaciones y generar confianza rápidamente con personas que no conozco." },
+            { id: 2, trait: "Destreza Social", text: "Disfruto relacionarme e integrarme en grupos diversos de personas." },
+            { id: 3, trait: "Destreza Social", text: "Se me facilita conectar a personas entre sí y crear ambientes acogedores." },
+            { id: 4, trait: "Destreza Social", text: "Me siento cómodo interactuando y expresándome en público." },
+            { id: 5, trait: "Destreza Social", text: "Suelo tomar la iniciativa para romper el hielo en reuniones sociales." },
+            { id: 6, trait: "Destreza Social", text: "Mantengo una actitud accesible y abierta ante nuevos contactos." },
+            { id: 7, trait: "Destreza Social", text: "Disfruto participar en eventos comunitarios con alta concurrencia." },
+            { id: 8, trait: "Destreza Social", text: "Me resulta sencillo entablar amistades y ampliar mi red de conocidos." },
+
+            { id: 9, trait: "Sensibilidad Social", text: "Percibo con facilidad cuando alguien a mi alrededor está pasando por una necesidad emocional o espiritual." },
+            { id: 10, trait: "Sensibilidad Social", text: "Siento un impulso genuino por consolar y acompañar a personas en vulnerabilidad o dolor." },
+            { id: 11, trait: "Sensibilidad Social", text: "Invierto tiempo de manera voluntaria en escuchar y apoyar las cargas de otros." },
+            { id: 12, trait: "Sensibilidad Social", text: "Me conmueven profundamente las necesidades sociales de la comunidad." },
+            { id: 13, trait: "Sensibilidad Social", text: "Suelo dar prioridad a atender a las personas antes que cumplir apresuradamente una tarea." },
+            { id: 14, trait: "Sensibilidad Social", text: "Escucho con atención y respeto las confidencias o problemas que otros me comparten." },
+            { id: 15, trait: "Sensibilidad Social", text: "Ofrezco ayuda práctica de forma proactiva sin esperar a que me la pidan." },
+            { id: 16, trait: "Sensibilidad Social", text: "Tengo paciencia para acompañar procesos de restauración personal en otros." },
+
+            { id: 17, trait: "Adaptabilidad", text: "Mantengo la calma y la efectividad cuando los planes cambian intempestivamente." },
+            { id: 18, trait: "Adaptabilidad", text: "Me adapto con soltura a nuevos equipos de trabajo y diferentes estilos de liderazgo." },
+            { id: 19, trait: "Adaptabilidad", text: "Respondo con ecuanimidad en entornos de alta presión o incertidumbre." },
+            { id: 20, trait: "Adaptabilidad", text: "Veo las reestructuraciones o reorganizaciones como oportunidades de aprendizaje." },
+
+            { id: 21, trait: "Adaptabilidad", text: "Acepto con tranquilidad cuando se modifica una instrucción a mitad del proceso." },
+            { id: 22, trait: "Adaptabilidad", text: "Puedo trabajar cómodamente sin necesidad de tener todo el escenario controlado." },
+            { id: 23, trait: "Adaptabilidad", text: "Ajusto mi ritmo de trabajo a las contingencias del momento sin estresarme." },
+            { id: 24, trait: "Adaptabilidad", text: "Me resulta sencillo moverme entre diferentes tareas o roles según la necesidad." },
+
+            { id: 25, trait: "Recursividad", text: "Suelo encontrar soluciones prácticas e ingeniosas frente a imprevistos o falta de recursos." },
+            { id: 26, trait: "Recursividad", text: "Prefiero proponer alternativas creativas antes que limitarme a decir que algo no se puede hacer." },
+            { id: 27, trait: "Recursividad", text: "Optimizo procesos existentes para resolver cuellos de botella con ideas simples." },
+            { id: 28, trait: "Recursividad", text: "Aprovecho al máximo las herramientas y materiales disponibles para lograr el objetivo." },
+            { id: 29, trait: "Recursividad", text: "Me apasiona encontrar formas más eficientes de realizar una labor." },
+            { id: 30, trait: "Recursividad", text: "Tengo agilidad mental para resolver problemas sobre la marcha." },
+            { id: 31, trait: "Recursividad", text: "Diseño métodos de trabajo innovadores cuando las vías tradicionales fallan." },
+            { id: 32, trait: "Recursividad", text: "Suelo aportar ideas útiles en momentos de estancamiento operativo." },
+
+            { id: 33, trait: "Persuasión", text: "Tengo facilidad para comunicar visiones, inspirar e influir en las decisiones de otros." },
+            { id: 34, trait: "Persuasión", text: "Me siento cómodo asumiendo la vocería de un grupo para motivar a alcanzar un objetivo." },
+            { id: 35, trait: "Persuasión", text: "Logro que otros se sumen activamente a iniciativas o proyectos que propongo." },
+            { id: 36, trait: "Persuasión", text: "Expreso mis argumentos con claridad, firmeza y convicción en debates o reuniones." },
+            { id: 37, trait: "Persuasión", text: "Tengo facilidad para movilizar equipos hacia una meta común." },
+            { id: 38, trait: "Persuasión", text: "Logro transmitir entusiasmo e inspirar confianza al hablar." },
+            { id: 39, trait: "Persuasión", text: "Defiendo mis ideas respetuosamente hasta lograr consensos favorables." },
+            { id: 40, trait: "Persuasión", text: "Suelo ser referente al momento de orientar decisiones en el equipo." },
+
+            { id: 41, trait: "Perseverancia", text: "Soy constante y concluyo los proyectos que inicio, aun cuando tomen tiempo o se vuelvan rutinarios." },
+            { id: 42, trait: "Perseverancia", text: "La autodisciplina y el orden metódico son características habituales en mi día a día." },
+            { id: 43, trait: "Perseverancia", text: "Mantengo mi nivel de compromiso intacto hasta ver concluidos los objetivos fijados." },
+            { id: 44, trait: "Perseverancia", text: "Supero los obstáculos u oposiciones con firmeza sin abandonar la meta." },
+            { id: 45, trait: "Perseverancia", text: "Pongo especial cuidado en los detalles para entregar trabajos bien terminados." },
+            { id: 46, trait: "Perseverancia", text: "Cumplo responsablemente mis asignaciones aun sin supervisión directa." },
+            { id: 47, trait: "Perseverancia", text: "Mantengo la constancia en el trabajo de largo alcance sin perder el impulso." },
+            { id: 48, trait: "Perseverancia", text: "Valoro la puntualidad y el cumplimiento riguroso de los compromisos." },
+
+            { id: 49, trait: "Tolerancia", text: "Manejo la frustración y escucho con paciencia puntos de vista completamente opuestos al mío." },
+            { id: 50, trait: "Tolerancia", text: "Evito reaccionar con dureza ante la ineficiencia ajena y busco la conciliación pacífica." },
+            { id: 51, trait: "Tolerancia", text: "Respeto los ritmos de aprendizaje y desarrollo de las demás personas sin juzgarlas." },
+            { id: 52, trait: "Tolerancia", text: "Mantengo el trato amable aun en discusiones intensas o acaloradas." },
+            { id: 53, trait: "Tolerancia", text: "Acepto las críticas constructivas sin tomar de forma personal los desacuerdos." },
+            { id: 54, trait: "Tolerancia", text: "Busco acuerdos donde todas las partes se sientan valoradas y escuchadas." },
+            { id: 55, trait: "Tolerancia", text: "Promuevo la armonía y la unidad en entornos con alta diversidad de criterio." },
+            { id: 56, trait: "Tolerancia", text: "Perdono errores de otros y doy nuevas oportunidades para corregir la marcha." },
+
+            { id: 57, trait: "Vitalidad", text: "Manejo un nivel de energía física y entusiasmo contagiante en jornadas de trabajo exigentes." },
+            { id: 58, trait: "Vitalidad", text: "Rindo de manera óptima en actividades dinámicas que requieran movimiento y ritmo activo." },
+            { id: 59, trait: "Vitalidad", text: "Tengo alta resistencia para afrontar eventos intensos de larga duración sin perder el dinamismo." },
+            { id: 60, trait: "Vitalidad", text: "Disfruto los desafíos que requieren un despliegue intenso de energía." },
+            { id: 61, trait: "Vitalidad", text: "Inyecto entusiasmo y dinamismo a los equipos cuando el ambiente decae." },
+            { id: 62, trait: "Vitalidad", text: "Me mantengo activo y enfocado durante jornadas extensas de servicio." },
+            { id: 63, trait: "Vitalidad", text: "Prefiero el trabajo dinámico antes que estar sentado durante periodos largos." },
+            { id: 64, trait: "Vitalidad", text: "Afronto el trabajo pesado con excelente disposición y buen ánimo." }
+        ];
+
+        let PREGUNTAS = [];
+        let currentIdx = 0;
+        let answers = {};
+        let userData = {};
+
+        window.addEventListener('DOMContentLoaded', () => {
+            checkSavedProgress();
+        });
+
+        function checkSavedProgress() {
+            const savedState = localStorage.getItem('igleco_test_progress');
+            if (savedState) {
+                document.getElementById('resume-banner').classList.remove('hidden');
             }
         }
 
-        // CATÁLOGO DE LOS 16 TIPOS DE PERSONALIDAD MBTI
-        const TIPOS_PERSONALIDAD = {
-            "ISTJ": { nombre: "Logístico", desc: "Pragmático, responsable, enfocado en el orden, la tradición y los procesos estructurados. Cumple sus deberes con alta fidelidad sin necesidad de supervisión constante." },
-            "INFJ": { nombre: "Consejero", desc: "Visionario, empático y orientado a guiar a las personas en su crecimiento espiritual y personal. Posee un discernimiento profundo y una gran sensibilidad." },
-            "INTJ": { nombre: "Arquitecto", desc: "Pensador estratégico, analítico y planificador de largo alcance. Diseña estructuras y sistemas eficientes para el desarrollo institucional." },
-            "ISFJ": { nombre: "Defensor", desc: "Leal, altruista y dedicado al cuidado de los demás. Trabaja con diligencia constante tras bambalinas creando entornos acogedores." },
-            "ISTP": { nombre: "Virtuoso", desc: "Práctico, observador y altamente recursivo en entornos operativos y técnicos. Resuelve contingencias con lógica e ingenio." },
-            "ISFP": { nombre: "Aventurero", desc: "Sensible, artístico y guiado por la expresión estética e intuitiva. Aporta calidez y creatividad sin buscar protagonismo." },
-            "INFP": { nombre: "Mediador", desc: "Idealista, compasivo y guiado por valores profundos. Excelente en el acompañamiento individual y en la restauración del alma." },
-            "INTP": { nombre: "Lógico", desc: "Analítico, curioso y enfocado en la solidez conceptual y bíblica. Examina la enseñanza y la estructura organizativa con rigor." },
-            "ESTP": { nombre: "Emprendedor", desc: "Dinámico, pragmático y orientado a la acción inmediata. Responde con agilidad en eventos masivos y contingencias en vivo." },
-            "ESFP": { nombre: "Animador", desc: "Espontáneo, entusiasta y enérgico. Conecta inmediatamente con grupos e inyecta alegría y dinamismo en la comunidad." },
-            "ENFP": { nombre: "Activista", desc: "Inspirador, creativo y motivador por naturaleza. Moviliza personas hacia causas comunitarias y evangelísticas con gran soltura." },
-            "ENTP": { nombre: "Orador", desc: "Persuasivo, innovador y articulador de ideas. Le agrada debatir, proponer estrategias audaces y desafiar el statu quo." },
-            "ESTJ": { nombre: "Ejecutivo", desc: "Organizador nato, estructurado y orientado a resultados medibles. Excelente en la logística, administración y coordinación de equipos." },
-            "ESFJ": { nombre: "Cónsul", desc: "Atento, colaborativo y centrado en la armonía social. Se destaca en la recepción, la hospitalidad y la cohesión de la membresía." },
-            "ENFJ": { nombre: "Donador", desc: "Líder inspirador, mentor compasivo y facilitador del potencial de otros. Guía equipos con empatía y firmeza espiritual." },
-            "ENTJ": { nombre: "Comandante", desc: "Líder estratégico, decidido y con visión global. Asume la dirección con autoridad, fijando metas claras y movilizando recursos." }
-        };
-
-        const DEFINICIONES_AREAS = {
-            "Acompañamiento": "Cuidado pastoral y soporte emocional primario a personas o familias en situaciones de vulnerabilidad o transición.",
-            "Adoración": "Dirección y ejecución del ministerio de música e instrumentación en las reuniones para facilitar la conexión espiritual.",
-            "Artístico": "Expresión creativa mediante artes escénicas, danza, teatro y composición visual para transmitir mensajes bíblicos.",
-            "Producción": "Gestión técnica y operativa del soporte logístico de audio, iluminación y transmisión en vivo.",
-            "Ayudas Administrativas": "Soporte organizativo en gestión de archivos, bases de datos y logística de suministros.",
-            "Ayudas Profesionales": "Orientación especializada en áreas técnicas (derecho, contabilidad, psicología) según necesidades.",
-            "Conexión": "Acogida y primer contacto con visitantes para su integración fluida a los grupos de la iglesia.",
-            "Contact Center": "Atención remota telefónica o virtual para responder inquietudes y registrar solicitudes.",
-            "Decoración": "Ambientación y diseño espacial de los diferentes entornos del templo o eventos especiales.",
-            "Discipulado": "Formación, mentoría y guía en el crecimiento espiritual mediante el estudio bíblico grupal.",
-            "CFV - Kids": "Formación espiritual y pedagógica dirigida a la infancia temprana y escolar.",
-            "Evangelismo": "Proyección hacia la comunidad externa mediante brigadas y actividades de alcance social.",
-            "Hospitalidad": "Atención a invitados especiales y preparación de espacios de convivencia y alimentos.",
-            "Maquillaje": "Caracterización y arreglo estético del personal de producción visual y cámaras.",
-            "Monitores Escuelas": "Apoyo logístico, control de asistencia y dinamización en las aulas durante talleres.",
-            "Oración": "Cobertura de intercesión continua por las peticiones de la comunidad y necesidades pastorales.",
-            "PowerKids": "Actividades de alto impacto y animación dinámicas enfocadas en preadolescentes y niños.",
-            "Seguridad": "Prevención, control de accesos y resguardo de la integridad física en las instalaciones.",
-            "Servidores": "Logística interna y protocolo durante los servicios: acomodación y guía al asistente.",
-            "Traductores": "Interpretación simultánea en lengua de señas u otros idiomas durante las reuniones.",
-            "Comunicaciones y Redes": "Diseño gráfico, fotografía y gestión de medios digitales/redes sociales.",
-            "Medios e Infraestructura": "Mantenimiento físico, montaje de escenarios y gestión de espacios de reunión."
-        };
-
-        // BANCO DE OBSERVACIONES CUALITATIVAS PROFUNDAS POR RASGO
-        const OBSERVACIONES = {
-            "Destreza Social": {
-                alto: "Muestra fluidez superior y soltura espontánea para iniciar vínculos e integrarse a diversos entornos. Genera confianza inmediata y facilita la cohesión en grupos heterogéneos.\n• Entorno Ideal: Vocería, recepción de nuevos asistentes, relaciones públicas o consolidación comunitaria.\n• Orientación Pastoral: Asignar responsabilidades de conexión e integración, velando por que mantenga la profundización en la relación tras el primer contacto.",
-                medio: "Demuestra competencias comunicativas sólidas y funcionales. Se relaciona con efectividad en entornos conocidos y se adapta paulatinamente a nuevos grupos con adecuada diplomacia.\n• Entorno Ideal: Integración en equipos ministeriales permanentes, labores colaborativas y atención en mesa.\n• Orientación Pastoral: Brindar espacios donde pueda ampliar progresivamente su red de contactos y asumir roles moderados de acogida.",
-                bajo: "Prefiere interacciones selectivas, círculos pequeños o roles enfocados en tareas específicas de baja exposición pública. Valora la privacidad y las conversaciones de contenido estructurado.\n• Entorno Ideal: Trabajo analítico, soporte operativo interno, logística técnica o tareas de concentración individual.\n• Orientación Pastoral: Respetar su ritmo social, asignando funciones claras sin forzar escenarios de sobreexposición mediática o pública."
-            },
-            "Sensibilidad Social": {
-                alto: "Evidencia alta empatía, ternura espiritual y discernimiento activo ante el dolor o necesidad ajena. Percibe detalles emocionales imperceptibles para otros y actúa con compasión oportuna.\n• Entorno Ideal: Consejería, consolación, cuidado de enfermos, visitas pastorales o intercesión de soporte.\n• Orientación Pastoral: Enseñar el establecimiento de límites saludables para proteger su estabilidad emocional y prevenir el agotamiento ministerial.",
-                medio: "Equilibra la calidez humana y la compasión con la objetividad operativa. Demuestra interés real por el bienestar del prójimo sin perder el enfoque en las metas encomendadas.\n• Entorno Ideal: Acompañamiento grupal, mentoría de alumnos, logística de atención a invitados y servidores.\n• Orientación Pastoral: Fomentar su participación en espacios de escucha activa donde su criterio equilibrado aporte sabiduría.",
-                bajo: "Presenta una perspectiva predominantemente lógica, pragmática y centrada en resultados medibles. Puede percibir las demandas emocionales complejas como factores distractores de la tarea.\n• Entorno Ideal: Administración, control de procesos, auditoría interna, seguridad o infraestructura física.\n• Orientación Pastoral: Brindar pautas y protocolos claros sobre la importancia del cuidado humano en los procesos administrativos que lidera."
-            },
-            "Adaptabilidad": {
-                alto: "Destaca por su ecuanimidad y resiliencia ante contingencias, imprevistos o reestructuraciones de último momento. Conserva la calma y reorganiza recursos con naturalidad sin perder la efectividad.\n• Entorno Ideal: Coordinación de eventos en vivo, producción de servicios, resolución de crisis o misiones de avanzada.\n• Orientación Pastoral: Aprovechar su flexibilidad para gestionar imprevistos operacionales transmitiendo paz al equipo.",
-                medio: "Responde con flexibilidad y madurez ante cambios organizacionales, siempre que cuente con explicaciones de contexto razonables o un tiempo mínimo de asimilación.\n• Entorno Ideal: Equipos operativos estables, programas continuos con adaptaciones estacionales y soporte docente.\n• Orientación Pastoral: Mantener una comunicación transparente sobre cambios futuros para maximizar su compromiso y rendimiento.",
-                bajo: "Requiere estabilidad, previsibilidad y procesos claramente definidos. Experimenta incomodidad frente a la improvisación o alteraciones abruptas en las reglas acordadas.\n• Entorno Ideal: Procesos estandarizados, manuales de procedimiento, archivo, planificación previa e inventarios.\n• Orientación Pastoral: Entregar instrucciones precisas, cronogramas detallados y evitar modificaciones intempestivas en sus asignaciones."
-            },
-            "Recursividad": {
-                alto: "Sobresale por su mentalidad innovadora e ingenio práctico. Encuentra alternativas eficientes frente a bloqueos complejos o limitaciones severas de recursos físicos o presupuestales.\n• Entorno Ideal: Innovación de proyectos, diseño de estrategias, arte, resolución de cuellos de botella y arranque de obras.\n• Orientación Pastoral: Canalizar su creatividad dentro del marco doctrinal e institutional, validando previamente sus propuestas antes de ejecutarlas.",
-                medio: "Demuestra capacidad de resolver inconvenientes habituales de forma práctica y efectiva. Utiliza con criterio los recursos asignados sin atascarse ante imprevistos menores.\n• Entorno Ideal: Mantenimiento operativo, coordinación logística intermedia y facilitación de recursos en talleres.\n• Orientación Pastoral: Estimular su autoconfianza para que plantee soluciones propias antes de escalar dudas sencillas a la directiva.",
-                bajo: "Prefiere apegarse a instructivos, métodos validados y directrices preestablecidas. Busca la confirmación de la autoridad antes de intentar vías no probadas.\n• Entorno Ideal: Tareas repetitivas de alta precisión, ejecución de guiones técnicos, soporte de seguridad y control.\n• Orientación Pastoral: Suministrar procedimientos paso a paso y brindar acompañamiento cercano cuando enfrente escenarios novedosos."
-            },
-            "Persuasión": {
-                alto: "Posee liderazgo inspirador, elocuencia y soltura argumentativa para motivar, movilizar y transformar posturas en grupos. Comunica la visión con entusiasmo contagioso.\n• Entorno Ideal: Capacitación, predicación, dirección de equipos, reclutamiento de voluntarios y campañas de alcance.\n• Orientación Pastoral: Formar en humildad y escucha activa para asegurar que su capacidad de influencia sirva a la edificación colectiva.",
-                medio: "Comunica ideas con claridad, coherencia y convicción personal. Logra influir positivamente en su entorno cercano desde el testimonio, la lógica y el trato respetuoso.\n• Entorno Ideal: Liderazgo de pequeñas células, enseñanza grupal, coordinación de comités específicos y mentoría.\n• Orientación Pastoral: Impulsar su desarrollo expositivo asignándole la vocería de proyectos progresivamente más amplios.",
-                bajo: "Siente mayor comodidad en roles de apoyo ejecutivo, trabajo silencioso de soporte o ejecución metodológica sin exposición directiva o discursiva pública.\n• Entorno Ideal: Soporte tras bambalinas, edición, montaje, logística interna, custodia y mantenimiento.\n• Orientación Pastoral: Valorar públicamente su fiel labor de soporte sin presionarlo para asumir roles expositivos que generen ansiedad."
-            },
-            "Perseverancia": {
-                alto: "Evidencia tenacidad, disciplina inquebrantable y alto nivel de compromiso. Mantiene el foco en metas de largo alcance superando la monotonía o la resistencia del entorno.\n• Entorno Ideal: Proyectos estratégicos de larga duración, construcción de sedes, consolidación de procesos y discipulado continuo.\n• Orientación Pastoral: Monitorear sus cargas de trabajo para evitar el sobreagotamiento derivado de su propia autoexigencia.",
-                medio: "Mantiene constancia y responsabilidad continua en sus responsabilidades asignadas. Concluye de manera confiable las metas a mediano plazo en los tiempos previstos.\n• Entorno Ideal: Programas trimestrales o semestrales, docencia periódica, turnos rotativos de servicio y gestión de aulas.\n• Orientación Pastoral: Establecer hitos de verificación parciales que mantengan su dinamismo a lo largo de ciclos extendidos.",
-                bajo: "Fluctúa en su nivel de entrega cuando las tareas se vuelven rutinarias o exigen plazos largos. Rinde mejor con incentivos de corto alcance y tareas dinámicas de rápida resolución.\n• Entorno Ideal: Tareas por objetivos inmediatos, eventos de un solo día, comisiones temporales de trabajo y brigadas puntuales.\n• Orientación Pastoral: Dividir los proyectos grandes en metas semanales y brindar mentoría frecuente para fortalecer la autodisciplina."
-            },
-            "Tolerancia": {
-                alto: "Manifiesta notable paciencia, serenidad y apertura para escuchar y conciliar puntos de vista diversos o encontrados. Promueve la cultura de paz y armonía en contextos complejos.\n• Entorno Ideal: Mediación de conflictos, atención a personas difíciles, recepción de quejas/sugerencias y arbitraje.\n• Orientación Pastoral: Guardar que su elevada transigencia no comprometa la firmeza necesaria al corregir conductas o aplicar normas.",
-                medio: "Mantiene un trato respetuoso, educado y tolerante frente a las diferencias individuales. Colabora en armonía y tolera adecuadamente la frustración laboral diaria.\n• Entorno Ideal: Trabajo en equipos multidisciplinarios, comités de servicio comunitario y atención al público general.\n• Orientación Pastoral: Reforzar sus habilidades de comunicación asertiva para que exprese sus desacuerdos constructivamente.",
-                bajo: "Presenta posturas firmes, rígidas o altamente normativas. Valora el cumplimiento estricto del deber y puede mostrar impaciencia ante la ineficiencia o el incumplimiento ajeno.\n• Entorno Ideal: Aplicación de reglamentos, auditoría de estándares de calidad, seguridad física e inspección operativa.\n• Orientación Pastoral: Disponerlo en entornos donde primen la norma y el orden, aconsejando gracia y templanza en su trato interpersonal."
-            },
-            "Vitalidad": {
-                alto: "Refleja energía contagiante, vigor físico y dinamismo para responder en escenarios de ritmo acelerado y alta exigencia operativa. Transmite entusiasmo al equipo.\n• Entorno Ideal: Ministerio juvenil, recreación infantil (PowerKids/Kids), montajes pesados, campamentos y evangelismo masivo.\n• Orientación Pastoral: Encauzar su abundante energía hacia metas organizadas para evitar la dispersión o el cansancio prematuro.",
-                medio: "Despliega un ritmo de trabajo activo, regular y sostenido. Mantiene un equilibrio saludable entre el esfuerzo físico y la pausa necesaria para el rendimiento constante.\n• Entorno Ideal: Protocolo de servicio regular, logística de reuniones, monitoreo de clases y trabajo de oficina.\n• Orientación Pastoral: Proporcionar roles con exigencia física razonable que le permitan mantener un desempeño constante sin desgaste.",
-                bajo: "Sobresale en labores reflexivas, analíticas, de concentración o de baja demanda física. Aporta calma, profundidad de análisis y meticulosidad al proceso.\n• Entorno Ideal: Intercesión, revisión de documentos, diseño, edición de textos, llamadas de seguimiento y planeación estratégica.\n• Orientación Pastoral: Asignarle entornos de trabajo cómodos y pausados donde su capacidad de concentración sea el factor diferenciador."
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
             }
-        };
-
-        async function loadRecords() {
-            const status = document.getElementById('status-msg');
-            status.style.display = "block";
-            status.className = "text-xs text-slate-500 font-medium";
-            status.innerText = "Conectando con Google Sheets...";
-
-            try {
-                const response = await fetch(GOOGLE_SCRIPT_URL, { method: 'GET', redirect: 'follow' });
-                if (!response.ok) throw new Error("Error en la respuesta del servidor");
-                
-                const data = await response.json();
-                dbRecords = Array.isArray(data) ? data : (data.records || []);
-                
-                status.className = "text-xs text-emerald-600 font-medium";
-                status.innerText = `Sincronización exitosa: ${dbRecords.length} registro(s) disponible(s).`;
-            } catch (e) {
-                status.className = "text-xs text-red-500 font-medium";
-                status.innerText = "Error al conectar con Google Sheets.";
-            }
+            return arr;
         }
 
-        function searchRecords() {
-            const query = document.getElementById('search-input').value.trim().toLowerCase();
-            const resultsList = document.getElementById('results-list');
-            const container = document.getElementById('results-container');
-            resultsList.innerHTML = '';
+        function startTest() {
+            const nombres = document.getElementById('reg-nombres').value.trim();
+            const apellidos = document.getElementById('reg-apellidos').value.trim();
+            const id = document.getElementById('reg-id').value.trim();
+            const edad = document.getElementById('reg-edad').value.trim();
+            const correo = document.getElementById('reg-correo').value.trim();
 
-            if (!query) {
-                alert("Por favor ingrese un término de búsqueda.");
+            if (!nombres || !apellidos || !id || !edad || !correo) {
+                alert("Por favor complete todos los campos obligatorios del registro.");
                 return;
             }
 
-            const matches = dbRecords.filter(r => {
-                const nombres = (r.nombres || r.Nombres || '').toLowerCase();
-                const apellidos = (r.apellidos || r.Apellidos || '').toLowerCase();
-                const fullName = `${nombres} ${apellidos}`;
-                const id = String(r.identificacion || r.Identificacion || '').toLowerCase();
-                
-                return fullName.includes(query) || id.includes(query);
+            userData = { nombres, apellidos, identificacion: id, edad, correo };
+            PREGUNTAS = shuffleArray(PREGUNTAS_BASE);
+            currentIdx = 0;
+            answers = {};
+
+            saveStateToLocalStorage();
+            launchTestView();
+        }
+
+        function resumeSavedTest() {
+            const savedState = localStorage.getItem('igleco_test_progress');
+            if (savedState) {
+                const parsed = JSON.parse(savedState);
+                userData = parsed.userData;
+                PREGUNTAS = parsed.PREGUNTAS;
+                currentIdx = parsed.currentIdx;
+                answers = parsed.answers;
+
+                launchTestView();
+            }
+        }
+
+        function launchTestView() {
+            document.getElementById('step-registration').classList.add('hidden');
+            document.getElementById('step-questions').classList.remove('hidden');
+            document.getElementById('progress-bar-container').classList.remove('hidden');
+            document.getElementById('progress-text').classList.remove('hidden');
+
+            renderQuestion();
+        }
+
+        function saveStateToLocalStorage() {
+            const state = { userData, PREGUNTAS, currentIdx, answers };
+            localStorage.setItem('igleco_test_progress', JSON.stringify(state));
+        }
+
+        function renderQuestion() {
+            const q = PREGUNTAS[currentIdx];
+            document.getElementById('question-badge').innerText = `Pregunta ${currentIdx + 1} de ${PREGUNTAS.length}`;
+            document.getElementById('question-text').innerText = q.text;
+
+            const pct = Math.round(((currentIdx + 1) / PREGUNTAS.length) * 100);
+            document.getElementById('progress-bar').style.width = `${pct}%`;
+            document.getElementById('progress-text').innerText = `${currentIdx + 1} / ${PREGUNTAS.length}`;
+
+            const radios = document.getElementsByName('likert-val');
+            radios.forEach(r => r.checked = false);
+
+            if (answers[q.id]) {
+                const selectedRadio = document.querySelector(`input[name="likert-val"][value="${answers[q.id]}"]`);
+                if (selectedRadio) selectedRadio.checked = true;
+            }
+
+            document.getElementById('btn-prev').style.visibility = currentIdx === 0 ? 'hidden' : 'visible';
+            document.getElementById('btn-next').innerText = currentIdx === PREGUNTAS.length - 1 ? 'Finalizar Evaluación ✓' : 'Siguiente →';
+        }
+
+        function nextQuestion() {
+            const q = PREGUNTAS[currentIdx];
+            const selectedRadio = document.querySelector('input[name="likert-val"]:checked');
+
+            if (!selectedRadio) {
+                alert("Por favor seleccione una opción para continuar.");
+                return;
+            }
+
+            answers[q.id] = parseInt(selectedRadio.value);
+            saveStateToLocalStorage();
+
+            if (currentIdx < PREGUNTAS.length - 1) {
+                currentIdx++;
+                renderQuestion();
+            } else {
+                submitTest();
+            }
+        }
+
+        function prevQuestion() {
+            if (currentIdx > 0) {
+                currentIdx--;
+                renderQuestion();
+            }
+        }
+
+        function submitTest() {
+            const traitScores = {
+                "Destreza Social": 0, "Sensibilidad Social": 0, "Adaptabilidad": 0, "Recursividad": 0,
+                "Persuasión": 0, "Perseverancia": 0, "Tolerancia": 0, "Vitalidad": 0
+            };
+
+            PREGUNTAS_BASE.forEach(q => {
+                const val = answers[q.id] || 3;
+                traitScores[q.trait] += val;
             });
 
-            if (matches.length === 0) {
-                resultsList.innerHTML = '<p class="text-sm text-slate-500 py-4 text-center">No se encontraron evaluaciones registradas con ese criterio.</p>';
-            } else {
-                matches.forEach((r) => {
-                    const idx = dbRecords.indexOf(r);
-                    const nombres = r.nombres || r.Nombres || '';
-                    const apellidos = r.apellidos || r.Apellidos || '';
-                    const id = r.identificacion || r.Identificacion || 'N/A';
-                    const edad = r.edad || r.Edad || 'N/A';
-                    const correo = r.correo || r.Correo || 'N/A';
-                    const top1 = r.top1 || r['Top 1 Area'] || 'N/A';
+            const perfilPct = {};
+            Object.keys(traitScores).forEach(t => {
+                const raw = traitScores[t];
+                perfilPct[t] = Math.round(((raw - 8) / 32) * 100);
+            });
 
-                    resultsList.innerHTML += `
-                        <div class="p-4 border border-slate-200 rounded-xl bg-slate-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                            <div>
-                                <h4 class="font-bold text-slate-900">${nombres} ${apellidos}</h4>
-                                <p class="text-xs text-slate-500 mt-0.5">ID: ${id} | Edad: ${edad} | Correo: ${correo}</p>
-                                <p class="text-xs font-semibold text-emerald-700 mt-1">Sugerencia Principal: ${top1}</p>
-                            </div>
-                            <div class="flex gap-2 w-full md:w-auto">
-                                <button onclick="viewInScreen(${idx})" class="flex-1 md:flex-none px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-lg border border-slate-300 transition cursor-pointer">
-                                    👁️ Ver en Pantalla
-                                </button>
-                                <button onclick="generatePDFForRecord(${idx})" class="flex-1 md:flex-none px-4 py-2 bg-black hover:bg-slate-800 text-white text-xs font-semibold rounded-lg transition cursor-pointer">
-                                    📄 Descargar PDF
-                                </button>
-                            </div>
-                        </div>
-                    `;
+            const topAreas = calculateTopAreas(perfilPct);
+
+            const payload = {
+                nombres: userData.nombres,
+                apellidos: userData.apellidos,
+                identificacion: userData.identificacion,
+                edad: userData.edad,
+                correo: userData.correo,
+                top1: `${topAreas[0].name} (${topAreas[0].score}%)`,
+                top2: `${topAreas[1].name} (${topAreas[1].score}%)`,
+                top3: `${topAreas[2].name} (${topAreas[2].score}%)`,
+                perfil: perfilPct
+            };
+
+            document.getElementById('step-questions').classList.add('hidden');
+            document.getElementById('progress-bar-container').classList.add('hidden');
+            document.getElementById('step-completion').classList.remove('hidden');
+
+            localStorage.removeItem('igleco_test_progress');
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).catch(e => console.error("Error al registrar en Sheets:", e));
+        }
+
+        function calculateTopAreas(perfil) {
+            const matrix = {
+                "Acompañamiento": { "Sensibilidad Social": 0.4, "Tolerancia": 0.3, "Destreza Social": 0.3 },
+                "Adoración": { "Vitalidad": 0.4, "Perseverancia": 0.3, "Adaptabilidad": 0.3 },
+                "Artístico": { "Recursividad": 0.4, "Vitalidad": 0.3, "Destreza Social": 0.3 },
+                "Producción": { "Perseverancia": 0.4, "Adaptabilidad": 0.3, "Recursividad": 0.3 },
+                "Ayudas Administrativas": { "Perseverancia": 0.5, "Adaptabilidad": 0.3, "Tolerancia": 0.2 },
+                "Ayudas Profesionales": { "Recursividad": 0.4, "Perseverancia": 0.3, "Sensibilidad Social": 0.3 },
+                "Conexión": { "Destreza Social": 0.5, "Sensibilidad Social": 0.3, "Vitalidad": 0.2 },
+                "Contact Center": { "Sensibilidad Social": 0.4, "Tolerancia": 0.3, "Destreza Social": 0.3 },
+                "Decoración": { "Recursividad": 0.5, "Perseverancia": 0.3, "Vitalidad": 0.2 },
+                "Discipulado": { "Persuasión": 0.4, "Sensibilidad Social": 0.3, "Perseverancia": 0.3 },
+                "CFV - Kids": { "Vitalidad": 0.4, "Sensibilidad Social": 0.3, "Recursividad": 0.3 },
+                "Evangelismo": { "Destreza Social": 0.4, "Persuasión": 0.4, "Vitalidad": 0.2 },
+                "Hospitalidad": { "Sensibilidad Social": 0.4, "Destreza Social": 0.3, "Tolerancia": 0.3 },
+                "Maquillaje": { "Recursividad": 0.4, "Perseverancia": 0.3, "Tolerancia": 0.3 },
+                "Monitores Escuelas": { "Perseverancia": 0.4, "Adaptabilidad": 0.3, "Tolerancia": 0.3 },
+                "Oración": { "Sensibilidad Social": 0.4, "Perseverancia": 0.4, "Tolerancia": 0.2 },
+                "PowerKids": { "Vitalidad": 0.5, "Recursividad": 0.3, "Destreza Social": 0.2 },
+                "Seguridad": { "Adaptabilidad": 0.4, "Tolerancia": 0.3, "Perseverancia": 0.3 },
+                "Servidores": { "Tolerancia": 0.4, "Destreza Social": 0.3, "Vitalidad": 0.3 },
+                "Traductores": { "Perseverancia": 0.4, "Adaptabilidad": 0.3, "Recursividad": 0.3 },
+                "Comunicaciones y Redes": { "Recursividad": 0.4, "Persuasión": 0.3, "Vitalidad": 0.3 },
+                "Medios e Infraestructura": { "Adaptabilidad": 0.4, "Perseverancia": 0.4, "Recursividad": 0.2 }
+            };
+
+            const scores = [];
+            Object.keys(matrix).forEach(area => {
+                const reqs = matrix[area];
+                let total = 0;
+                Object.keys(reqs).forEach(trait => {
+                    total += (perfil[trait] || 50) * reqs[trait];
                 });
-            }
-            container.style.display = "block";
-        }
-
-        // ALGORITMO DE DEDUCCIÓN DE PERSONALIDAD 16 TIPOS (MBTI)
-        function derivePersonalityType(perfil) {
-            const des = perfil["Destreza Social"] || 50;
-            const perS = perfil["Persuasión"] || 50;
-            const E = (des + perS) / 2 >= 55 ? 'E' : 'I';
-
-            const rec = perfil["Recursividad"] || 50;
-            const vit = perfil["Vitalidad"] || 50;
-            const N = (rec + vit) / 2 >= 55 ? 'N' : 'S';
-
-            const sen = perfil["Sensibilidad Social"] || 50;
-            const tol = perfil["Tolerancia"] || 50;
-            const F = (sen + tol) / 2 >= 55 ? 'F' : 'T';
-
-            const per = perfil["Perseverancia"] || 50;
-            const ada = perfil["Adaptabilidad"] || 50;
-            const J = per >= ada ? 'J' : 'P';
-
-            const code = `${E}${N}${F}${J}`;
-            const info = TIPOS_PERSONALIDAD[code] || { nombre: "Perfil Equilibrado", desc: "Demuestra una combinación versátil de rasgos analíticos y sociales." };
-
-            return { code, nombre: info.nombre, desc: info.desc };
-        }
-
-        // DEDUCCIÓN DE ORIENTACIÓN PRÁCTICA AL SERVICIO EN LA IGLESIA
-        function deriveServiceOrientation(perfil) {
-            const des = perfil["Destreza Social"] || 50;
-            const sen = perfil["Sensibilidad Social"] || 50;
-            const perS = perfil["Persuasión"] || 50;
-            const per = perfil["Perseverancia"] || 50;
-            const rec = perfil["Recursividad"] || 50;
-
-            let orientacion = "";
-            let detalles = "";
-
-            if ((des + sen) / 2 >= 65) {
-                orientacion = "Orientación de Servicio Directo a Personas (Cuidado y Recepción)";
-                detalles = "Perfil ideal para estar en contacto permanente con los asistentes, brindando acogida, consuelo, apoyo emocional y acompañamiento en grupos.";
-            } else if (per >= 65 && des < 55) {
-                orientacion = "Orientación a Labores Administrativas y Metodológicas (Estructura Interna)";
-                detalles = "Excelente para el soporte en el orden operativo tras bambalinas, sistematización de datos, archivo, control logístico e inventarios.";
-            } else if (rec >= 65) {
-                orientacion = "Orientación Creativa, Técnica y de Producción (Soporte Operativo)";
-                detalles = "Destaca en entornos dinámicos que demandan solución práctica de problemas, montaje, arte, medios de comunicación o infraestructura física.";
-            } else if (perS >= 65) {
-                orientacion = "Orientación de Liderazgo, Vocería y Movilización (Dirección de Equipos)";
-                detalles = "Facilidad para guiar proyectos, capacitar voluntarios, liderar comités o motivar hacia metas grupales con comunicación persuasiva.";
-            } else {
-                orientacion = "Perfil Operativo Polivalente / Soporte Silencioso de Bajo Perfil";
-                detalles = "Prefiere ejecutar instrucciones claras dentro de rutinas estables sin requerir alta exposición pública, actuando como un pilar confiable de apoyo.";
-            }
-
-            return { orientacion, detalles };
-        }
-
-        // NARRATIVA CUALITATIVA GENERAL POR EJES
-        function generateAxisNarrative(perfil) {
-            const rec = perfil["Recursividad"] || 50;
-            const per = perfil["Perseverancia"] || 50;
-            const vit = perfil["Vitalidad"] || 50;
-            const avgProd = (rec + per + vit) / 3;
-
-            let prodDesc = "";
-            if (avgProd >= 70) {
-                prodDesc = "En cuanto a la Ejecución de Tareas y Productividad, el evaluado refleja un dinamismo operativo sobresaliente, caracterizado por una marcada agilidad para resolver imprevistos y sostener la disciplina en entregables exigentes.";
-            } else if (avgProd >= 50) {
-                prodDesc = "En el ámbito de la Ejecución de Tareas y Productividad, demuestra un desempeño constante, metódico y funcional dentro de procesos bien estructurados y rutinas estables.";
-            } else {
-                prodDesc = "Respecto a la Ejecución de Tareas y Productividad, muestra inclinación hacia tareas de ritmo pausado y secuencial que requieren acompañamiento paso a paso e instrucciones claras.";
-            }
-
-            const ada = perfil["Adaptabilidad"] || 50;
-            const tol = perfil["Tolerancia"] || 50;
-            const avgEmo = (ada + tol) / 2;
-
-            let emoDesc = "";
-            if (avgEmo >= 70) {
-                emoDesc = "En la dimensión del Manejo Emocional, evidencia alta madurez, templanza y autocontrol ante escenarios de presión o imprevistos, actuando como un agente de serenidad en el grupo.";
-            } else if (avgEmo >= 50) {
-                emoDesc = "En cuanto al Manejo Emocional, conserva una estabilidad adecuada frente a contingencias habituales, requiriendo un margen normal de adaptación ante cambios organizacionales.";
-            } else {
-                emoDesc = "En el área del Manejo Emocional, refleja un alto apego a la norma y a las reglas establecidas, pudiendo experimentar incomprensión ante la improvisación o alteraciones imprevistas.";
-            }
-
-            const des = perfil["Destreza Social"] || 50;
-            const sen = perfil["Sensibilidad Social"] || 50;
-            const perS = perfil["Persuasión"] || 50;
-            const avgRel = (des + sen + perS) / 3;
-
-            let relDesc = "";
-            if (avgRel >= 70) {
-                relDesc = "En lo referente a las Relaciones Interpersonales, se distingue por su empatía activa, soltura comunicativa y capacidad natural para conectar de forma cercana con diversos tipos de personas.";
-            } else if (avgRel >= 50) {
-                relDesc = "En la esfera de las Relaciones Interpersonales, interactúa con educación, respeto y buen trato, adaptándose favorablemente al trabajo colaborativo en equipos formales.";
-            } else {
-                relDesc = "En lo relativo a Relaciones Interpersonales, mantiene un estilo cauto y reservado, priorizando círculos de confianza reducidos y enfocado en la tarea por encima de la socialización.";
-            }
-
-            return { prodDesc, emoDesc, relDesc };
-        }
-
-        // ANÁLISIS GENERAL DE FORTALEZAS Y OPORTUNIDADES
-        function generateGeneralSWOT(perfil) {
-            const sorted = Object.keys(perfil).sort((a, b) => perfil[b] - perfil[a]);
-            const topTraits = sorted.slice(0, 3);
-            const lowTraits = sorted.slice(-2);
-
-            const fortalezas = `Demuestra una marcada solvencia en ${topTraits.join(', ')}, lo que le permite aportar valor inmediato en la resolución de problemas, el compromiso con el deber y la colaboración comunitaria.`;
-            const oportunidades = `Sus principales áreas de crecimiento radican en fortalecer ${lowTraits.join(' y ')}, gestionando la autorregulación para mantener el equilibrio entre el rendimiento y la flexibilidad.`;
-
-            return { fortalezas, oportunidades };
-        }
-
-        // MOSTRAR RESULTADOS EN PANTALLA (MODAL COMPLETO)
-        function viewInScreen(index) {
-            const record = dbRecords[index];
-            let perfil = {};
-            try {
-                const rawPerfil = record.perfil || record['Perfil Resumen'];
-                perfil = typeof rawPerfil === 'string' ? JSON.parse(rawPerfil) : rawPerfil;
-            } catch (e) { perfil = {}; }
-
-            const nombres = record.nombres || record.Nombres || '';
-            const apellidos = record.apellidos || record.Apellidos || '';
-            const id = record.identificacion || record.Identificacion || 'N/A';
-            const edad = record.edad || record.Edad || 'N/A';
-            const correo = record.correo || record.Correo || 'N/A';
-
-            const rawTop1 = record.top1 || record['Top 1 Area'] || 'N/A';
-            const rawTop2 = record.top2 || record['Top 2 Area'] || 'N/A';
-            const rawTop3 = record.top3 || record['Top 3 Area'] || 'N/A';
-
-            const pType = derivePersonalityType(perfil);
-            const sOrient = deriveServiceOrientation(perfil);
-            const axisNav = generateAxisNarrative(perfil);
-            const swot = generateGeneralSWOT(perfil);
-
-            // RENDERIZADO DE LOS 8 RASGOS DETALLADOS PARA EL MODAL EN PANTALLA
-            const sortedTraits = Object.keys(perfil).sort((a, b) => perfil[b] - perfil[a]);
-            let traitsCardsHTML = "";
-            sortedTraits.forEach(trait => {
-                const score = perfil[trait] || 50;
-                let badge = "DESARROLLADO";
-                let badgeColor = "bg-blue-100 text-blue-800 border-blue-200";
-                let levelKey = "medio";
-
-                if (score >= 75) {
-                    badge = "SOBRESALIENTE";
-                    badgeColor = "bg-emerald-100 text-emerald-800 border-emerald-200";
-                    levelKey = "alto";
-                } else if (score < 50) {
-                    badge = "EN DESARROLLO";
-                    badgeColor = "bg-amber-100 text-amber-800 border-amber-200";
-                    levelKey = "bajo";
-                }
-
-                const obs = OBSERVACIONES[trait] ? OBSERVACIONES[trait][levelKey] : "Desempeño adecuado.";
-
-                traitsCardsHTML += `
-                    <div class="p-4 border border-slate-200 rounded-xl bg-slate-50/50 space-y-2">
-                        <div class="flex justify-between items-center">
-                            <span class="font-bold text-slate-900 text-sm">${trait}</span>
-                            <div class="flex items-center gap-2">
-                                <span class="text-xs font-bold text-slate-700 font-mono">${score}%</span>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeColor}">${badge}</span>
-                            </div>
-                        </div>
-                        <p class="text-xs text-slate-600 whitespace-pre-line leading-relaxed">${obs}</p>
-                    </div>
-                `;
+                scores.push({ name: area, score: Math.round(total) });
             });
 
-            const content = document.getElementById('modal-content');
-            content.innerHTML = `
-                <div class="border-b border-slate-200 pb-4">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Informe Cualitativo Completo</span>
-                    <h2 class="text-2xl font-black text-slate-900">${nombres} ${apellidos}</h2>
-                    <p class="text-xs text-slate-500 mt-1">ID: ${id} | Edad: ${edad} años | Correo: ${correo}</p>
-                </div>
-
-                <!-- TIPO DE PERSONALIDAD -->
-                <div class="bg-slate-900 text-white p-5 rounded-xl space-y-2">
-                    <span class="text-xs font-bold uppercase tracking-wider text-amber-400">Arquetipo de Personalidad Sugerido</span>
-                    <h3 class="text-xl font-bold">${pType.code} - ${pType.nombre}</h3>
-                    <p class="text-xs text-slate-300 leading-relaxed">${pType.desc}</p>
-                </div>
-
-                <!-- ÁREAS RECOMENDADAS -->
-                <div class="space-y-3">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-700">Áreas de Servicio Sugeridas</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                        <div class="p-3 border border-slate-200 rounded-lg bg-emerald-50/50">
-                            <span class="font-bold text-emerald-800">1. ${rawTop1}</span>
-                        </div>
-                        <div class="p-3 border border-slate-200 rounded-lg bg-slate-50">
-                            <span class="font-bold text-slate-700">2. ${rawTop2}</span>
-                        </div>
-                        <div class="p-3 border border-slate-200 rounded-lg bg-slate-50">
-                            <span class="font-bold text-slate-700">3. ${rawTop3}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- DIAGNÓSTICO CUALITATIVO PROFUNDO POR CATEGORÍA (8 RASGOS) -->
-                <div class="space-y-3">
-                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800">Diagnóstico Cualitativo Profundo por Categoría</h3>
-                    <div class="space-y-3">
-                        ${traitsCardsHTML}
-                    </div>
-                </div>
-
-                <!-- ORIENTACIÓN DE SERVICIO PRÁCTICO -->
-                <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 space-y-2 text-xs">
-                    <h3 class="font-bold text-blue-900 uppercase tracking-wider">Orientación de Servicio Práctico en la Iglesia</h3>
-                    <p class="font-bold text-slate-800">${sOrient.orientacion}</p>
-                    <p class="text-slate-600 leading-relaxed">${sOrient.detalles}</p>
-                </div>
-
-                <!-- NARRATIVA POR EJES CONDUCTUALES -->
-                <div class="space-y-3 text-xs">
-                    <h3 class="font-bold uppercase tracking-wider text-slate-700">Descripción Cualitativa por Ejes Conductuales</h3>
-                    <div class="p-4 border border-slate-200 rounded-xl space-y-2 bg-slate-50">
-                        <p>• <strong>Ejecución y Productividad:</strong> ${axisNav.prodDesc}</p>
-                        <p>• <strong>Manejo Emocional:</strong> ${axisNav.emoDesc}</p>
-                        <p>• <strong>Relaciones Interpersonales:</strong> ${axisNav.relDesc}</p>
-                    </div>
-                </div>
-
-                <!-- FORTALEZAS Y OPORTUNIDADES GLOBALES -->
-                <div class="space-y-3 text-xs">
-                    <h3 class="font-bold uppercase tracking-wider text-slate-700">Análisis General de Fortalezas y Oportunidades</h3>
-                    <div class="p-4 border border-slate-200 rounded-xl space-y-2 bg-white">
-                        <p>• <strong>Fortalezas Generales:</strong> ${swot.fortalezas}</p>
-                        <p>• <strong>Oportunidades de Crecimiento:</strong> ${swot.oportunidades}</p>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('preview-modal').style.display = 'flex';
+            scores.sort((a, b) => b.score - a.score);
+            return scores;
         }
-
-        function closeModal() {
-            document.getElementById('preview-modal').style.display = 'none';
-        }
-
-        // GENERACIÓN DEL PDF COMPLETO (INCLUYENDO LA TABLA DE LOS 8 RASGOS CUALITATIVOS)
-        function generatePDFForRecord(index) {
-            const record = dbRecords[index];
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-
-            function cleanAreaName(rawName) {
-                if (!rawName) return "";
-                return rawName.replace(/\s*\(\d+\%\)/g, "").trim();
-            }
-
-            let perfil = {};
-            try {
-                const rawPerfil = record.perfil || record['Perfil Resumen'];
-                perfil = typeof rawPerfil === 'string' ? JSON.parse(rawPerfil) : rawPerfil;
-            } catch (e) { perfil = {}; }
-
-            const nombres = record.nombres || record.Nombres || '';
-            const apellidos = record.apellidos || record.Apellidos || '';
-            const id = record.identificacion || record.Identificacion || 'N/A';
-            const edad = record.edad || record.Edad || 'N/A';
-            const correo = record.correo || record.Correo || 'N/A';
-
-            const rawTop1 = record.top1 || record['Top 1 Area'] || 'N/A';
-            const rawTop2 = record.top2 || record['Top 2 Area'] || 'N/A';
-            const rawTop3 = record.top3 || record['Top 3 Area'] || 'N/A';
-
-            const cleanTop1 = cleanAreaName(rawTop1);
-            const cleanTop2 = cleanAreaName(rawTop2);
-            const cleanTop3 = cleanAreaName(rawTop3);
-
-            const pType = derivePersonalityType(perfil);
-            const sOrient = deriveServiceOrientation(perfil);
-            const axisNav = generateAxisNarrative(perfil);
-            const swot = generateGeneralSWOT(perfil);
-
-            // ENCABEZADO
-            doc.setFillColor(0, 0, 0);
-            doc.rect(0, 0, 210, 20, 'F');
-            doc.setTextColor(255, 255, 255);
-            doc.setFontSize(13);
-            doc.setFont("helvetica", "bold");
-            doc.text("IGLECO - PERFILAMIENTO PSICOMÉTRICO Y MINISTERIAL", 14, 13);
-
-            // DATOS PERSONALES
-            doc.setTextColor(0, 0, 0);
-            doc.setFontSize(11);
-            doc.text("INFORMACIÓN DEL EVALUADO", 14, 28);
-            
-            doc.setFontSize(9);
-            doc.setFont("helvetica", "normal");
-            doc.text(`Nombre Completo: ${nombres} ${apellidos}`, 14, 34);
-            doc.text(`Identificación: ${id}`, 14, 40);
-            doc.text(`Edad: ${edad} años`, 14, 46);
-            doc.text(`Correo Electrónico: ${correo}`, 14, 52);
-
-            // ARQUETIPO DE PERSONALIDAD (16 TIPOS)
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("PERFILAMIENTO DE PERSONALIDAD (SISTEMA DE 16 TIPOS)", 14, 62);
-
-            doc.autoTable({
-                startY: 65,
-                head: [['Arquetipo Deducido', 'Descripción del Perfil de Personalidad']],
-                body: [[ `${pType.code} - ${pType.nombre}`, pType.desc ]],
-                theme: 'striped',
-                headStyles: { fillColor: [0, 0, 0] },
-                columnStyles: { 0: { cellWidth: 50 }, 1: { cellWidth: 130 } }
-            });
-
-            // ÁREAS RECOMENDADAS
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(11);
-            doc.text("ÁREAS DE SERVICIO SUGERIDAS Y PROPÓSITO", 14, doc.lastAutoTable.finalY + 10);
-
-            const areasBody = [
-                ['Área Principal (Top 1)', rawTop1, DEFINICIONES_AREAS[cleanTop1] || "Acompañamiento e integración comunitaria."],
-                ['Área Secundaria (Top 2)', rawTop2, DEFINICIONES_AREAS[cleanTop2] || "Soporte colaborativo en procesos operativos."],
-                ['Área Alternativa (Top 3)', rawTop3, DEFINICIONES_AREAS[cleanTop3] || "Opción complementaria de servicio."]
-            ];
-
-            doc.autoTable({
-                startY: doc.lastAutoTable.finalY + 14,
-                head: [['Prioridad', 'Área Recomendada', 'Propósito']],
-                body: areasBody,
-                theme: 'striped',
-                headStyles: { fillColor: [0, 0, 0] },
-                columnStyles: { 0: { cellWidth: 46 },
+    </script>
+</body>
+</html>
