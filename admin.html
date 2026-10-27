@@ -54,7 +54,7 @@
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-200 pb-4">
                     <div>
                         <h2 class="text-2xl font-bold text-slate-900">Consulta de Evaluados</h2>
-                        <p class="text-sm text-slate-500">Busque por identificación o nombres para visualizar en pantalla o descargar el informe en PDF.</p>
+                        <p class="text-sm text-slate-500">Busque por identificación o nombres para visualizar en pantalla o descargar el informe cualitativo individual en PDF.</p>
                     </div>
                     <button onclick="loadRecords()" type="button" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg border border-slate-300 transition flex items-center gap-1 cursor-pointer">
                         🔄 Sincronizar Datos
@@ -90,7 +90,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIuqJ7f3v20mmdThj1Ia8A6el4RrJ_KM-Le8CbD826l_1s2x2yooDNDMrya98K0v_kqA/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3jCdQhXobfC7RMKPJIxgQXKzeXLyUMeuU8VOQQr25G_QRqaJ-pTCF3Cf0rb9S8PZObQ/exec";
         let dbRecords = [];
 
         function executeLogin() {
@@ -148,6 +148,50 @@
             "Traductores": "Interpretación simultánea en lengua de señas u otros idiomas durante las reuniones.",
             "Comunicaciones y Redes": "Diseño gráfico, fotografía y gestión de medios digitales/redes sociales.",
             "Medios e Infraestructura": "Mantenimiento físico, montaje de escenarios y gestión de espacios de reunión."
+        };
+
+        // BANCO DE OBSERVACIONES CUALITATIVAS PROFUNDAS POR RASGO
+        const OBSERVACIONES = {
+            "Destreza Social": {
+                alto: "Muestra fluidez superior y soltura espontánea para iniciar vínculos e integrarse a diversos entornos. Genera confianza inmediata y facilita la cohesión en grupos heterogéneos.\n• Entorno Ideal: Vocería, recepción de nuevos asistentes, relaciones públicas o consolidación comunitaria.\n• Orientación Pastoral: Asignar responsabilidades de conexión e integración, velando por que mantenga la profundización en la relación tras el primer contacto.",
+                medio: "Demuestra competencias comunicativas sólidas y funcionales. Se relaciona con efectividad en entornos conocidos y se adapta paulatinamente a nuevos grupos con adecuada diplomacia.\n• Entorno Ideal: Integración en equipos ministeriales permanentes, labores colaborativas y atención en mesa.\n• Orientación Pastoral: Brindar espacios donde pueda ampliar progresivamente su red de contactos y asumir roles moderados de acogida.",
+                bajo: "Prefiere interacciones selectivas, círculos pequeños o roles enfocados en tareas específicas de baja exposición pública. Valora la privacidad y las conversaciones de contenido estructurado.\n• Entorno Ideal: Trabajo analítico, soporte operativo interno, logística técnica o tareas de concentración individual.\n• Orientación Pastoral: Respetar su ritmo social, asignando funciones claras sin forzar escenarios de sobreexposición mediática o pública."
+            },
+            "Sensibilidad Social": {
+                alto: "Evidencia alta empatía, ternura espiritual y discernimiento activo ante el dolor o necesidad ajena. Percibe detalles emocionales imperceptibles para otros y actúa con compasión oportuna.\n• Entorno Ideal: Consejería, consolación, cuidado de enfermos, visitas pastorales o intercesión de soporte.\n• Orientación Pastoral: Enseñar el establecimiento de límites saludables para proteger su estabilidad emocional y prevenir el agotamiento ministerial.",
+                medio: "Equilibra la calidez humana y la compasión con la objetividad operativa. Demuestra interés real por el bienestar del prójimo sin perder el enfoque en las metas encomendadas.\n• Entorno Ideal: Acompañamiento grupal, mentoría de alumnos, logística de atención a invitados y servidores.\n• Orientación Pastoral: Fomentar su participación en espacios de escucha activa donde su criterio equilibrado aporte sabiduría.",
+                bajo: "Presenta una perspectiva predominantemente lógica, pragmática y centrada en resultados medibles. Puede percibir las demandas emocionales complejas como factores distractores de la tarea.\n• Entorno Ideal: Administración, control de procesos, auditoría interna, seguridad o infraestructura física.\n• Orientación Pastoral: Brindar pautas y protocolos claros sobre la importancia del cuidado humano en los procesos administrativos que lidera."
+            },
+            "Adaptabilidad": {
+                alto: "Destaca por su ecuanimidad y resiliencia ante contingencias, imprevistos o reestructuraciones de último momento. Conserva la calma y reorganiza recursos con naturalidad sin perder la efectividad.\n• Entorno Ideal: Coordinación de eventos en vivo, producción de servicios, resolución de crisis o misiones de avanzada.\n• Orientación Pastoral: Aprovechar su flexibilidad para gestionar imprevistos operacionales transmitiendo paz al equipo.",
+                medio: "Responde con flexibilidad y madurez ante cambios organizacionales, siempre que cuente con explicaciones de contexto razonables o un tiempo mínimo de asimilación.\n• Entorno Ideal: Equipos operativos estables, programas continuos con adaptaciones estacionales y soporte docente.\n• Orientación Pastoral: Mantener una comunicación transparente sobre cambios futuros para maximizar su compromiso y rendimiento.",
+                bajo: "Requiere estabilidad, previsibilidad y procesos claramente definidos. Experimenta incomodidad frente a la improvisación o alteraciones abruptas en las reglas acordadas.\n• Entorno Ideal: Procesos estandarizados, manuales de procedimiento, archivo, planificación previa e inventarios.\n• Orientación Pastoral: Entregar instrucciones precisas, cronogramas detallados y evitar modificaciones intempestivas en sus asignaciones."
+            },
+            "Recursividad": {
+                alto: "Sobresale por su mentalidad innovadora e ingenio práctico. Encuentra alternativas eficientes frente a bloqueos complejos o limitaciones severas de recursos físicos o presupuestales.\n• Entorno Ideal: Innovación de proyectos, diseño de estrategias, arte, resolución de cuellos de botella y arranque de obras.\n• Orientación Pastoral: Canalizar su creatividad dentro del marco doctrinal e institutional, validando previamente sus propuestas antes de ejecutarlas.",
+                medio: "Demuestra capacidad de resolver inconvenientes habituales de forma práctica y efectiva. Utiliza con criterio los recursos asignados sin atascarse ante imprevistos menores.\n• Entorno Ideal: Mantenimiento operativo, coordinación logística intermedia y facilitación de recursos en talleres.\n• Orientación Pastoral: Estimular su autoconfianza para que plantee soluciones propias antes de escalar dudas sencillas a la directiva.",
+                bajo: "Prefiere apegarse a instructivos, métodos validados y directrices preestablecidas. Busca la confirmación de la autoridad antes de intentar vías no probadas.\n• Entorno Ideal: Tareas repetitivas de alta precisión, ejecución de guiones técnicos, soporte de seguridad y control.\n• Orientación Pastoral: Suministrar procedimientos paso a paso y brindar acompañamiento cercano cuando enfrente escenarios novedosos."
+            },
+            "Persuasión": {
+                alto: "Posee liderazgo inspirador, elocuencia y soltura argumentativa para motivar, movilizar y transformar posturas en grupos. Comunica la visión con entusiasmo contagioso.\n• Entorno Ideal: Capacitación, predicación, dirección de equipos, reclutamiento de voluntarios y campañas de alcance.\n• Orientación Pastoral: Formar en humildad y escucha activa para asegurar que su capacidad de influencia sirva a la edificación colectiva.",
+                medio: "Comunica ideas con claridad, coherencia y convicción personal. Logra influir positivamente en su entorno cercano desde el testimonio, la lógica y el trato respetuoso.\n• Entorno Ideal: Liderazgo de pequeñas células, enseñanza grupal, coordinación de comités específicos y mentoría.\n• Orientación Pastoral: Impulsar su desarrollo expositivo asignándole la vocería de proyectos progresivamente más amplios.",
+                bajo: "Siente mayor comodidad en roles de apoyo ejecutivo, trabajo silencioso de soporte o ejecución metodológica sin exposición directiva o discursiva pública.\n• Entorno Ideal: Soporte tras bambalinas, edición, montaje, logística interna, custodia y mantenimiento.\n• Orientación Pastoral: Valorar públicamente su fiel labor de soporte sin presionarlo para asumir roles expositivos que generen ansiedad."
+            },
+            "Perseverancia": {
+                alto: "Evidencia tenacidad, disciplina inquebrantable y alto nivel de compromiso. Mantiene el foco en metas de largo alcance superando la monotonía o la resistencia del entorno.\n• Entorno Ideal: Proyectos estratégicos de larga duración, construcción de sedes, consolidación de procesos y discipulado continuo.\n• Orientación Pastoral: Monitorear sus cargas de trabajo para evitar el sobreagotamiento derivado de su propia autoexigencia.",
+                medio: "Mantiene constancia y responsabilidad continua en sus responsabilidades asignadas. Concluye de manera confiable las metas a mediano plazo en los tiempos previstos.\n• Entorno Ideal: Programas trimestrales o semestrales, docencia periódica, turnos rotativos de servicio y gestión de aulas.\n• Orientación Pastoral: Establecer hitos de verificación parciales que mantengan su dinamismo a lo largo de ciclos extendidos.",
+                bajo: "Fluctúa en su nivel de entrega cuando las tareas se vuelven rutinarias o exigen plazos largos. Rinde mejor con incentivos de corto alcance y tareas dinámicas de rápida resolución.\n• Entorno Ideal: Tareas por objetivos inmediatos, eventos de un solo día, comisiones temporales de trabajo y brigadas puntuales.\n• Orientación Pastoral: Dividir los proyectos grandes en metas semanales y brindar mentoría frecuente para fortalecer la autodisciplina."
+            },
+            "Tolerancia": {
+                alto: "Manifiesta notable paciencia, serenidad y apertura para escuchar y conciliar puntos de vista diversos o encontrados. Promueve la cultura de paz y armonía en contextos complejos.\n• Entorno Ideal: Mediación de conflictos, atención a personas difíciles, recepción de quejas/sugerencias y arbitraje.\n• Orientación Pastoral: Guardar que su elevada transigencia no comprometa la firmeza necesaria al corregir conductas o aplicar normas.",
+                medio: "Mantiene un trato respetuoso, educado y tolerante frente a las diferencias individuales. Colabora en armonía y tolera adecuadamente la frustración laboral diaria.\n• Entorno Ideal: Trabajo en equipos multidisciplinarios, comités de servicio comunitario y atención al público general.\n• Orientación Pastoral: Reforzar sus habilidades de comunicación asertiva para que exprese sus desacuerdos constructivamente.",
+                bajo: "Presenta posturas firmes, rígidas o altamente normativas. Valora el cumplimiento estricto del deber y puede mostrar impaciencia ante la ineficiencia o el incumplimiento ajeno.\n• Entorno Ideal: Aplicación de reglamentos, auditoría de estándares de calidad, seguridad física e inspección operativa.\n• Orientación Pastoral: Disponerlo en entornos donde primen la norma y el orden, aconsejando gracia y templanza en su trato interpersonal."
+            },
+            "Vitalidad": {
+                alto: "Refleja energía contagiante, vigor físico y dinamismo para responder en escenarios de ritmo acelerado y alta exigencia operativa. Transmite entusiasmo al equipo.\n• Entorno Ideal: Ministerio juvenil, recreación infantil (PowerKids/Kids), montajes pesados, campamentos y evangelismo masivo.\n• Orientación Pastoral: Encauzar su abundante energía hacia metas organizadas para evitar la dispersión o el cansancio prematuro.",
+                medio: "Despliega un ritmo de trabajo activo, regular y sostenido. Mantiene un equilibrio saludable entre el esfuerzo físico y la pausa necesaria para el rendimiento constante.\n• Entorno Ideal: Protocolo de servicio regular, logística de reuniones, monitoreo de clases y trabajo de oficina.\n• Orientación Pastoral: Proporcionar roles con exigencia física razonable que le permitan mantener un desempeño constante sin desgaste.",
+                bajo: "Sobresale en labores reflexivas, analíticas, de concentración o de baja demanda física. Aporta calma, profundidad de análisis y meticulosidad al proceso.\n• Entorno Ideal: Intercesión, revisión de documentos, diseño, edición de textos, llamadas de seguimiento y planeación estratégica.\n• Orientación Pastoral: Asignarle entornos de trabajo cómodos y pausados donde su capacidad de concentración sea el factor diferenciador."
+            }
         };
 
         async function loadRecords() {
@@ -338,7 +382,7 @@
             return { fortalezas, oportunidades };
         }
 
-        // MOSTRAR RESULTADOS EN PANTALLA (MODAL)
+        // MOSTRAR RESULTADOS EN PANTALLA (MODAL COMPLETO)
         function viewInScreen(index) {
             const record = dbRecords[index];
             let perfil = {};
@@ -362,10 +406,45 @@
             const axisNav = generateAxisNarrative(perfil);
             const swot = generateGeneralSWOT(perfil);
 
+            // RENDERIZADO DE LOS 8 RASGOS DETALLADOS PARA EL MODAL EN PANTALLA
+            const sortedTraits = Object.keys(perfil).sort((a, b) => perfil[b] - perfil[a]);
+            let traitsCardsHTML = "";
+            sortedTraits.forEach(trait => {
+                const score = perfil[trait] || 50;
+                let badge = "DESARROLLADO";
+                let badgeColor = "bg-blue-100 text-blue-800 border-blue-200";
+                let levelKey = "medio";
+
+                if (score >= 75) {
+                    badge = "SOBRESALIENTE";
+                    badgeColor = "bg-emerald-100 text-emerald-800 border-emerald-200";
+                    levelKey = "alto";
+                } else if (score < 50) {
+                    badge = "EN DESARROLLO";
+                    badgeColor = "bg-amber-100 text-amber-800 border-amber-200";
+                    levelKey = "bajo";
+                }
+
+                const obs = OBSERVACIONES[trait] ? OBSERVACIONES[trait][levelKey] : "Desempeño adecuado.";
+
+                traitsCardsHTML += `
+                    <div class="p-4 border border-slate-200 rounded-xl bg-slate-50/50 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-slate-900 text-sm">${trait}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-bold text-slate-700 font-mono">${score}%</span>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeColor}">${badge}</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-600 whitespace-pre-line leading-relaxed">${obs}</p>
+                    </div>
+                `;
+            });
+
             const content = document.getElementById('modal-content');
             content.innerHTML = `
                 <div class="border-b border-slate-200 pb-4">
-                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Informe Cualitativo de Evaluación</span>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Informe Cualitativo Completo</span>
                     <h2 class="text-2xl font-black text-slate-900">${nombres} ${apellidos}</h2>
                     <p class="text-xs text-slate-500 mt-1">ID: ${id} | Edad: ${edad} años | Correo: ${correo}</p>
                 </div>
@@ -390,6 +469,14 @@
                         <div class="p-3 border border-slate-200 rounded-lg bg-slate-50">
                             <span class="font-bold text-slate-700">3. ${rawTop3}</span>
                         </div>
+                    </div>
+                </div>
+
+                <!-- DIAGNÓSTICO CUALITATIVO PROFUNDO POR CATEGORÍA (8 RASGOS) -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800">Diagnóstico Cualitativo Profundo por Categoría</h3>
+                    <div class="space-y-3">
+                        ${traitsCardsHTML}
                     </div>
                 </div>
 
@@ -427,7 +514,7 @@
             document.getElementById('preview-modal').style.display = 'none';
         }
 
-        // GENERACIÓN DEL PDF ESTRUCTURADO Y COMPLETO
+        // GENERACIÓN DEL PDF COMPLETO (INCLUYENDO LA TABLA DE LOS 8 RASGOS CUALITATIVOS)
         function generatePDFForRecord(index) {
             const record = dbRecords[index];
             const { jsPDF } = window.jspdf;
@@ -490,7 +577,7 @@
 
             doc.autoTable({
                 startY: 65,
-                head: [['Arquetipo Deduce', 'Descripción del Perfil de Personalidad']],
+                head: [['Arquetipo Deducido', 'Descripción del Perfil de Personalidad']],
                 body: [[ `${pType.code} - ${pType.nombre}`, pType.desc ]],
                 theme: 'striped',
                 headStyles: { fillColor: [0, 0, 0] },
@@ -515,6 +602,44 @@
                 theme: 'striped',
                 headStyles: { fillColor: [0, 0, 0] },
                 columnStyles: { 0: { cellWidth: 46 }, 1: { cellWidth: 44 }, 2: { cellWidth: 90 } }
+            });
+
+            // DIAGNÓSTICO CUALITATIVO PROFUNDO POR CATEGORÍA (8 RASGOS INDIVIDUALES RESTAURADOS)
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(11);
+            doc.text("DIAGNÓSTICO CUALITATIVO PROFUNDO POR CATEGORÍA", 14, doc.lastAutoTable.finalY + 10);
+
+            const sortedTraits = Object.keys(perfil).sort((a, b) => perfil[b] - perfil[a]);
+
+            const traitRows = sortedTraits.map(trait => {
+                const score = perfil[trait] || 50;
+                let nivelKey = "medio";
+                let badge = "DESARROLLADO";
+                
+                if (score >= 75) {
+                    nivelKey = "alto";
+                    badge = "SOBRESALIENTE";
+                } else if (score < 50) {
+                    nivelKey = "bajo";
+                    badge = "EN DESARROLLO";
+                }
+
+                const obsObj = OBSERVACIONES[trait] || {
+                    alto: "Desempeño sobresaliente en la categoría.",
+                    medio: "Desempeño adecuado y funcional.",
+                    bajo: "Área con oportunidad de crecimiento."
+                };
+
+                return [trait, `${score}%\n[ ${badge} ]`, obsObj[nivelKey]];
+            });
+
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 14,
+                head: [['Rasgo Evaluado', 'Puntaje / Nivel', 'Perfilamiento Cualitativo Profundo / Observación']],
+                body: traitRows.length > 0 ? traitRows : [['N/A', 'N/A', 'Sin datos disponibles']],
+                theme: 'grid',
+                headStyles: { fillColor: [0, 0, 0] },
+                columnStyles: { 0: { cellWidth: 36 }, 1: { cellWidth: 38 }, 2: { cellWidth: 106 } }
             });
 
             // ORIENTACIÓN PRÁCTICA AL SERVICIO
